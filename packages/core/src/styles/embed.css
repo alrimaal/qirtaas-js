@@ -1,0 +1,215 @@
+/* Embedded-editor stylesheet. Ships the Tailwind utilities + design tokens +
+   font the editor needs, WITHOUT Tailwind's global preflight — the embed must
+   never restyle the host page. The editor's prose/structural styles live in
+   component <style> blocks and travel with the components.
+
+   Everything is placed in the `qirtaas` cascade layer so a host page's own
+   (unlayered) CSS always wins on collisions. */
+/* `primevue` holds PrimeVue's runtime-injected component styles (see
+   embedThemeOptions); ordered last so it beats our utilities, but still loses to
+   the host's unlayered CSS. */
+@layer qirtaas-reset, theme, qirtaas, primevue;
+
+/* Tailwind theme vars + utilities, but NOT preflight. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(qirtaas);
+
+/* PrimeIcons (.pi-* classes + font) is imported as a side-effect in index.ts,
+   not via @import here: a JS import lets Vite resolve its relative font url()s
+   and inline them into the built stylesheet, so the icons survive CSS injection
+   on a host page. */
+
+/* Scan the editor + embed shell for class usage. */
+@source "../editor";
+@source "../components";
+
+/* Quran Foundation's QPC Hafs glyph font (must stay global — @font-face can't
+   be scoped). Renders only with text_qpc_hafs strings from the quran.com API. */
+@font-face {
+  font-family: "Uthmanic Hafs";
+  src: url("https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2")
+    format("woff2");
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-quran: "Uthmanic Hafs", serif;
+  --font-quran-uthmani: "Geeza Pro", "Scheherazade New", serif;
+  --color-primary: #5d1d3d;
+  --color-accent: #410322;
+  --color-accent-hover: #edc5d9;
+  --color-bg: #ffffff;
+  --color-bg-soft: #f8fafc;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-on-accent: #ffffff;
+  --color-border: #e2e8f0;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+  --color-error-text: #b91c1c;
+  --color-hadith-text: #14532d;
+  --shadow-card-hover: 0 4px 24px rgba(93, 29, 61, 0.08);
+}
+
+/* Scoped reset — re-establishes a clean baseline INSIDE every Qirtaas root so
+   the host page's inherited typography/box-sizing and bare-element rules don't
+   bleed in. We dropped Tailwind's global preflight (it must never touch the
+   host); this is its scoped replacement.
+
+   Deliberately UNLAYERED (not in `qirtaas`): a host's CSS is almost always
+   unlayered, and for normal declarations unlayered always beats layered — so a
+   reset buried in our layer would lose to the host every time. Unlayered keeps
+   us on equal footing, decided by specificity, while the `.qirtaas-scope`
+   prefix guarantees we still only ever style our own subtree.
+
+   Defends against inheritance (font/color/line-height…) and low-specificity
+   element rules (`* {}`, `h1 {}`). It does NOT defend against a host that puts
+   `!important` on bare element selectors (e.g. `button { …!important }`) — that
+   is a documented residual; only shadow DOM (rejected: it breaks ProseMirror
+   selection) would fully isolate. */
+.qirtaas-scope,
+.qirtaas-scope *,
+.qirtaas-scope *::before,
+.qirtaas-scope *::after {
+  box-sizing: border-box;
+}
+
+.qirtaas-scope {
+  /* Break inheritance from the host's <body>/<html>. Descendants inherit these
+     from here unless an editor utility/component style overrides them, so this
+     does NOT clobber e.g. the Quran font utilities. */
+  font-family: var(--font-sans) !important;
+  font-size: 16px;
+  line-height: 1.5 !important;
+  color: var(--color-ink);
+  text-align: start;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-transform: none !important;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-indent: 0;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Host rules that target bare elements (e.g. `h1,p { text-transform: … }`)
+   reach our descendants directly, beating root inheritance. `:where()` keeps
+   our specificity at the `.qirtaas-scope` class so genuine editor styles still
+   win, while still out-ranking the host's element selectors. */
+.qirtaas-scope :where(h1, h2, h3, h4, h5, h6, p, span, div, li, td, th, a, label, blockquote, figcaption) {
+  text-transform: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+}
+
+/* Form controls don't inherit typography by default — pull it back in, and
+   strip host overrides so PrimeVue's own styling shows through. `font: inherit`
+   does NOT cover text-transform/letter-spacing/word-spacing, and a host's bare
+   `input { text-transform: uppercase }` beats root inheritance, so reset those
+   explicitly (this is what was upper-casing the search dialog input). */
+.qirtaas-scope :where(button, input, select, textarea, optgroup) {
+  font: inherit;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-transform: none;
+  color: inherit;
+}
+
+/* Native UA control-chrome reset — the other half of dropped preflight. Without
+   it a bare <button> (e.g. the Quran verse node wrapper) or <input> shows the
+   browser's default border + grey background. Kept in a LOW-priority layer
+   (ordered before theme/qirtaas above) on purpose: it beats the UA stylesheet
+   so the native chrome is gone, but LOSES to utilities and to PrimeVue's own
+   (unlayered) styles — so `border`/`bg-*` classes and PrimeVue components still
+   render normally. Unlayering this (like the typography reset) would instead
+   override the `border` utility and wipe every editor border. */
+@layer qirtaas-reset {
+  /* `:not(.p-component)` spares PrimeVue components: they ship their own
+     border/background and carry `p-component`. Without this, a host that puts
+     its shared PrimeVue in a CSS layer (the @qirtaas/vue embed inherits the
+     host's instance) can let this reset out-rank PrimeVue's styles — wiping the
+     InputText border and turning filled (e.g. primary) Buttons transparent. The
+     reset still hits the editor's bare elements (Quran verse wrapper, etc.). */
+  .qirtaas-scope *:not(.p-component),
+  .qirtaas-scope ::before,
+  .qirtaas-scope ::after {
+    /* width 0 + solid: kills the native border; a `border` utility re-adds width */
+    border: 0 solid;
+  }
+  .qirtaas-scope :where(button, input, optgroup, select, textarea):not(.p-component) {
+    background-color: transparent;
+    background-image: none;
+  }
+  .qirtaas-scope :where(button, [type="button"], [type="reset"], [type="submit"]) {
+    cursor: pointer;
+  }
+}
+
+/* Toolbar popovers (Insert/Heading/Align/Highlight/Link) render into the
+   body-level overlay root. PrimeVue assigns them the `overlay` z-index tier
+   (~1000), which sits BELOW a host modal Dialog (`modal` tier, ~1100). So when
+   the embed is mounted inside the host's dialog (e.g. CaaS's note editor) the
+   popovers open but are occluded behind it. Lift them above the host modal
+   layer. `!important` is required: PrimeVue writes the z-index inline.
+   Dialogs (Quran/Hadith search) use the modal tier and already stack correctly,
+   so they're intentionally left alone. */
+@layer qirtaas {
+  .qirtaas-overlay-root .p-popover {
+    z-index: 2000 !important;
+  }
+}
+
+/* The toolbar's PrimeVue Popover panels render into the body-level overlay root.
+   Their panel chrome is PrimeVue's (`--p-popover-*`), which doesn't resolve in
+   the shared-host embed there, so the panel paints transparent. Paint it from
+   our own tokens instead (the same `--color-bg` the bubble menu uses, which IS
+   declared on the overlay root). Unlayered so it beats the host's `primevue`
+   cascade-layer rule whose token is unresolved. */
+.qirtaas-overlay-root .p-popover {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+}
+
+/* Embed dark mode keys on .qirtaas-dark (host owns theme via options.theme).
+   The SPA keeps its own .dark-mode rules in apps/web/src/assets/main.css. */
+@layer qirtaas {
+  .qirtaas-dark {
+    --color-primary: #ce6499;
+    --color-accent: #edc5d9;
+    --color-accent-hover: #edc5d9;
+    --color-bg: #111111;
+    --color-bg-soft: #1c1c24;
+    --color-ink: #e2e8f0;
+    --color-muted: #dfe6ec;
+    --color-on-accent: #ffffff;
+    --color-border: #b0b0b0;
+    --color-error-bg: #872c38;
+    --color-error-border: #912121;
+    --color-error-text: #fca5a5;
+    --color-hadith-text: #86efac;
+    --shadow-card-hover: 0 4px 24px rgba(212, 132, 158, 0.15);
+  }
+
+  .qirtaas-dark .tiptap mark[data-color="#fef08a"] {
+    background-color: #ca8a04 !important;
+  }
+  .qirtaas-dark .tiptap mark[data-color="#bbf7d0"] {
+    background-color: #15803d !important;
+  }
+  .qirtaas-dark .tiptap mark[data-color="#bfdbfe"] {
+    background-color: #1d4ed8 !important;
+  }
+  .qirtaas-dark .tiptap mark[data-color="#fbcfe8"] {
+    background-color: #be185d !important;
+  }
+  .qirtaas-dark .tiptap mark[data-color="#fed7aa"] {
+    background-color: #c2410c !important;
+  }
+  .qirtaas-dark .tiptap mark[data-color="#e9d5ff"] {
+    background-color: #7e22ce !important;
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "qirtaas-js",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @qirtaas/core && npm run build -w @qirtaas/vue && npm run build -w @qirtaas/react"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

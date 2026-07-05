@@ -1,0 +1,62 @@
+{
+  "name": "@qirtaas/vue",
+  "version": "0.1.0",
+  "description": "Idiomatic Vue 3 components for the Qirtaas embeddable rich-text editor.",
+  "license": "MIT",
+  "author": "Alrimaal",
+  "homepage": "https://github.com/alrimaal/qirtaas-js/tree/main/packages/vue#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alrimaal/qirtaas-js.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/alrimaal/qirtaas-js/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "editor",
+    "rich-text",
+    "wysiwyg",
+    "tiptap",
+    "primevue",
+    "arabic",
+    "qirtaas"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/qirtaas-vue.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/qirtaas-vue.js"
+    },
+    "./qirtaas.css": "./dist/qirtaas.css"
+  },
+  "scripts": {
+    "build": "vite build",
+    "prepublishOnly": "vite build"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.0",
+    "primevue": "^4.0.0",
+    "@primeuix/themes": "^1.0.0"
+  },
+  "dependencies": {
+    "@qirtaas/core": "^0.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vue/language-core": "^3.2.5",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^5.0.3"
+  }
+}

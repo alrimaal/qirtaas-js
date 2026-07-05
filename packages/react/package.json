@@ -1,0 +1,57 @@
+{
+  "name": "@qirtaas/react",
+  "version": "0.1.0",
+  "description": "Idiomatic React components for the Qirtaas embeddable rich-text editor.",
+  "license": "MIT",
+  "author": "Alrimaal",
+  "homepage": "https://github.com/alrimaal/qirtaas-js/tree/main/packages/react#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alrimaal/qirtaas-js.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/alrimaal/qirtaas-js/issues"
+  },
+  "keywords": [
+    "react",
+    "editor",
+    "rich-text",
+    "wysiwyg",
+    "tiptap",
+    "arabic",
+    "qirtaas"
+  ],
+  "type": "module",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "module": "./dist/qirtaas-react.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/qirtaas-react.js"
+    },
+    "./qirtaas.css": "./dist/qirtaas.css"
+  },
+  "scripts": {
+    "build": "vite build",
+    "prepublishOnly": "vite build"
+  },
+  "dependencies": {
+    "@qirtaas/core": "^0.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.4",
+    "vite": "^7.3.1"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "name": "@qirtaas/core",
+  "version": "0.1.0",
+  "description": "Embeddable rich-text editor SDK for Islamic writings. Framework-agnostic mount API and CDN/UMD bundle.",
+  "license": "MIT",
+  "author": "Alrimaal",
+  "homepage": "https://github.com/alrimaal/qirtaas-js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alrimaal/qirtaas-js.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/alrimaal/qirtaas-js/issues"
+  },
+  "keywords": [
+    "editor",
+    "rich-text",
+    "wysiwyg",
+    "tiptap",
+    "arabic",
+    "rtl",
+    "quran",
+    "hadith",
+    "qirtaas",
+    "embed",
+    "sdk"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/qirtaas.umd.js",
+  "module": "./dist/qirtaas.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/qirtaas.js",
+      "require": "./dist/qirtaas.umd.js"
+    },
+    "./qirtaas.css": "./dist/qirtaas.css",
+    "./*.vue": "./src/*.vue",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "vite build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@primeuix/styled": "^0.7.4",
+    "@primeuix/themes": "^2.0.3",
+    "@sentry/vue": "^10.47.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@tiptap/core": "^3.20.4",
+    "@tiptap/extension-details": "^3.22.2",
+    "@tiptap/extension-emoji": "^3.20.5",
+    "@tiptap/extension-file-handler": "^3.23.1",
+    "@tiptap/extension-highlight": "^3.20.4",
+    "@tiptap/extension-link": "^3.20.4",
+    "@tiptap/extension-placeholder": "^3.20.4",
+    "@tiptap/extension-table": "^3.22.3",
+    "@tiptap/extension-text-align": "^3.20.4",
+    "@tiptap/extension-underline": "^3.20.4",
+    "@tiptap/pm": "^3.20.4",
+    "@tiptap/starter-kit": "^3.20.4",
+    "@tiptap/suggestion": "^3.20.4",
+    "@tiptap/vue-3": "^3.20.4",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vue/language-core": "^3.2.5",
+    "axios": "^1.13.6",
+    "dompurify": "^3.3.3",
+    "lucide-vue-next": "^1.0.0",
+    "moveable": "^0.53.0",
+    "postcss-prefix-selector": "^2.1.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.4",
+    "tippy.js": "^6.3.7",
+    "tiptap-text-direction": "^0.4.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^5.0.3",
+    "vue": "^3.5.29",
+    "vue-i18n": "^11.3.0"
+  }
+}
