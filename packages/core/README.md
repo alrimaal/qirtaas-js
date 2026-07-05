@@ -1,6 +1,6 @@
 # @qirtaas/core
 
-Framework-agnostic, embeddable rich-text editor SDK for Islamic scholarly
+Framework-agnostic, embeddable rich-text editor SDK for Islamic
 writing (Qur'an verses, hadith, RTL/Arabic typography). Ships a single bundle
 with a self-contained mount API and its own scoped styles, so it drops into any
 host page without leaking CSS or fighting the host's framework.
