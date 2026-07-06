@@ -63,6 +63,12 @@ export function createResizableImageNodeView(opts: Options): NodeViewRenderer {
     const mount = () => {
       if (moveable || !editor.isEditable) return;
       host = findHost();
+      // Moveable's control box is absolutely positioned inside the host; a
+      // static host would anchor it to an ancestor outside the scroller,
+      // offsetting the frame and letting it escape the editor's overflow clip.
+      if (getComputedStyle(host).position === "static") {
+        host.style.position = "relative";
+      }
       moveable = new Moveable(host, {
         target: img,
         resizable: true,

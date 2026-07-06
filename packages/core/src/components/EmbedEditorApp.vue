@@ -219,8 +219,9 @@ defineExpose({
       />
       <!-- The SDK owns the scroll: toolbar(s) stay pinned while only the editor
            scrolls. `data-editor-scroll` is the seam the resizable-image NodeView
-           looks up for its scroll container. -->
-      <div class="flex-1 min-h-0 min-w-0 overflow-y-auto" data-editor-scroll>
+           looks up for its scroll container; it must stay positioned (relative)
+           so Moveable's control box anchors and clips to the editor. -->
+      <div class="flex-1 min-h-0 min-w-0 overflow-y-auto relative" data-editor-scroll>
         <DocumentEditor
           ref="editorRef"
           :model-value="content"

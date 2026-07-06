@@ -128,17 +128,53 @@ function selectFirstImage(files: File[]): File | null {
   return file;
 }
 
+// Inserted images default to at most this wide (aspect ratio kept); anything
+// smaller keeps its natural size. Without it, large photos land at full
+// natural width and swamp the document.
+const DEFAULT_IMAGE_WIDTH = 480;
+
+let pendingImageDims: { width: number; height: number } | null = null;
+
+async function measureImage(file: File) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const dims = { width: bmp.width, height: bmp.height };
+    bmp.close();
+    return dims;
+  } catch {
+    return null;
+  }
+}
+
 function startImageUpload(file: File, pos: number | null) {
   pendingImagePos = pos;
   pendingImageFile.value = file;
+  // Decode in parallel with the upload; if it hasn't finished (or failed) by
+  // insert time we fall back to unsized attrs, i.e. the old behavior.
+  pendingImageDims = null;
+  void measureImage(file).then((dims) => {
+    if (pendingImageFile.value === file) pendingImageDims = dims;
+  });
   trackEvent("image_upload_started");
+}
+
+function defaultImageSize() {
+  if (!pendingImageDims) return { width: null, height: null };
+  const scale = Math.min(1, DEFAULT_IMAGE_WIDTH / pendingImageDims.width);
+  return {
+    width: Math.round(pendingImageDims.width * scale),
+    height: Math.round(pendingImageDims.height * scale),
+  };
 }
 
 function onImageUploaded(imageId: string) {
   const ed = editor.value;
   pendingImageFile.value = null;
   if (!ed) return;
-  const node = { type: "imageNode", attrs: { imageId, alt: "" } };
+  const node = {
+    type: "imageNode",
+    attrs: { imageId, alt: "", ...defaultImageSize() },
+  };
   if (pendingImagePos !== null) {
     const docSize = ed.state.doc.content.size;
     const pos = Math.min(Math.max(pendingImagePos, 0), docSize);
@@ -147,12 +183,14 @@ function onImageUploaded(imageId: string) {
     ed.chain().focus().insertContent(node).run();
   }
   pendingImagePos = null;
+  pendingImageDims = null;
   trackEvent("image_inserted");
 }
 
 function onImageUploadCancelled() {
   pendingImageFile.value = null;
   pendingImagePos = null;
+  pendingImageDims = null;
 }
 
 function insertImageFromInput(file: File) {
