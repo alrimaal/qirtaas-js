@@ -17,3 +17,44 @@ export const IsDarkKey: InjectionKey<Ref<boolean>> = Symbol(
 export function useIsDark(): Ref<boolean> {
   return inject(IsDarkKey, ref(false));
 }
+
+export interface DocumentLinkDocMeta {
+  id: string;
+  title: string;
+  updated_at?: string;
+}
+
+/**
+ * Host capabilities behind the page-link (documentLink) feature: listing and
+ * searching the user's documents, creating one, and navigating to one. Hosts
+ *  that can't (embed SDK, shared read-only view) simply don't provide it — the
+ * default disables the /page command, and existing chips render from their
+ * persisted label snapshot, non-clickable.
+ */
+export interface DocumentLinkHost {
+  enabled: boolean;
+  /** Reactive doc list; chips resolve live titles from it so renames
+   *  propagate without any extra fetch. */
+  documents: Ref<DocumentLinkDocMeta[]>;
+  searchDocuments(query: string): Promise<DocumentLinkDocMeta[]>;
+  createDocument(): Promise<DocumentLinkDocMeta>;
+  openDocument(id: string): void;
+}
+
+const DISABLED_DOCUMENT_LINK_HOST: DocumentLinkHost = {
+  enabled: false,
+  documents: ref([]),
+  searchDocuments: async () => [],
+  createDocument: () => {
+    throw new Error("documentLink host not provided");
+  },
+  openDocument: () => {},
+};
+
+export const DocumentLinkHostKey: InjectionKey<DocumentLinkHost> = Symbol(
+  "qirtaas.editor.documentLinkHost"
+);
+
+export function useDocumentLinkHost(): DocumentLinkHost {
+  return inject(DocumentLinkHostKey, DISABLED_DOCUMENT_LINK_HOST);
+}

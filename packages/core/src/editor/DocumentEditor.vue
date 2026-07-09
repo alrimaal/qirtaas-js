@@ -28,13 +28,19 @@ import {
 import { QuranVerse } from "./extensions/QuranVerse";
 import { QuranMushaf } from "./extensions/QuranMushaf";
 import { HadithNode } from "./extensions/HadithNode";
+import { DocumentLink } from "./extensions/DocumentLink";
 import { SlashCommand } from "./extensions/SlashCommand";
 import { Honorific } from "./extensions/Honorific";
 import { ImageNode } from "./extensions/ImageNode";
 import { FileHandler } from "@tiptap/extension-file-handler";
 import QuranSearchDialog from "./QuranSearchDialog.vue";
 import HadithSearchDialog from "./HadithSearchDialog.vue";
+import DocumentLinkPicker from "./DocumentLinkPicker.vue";
 import ImageUploadDialog from "./ImageUploadDialog.vue";
+import {
+  useDocumentLinkHost,
+  type DocumentLinkDocMeta,
+} from "./runtime/context";
 import { MAX_IMAGE_BYTES } from "@qirtaas/core/services/images";
 import { useI18n } from "vue-i18n";
 import TextDirection from "tiptap-text-direction";
@@ -69,7 +75,19 @@ const { t, locale } = useI18n();
 
 const quranDialogVisible = ref(false);
 const hadithDialogVisible = ref(false);
+const documentLinkPickerVisible = ref(false);
 const failedToLoad = ref(false);
+
+const documentLinkHost = useDocumentLinkHost();
+
+function insertDocumentLink(doc: DocumentLinkDocMeta) {
+  editor.value
+    ?.chain()
+    .focus()
+    .insertDocumentLink(doc.id, doc.title || t("editor.pageLink.untitled"))
+    .run();
+  trackEvent("document_link_inserted");
+}
 
 const pendingImageFile = ref<File | null>(null);
 let pendingImagePos: number | null = null;
@@ -257,6 +275,7 @@ const editor = useEditor({
     QuranVerse,
     QuranMushaf,
     HadithNode,
+    DocumentLink,
     Honorific,
     ImageNode.configure({
       documentId: props.documentId,
@@ -280,12 +299,16 @@ const editor = useEditor({
     }),
     SlashCommand.configure({
       locale: locale.value,
+      commandFilter: (id: string) =>
+        id !== "page" || documentLinkHost.enabled,
       onCommand: (commandId: string, editor: import("@tiptap/core").Editor) => {
         trackEvent("slash_command", { command: commandId });
         if (commandId === "quran") {
           quranDialogVisible.value = true;
         } else if (commandId === "hadith") {
           hadithDialogVisible.value = true;
+        } else if (commandId === "page") {
+          documentLinkPickerVisible.value = true;
         } else if (commandId === "jj" || commandId === "saw") {
           editor
             ?.chain()
@@ -581,6 +604,12 @@ function insertQuranMushaf(data: {
       <HadithSearchDialog
         v-model:visible="hadithDialogVisible"
         @insert="insertHadith"
+      />
+      <DocumentLinkPicker
+        v-if="documentLinkHost.enabled"
+        v-model:visible="documentLinkPickerVisible"
+        :exclude-id="props.documentId"
+        @select="insertDocumentLink"
       />
       <ImageUploadDialog
         :file="pendingImageFile"

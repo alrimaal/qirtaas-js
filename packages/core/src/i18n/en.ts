@@ -40,6 +40,15 @@ export default {
     hadith: {
       viewDetails: "Details",
     },
+    pageLink: {
+      pickerTitle: "Link to page",
+      searchPlaceholder: "Search pages...",
+      createNew: "Create new page",
+      noResults: "No pages found.",
+      untitled: "Untitled",
+      deleted: "This page was deleted",
+      createFailed: "Failed to create page.",
+    },
     findReplace: {
       title: "Find & Replace",
       findPlaceholder: "Search key",

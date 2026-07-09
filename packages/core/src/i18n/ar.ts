@@ -39,6 +39,15 @@ export default {
     hadith: {
       viewDetails: "التفاصيل",
     },
+    pageLink: {
+      pickerTitle: "ربط صفحة",
+      searchPlaceholder: "ابحث في الصفحات...",
+      createNew: "إنشاء صفحة جديدة",
+      noResults: "لم يتم العثور على صفحات.",
+      untitled: "بدون عنوان",
+      deleted: "هذه الصفحة محذوفة",
+      createFailed: "تعذر إنشاء الصفحة.",
+    },
     findReplace: {
       title: "بحث وتغيير",
       findPlaceholder: "كلمة البحث",

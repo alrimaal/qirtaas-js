@@ -26,6 +26,12 @@ const COMMAND_DEFS: CommandDef[] = [
   { id: "quran", labelEn: "Quran", labelAr: "قرآن", icon: "pi pi-book" },
   { id: "hadith", labelEn: "Hadith", labelAr: "حديث", icon: "pi pi-comment" },
   {
+    id: "page",
+    labelEn: "Link to page",
+    labelAr: "ربط صفحة",
+    icon: "pi pi-file",
+  },
+  {
     id: "jj",
     labelEn: "ﷻ Jalla Jalaaluhu",
     labelAr: "ﷻ جل جلاله",
@@ -39,9 +45,12 @@ const COMMAND_DEFS: CommandDef[] = [
   },
 ];
 
-function buildCommands(locale: string): SlashCommandItem[] {
+function buildCommands(
+  locale: string,
+  commandFilter: (id: string) => boolean
+): SlashCommandItem[] {
   const isAr = locale === "ar";
-  return COMMAND_DEFS.map((cmd) => ({
+  return COMMAND_DEFS.filter((cmd) => commandFilter(cmd.id)).map((cmd) => ({
     id: cmd.id,
     label: isAr ? cmd.labelAr : cmd.labelEn,
     searchTerms: [cmd.labelEn.toLowerCase(), cmd.labelAr],
@@ -55,6 +64,9 @@ export const SlashCommand = Extension.create({
   addOptions() {
     return {
       locale: "en" as string,
+      // Lets hosts drop commands whose backing capability is unavailable
+      // (e.g. /page when no document-link host is provided).
+      commandFilter: ((_id: string) => true) as (id: string) => boolean,
       onCommand: (
         _commandId: string,
         _editor?: import("@tiptap/core").Editor,
@@ -64,7 +76,7 @@ export const SlashCommand = Extension.create({
 
   addProseMirrorPlugins() {
     const onCommand = this.options.onCommand;
-    const commands = buildCommands(this.options.locale);
+    const commands = buildCommands(this.options.locale, this.options.commandFilter);
 
     return [
       Suggestion({
