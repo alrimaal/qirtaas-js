@@ -1,5 +1,16 @@
 # @qirtaas/vue
 
+## 0.3.0
+
+### Minor Changes
+
+- c395f36: Support document linking
+
+### Patch Changes
+
+- Updated dependencies [c395f36]
+  - @qirtaas/core@0.3.0
+
 ## 0.2.1
 
 ### Patch Changes

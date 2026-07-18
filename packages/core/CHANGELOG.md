@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.3.0
+
+### Minor Changes
+
+- c395f36: Support document linking
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@qirtaas/core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Embeddable rich-text editor SDK for Islamic writings. Framework-agnostic mount API and CDN/UMD bundle.",
   "license": "MIT",
   "author": "Alrimaal",
