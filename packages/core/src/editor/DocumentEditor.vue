@@ -299,8 +299,7 @@ const editor = useEditor({
     }),
     SlashCommand.configure({
       locale: locale.value,
-      commandFilter: (id: string) =>
-        id !== "page" || documentLinkHost.enabled,
+      commandFilter: (id: string) => id !== "page" || documentLinkHost.enabled,
       onCommand: (commandId: string, editor: import("@tiptap/core").Editor) => {
         trackEvent("slash_command", { command: commandId });
         if (commandId === "quran") {
@@ -367,7 +366,8 @@ defineExpose({
 function onAtomAction(nodeType: string, attrs: Record<string, unknown>) {
   if (nodeType === "quranVerse") {
     const surah = attrs.surah as number;
-    const fromAyah = (attrs.fromAyah as number | null) ?? (attrs.ayah as number);
+    const fromAyah =
+      (attrs.fromAyah as number | null) ?? (attrs.ayah as number);
     verseDetail.open(surah, fromAyah, locale.value);
   } else if (nodeType === "hadithNode") {
     hadithDetail.open(
@@ -438,9 +438,12 @@ function insertQuranVerse(data: {
   trackEvent("quran_inserted", {
     surah: data.surah,
     ayah: data.ayah,
-    range: data.fromAyah != null && data.toAyah != null && data.fromAyah !== data.toAyah
-      ? `${data.fromAyah}-${data.toAyah}`
-      : undefined,
+    range:
+      data.fromAyah != null &&
+      data.toAyah != null &&
+      data.fromAyah !== data.toAyah
+        ? `${data.fromAyah}-${data.toAyah}`
+        : undefined,
   });
   if (verseDetail.isOpen.value) {
     verseDetail.open(data.surah, data.fromAyah ?? data.ayah, locale.value);
@@ -753,6 +756,31 @@ function insertQuranMushaf(data: {
   list-style-type: disc;
   padding-inline-start: 1.5rem;
   margin: 0.5rem 0;
+}
+
+/* Direction-neutral glyphs so markers read correctly in RTL Arabic */
+.tiptap ul ul li::marker {
+  font-size: 0.5em;
+}
+
+.tiptap ul ul {
+  list-style-type: "◆    ";
+}
+
+.tiptap ul ul ul {
+  list-style-type: "▪    ";
+}
+
+.tiptap ul ul ul ul {
+  list-style-type: "○    ";
+}
+
+.tiptap ul ul ul ul ul {
+  list-style-type: "◇    ";
+}
+
+.tiptap ul ul ul ul ul ul {
+  list-style-type: "▫    ";
 }
 
 .tiptap ol {
