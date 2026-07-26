@@ -23,6 +23,7 @@ const emit = defineEmits<{
       fromWord: number | null;
       toWord: number | null;
       text: string;
+      displayMode: "inline" | "card";
     }
   ];
   expandToBrowser: [];
@@ -47,7 +48,7 @@ watch(
   }
 );
 
-function onInsert() {
+function onInsert(displayMode: "inline" | "card") {
   const sel = selection.value;
   if (!sel || !sel.complete) return;
   emit("insert", {
@@ -58,6 +59,7 @@ function onInsert() {
     fromWord: sel.isFull ? null : sel.fromWord,
     toWord: sel.isFull ? null : sel.toWord,
     text: sel.text,
+    displayMode,
   });
 }
 </script>
@@ -122,12 +124,21 @@ function onInsert() {
         @click="emit('back')"
       />
       <Button
-        :label="t('quran.insert')"
+        :label="t('quran.insertAsCard')"
+        icon="pi pi-id-card"
+        size="small"
+        severity="secondary"
+        outlined
+        :disabled="!selection?.complete"
+        @click="onInsert('card')"
+      />
+      <Button
+        :label="t('quran.insertInline')"
         icon="pi pi-check"
         size="small"
         class="!bg-primary !text-white hover:!opacity-90"
         :disabled="!selection?.complete"
-        @click="onInsert"
+        @click="onInsert('inline')"
       />
     </div>
   </div>

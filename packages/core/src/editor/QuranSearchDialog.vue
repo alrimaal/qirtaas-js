@@ -26,6 +26,7 @@ const emit = defineEmits<{
       surahNameArabic: string;
       surahNameEnglish: string;
       text: string;
+      displayMode: "inline" | "card";
     }
   ];
   insertMushaf: [
@@ -124,6 +125,7 @@ function onWordInsert(p: {
   fromWord: number | null;
   toWord: number | null;
   text: string;
+  displayMode: "inline" | "card";
 }) {
   emit("insert", {
     surah: p.surah,
@@ -135,6 +137,7 @@ function onWordInsert(p: {
     surahNameArabic: p.surahNameArabic,
     surahNameEnglish: p.surahNameEnglish,
     text: p.text,
+    displayMode: p.displayMode,
   });
   close();
 }
@@ -157,6 +160,7 @@ function onInlineInsert(p: {
     surahNameArabic: p.surahNameArabic,
     surahNameEnglish: p.surahNameEnglish,
     text: p.text,
+    displayMode: "inline",
   });
   close();
 }

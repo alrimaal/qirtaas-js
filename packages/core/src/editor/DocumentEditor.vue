@@ -426,13 +426,14 @@ function insertQuranVerse(data: {
   surahNameArabic: string;
   surahNameEnglish: string;
   text: string;
+  displayMode?: "inline" | "card";
 }) {
   editor.value
     ?.chain()
     .focus()
     .insertContent({
       type: "quranVerse",
-      attrs: { ...data, encoding: "qpc_hafs" },
+      attrs: { ...data, encoding: "qpc_hafs", displayMode: data.displayMode ?? "inline" },
     })
     .run();
   trackEvent("quran_inserted", {

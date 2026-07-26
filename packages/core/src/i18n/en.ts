@@ -126,6 +126,8 @@ export default {
     previewError: "Couldn't load verse text",
     insertText: "Insert text",
     insertMushafImage: "Insert mushaf image",
+    insertInline: "Insert inline",
+    insertAsCard: "Insert as card",
   },
   wordSelect: {
     tapEndWord: "Tap an end word to finish the range…",

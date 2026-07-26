@@ -16,11 +16,7 @@ export function formatReference(attrs: VerseRefAttrs): string {
   const from = attrs.fromAyah ?? attrs.ayah ?? 0;
   const to = attrs.toAyah ?? attrs.ayah ?? from;
   if (from === to) {
-    const slice =
-      attrs.fromWord != null && attrs.toWord != null
-        ? ` (${attrs.fromWord + 1}-${attrs.toWord + 1})`
-        : "";
-    return `${attrs.surahNameArabic} ${attrs.surah}:${from}${slice}`;
+    return `${attrs.surahNameArabic} ${attrs.surah}:${from}`;
   }
   return `${attrs.surahNameArabic} ${attrs.surah}:${from}-${to}`;
 }

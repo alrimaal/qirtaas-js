@@ -124,6 +124,8 @@ export default {
     previewError: "تعذر تحميل نص الآية",
     insertText: "إدراج النص",
     insertMushafImage: "إدراج صورة المصحف",
+    insertInline: "إدراج ضمن النص",
+    insertAsCard: "إدراج كبطاقة",
   },
   wordSelect: {
     tapEndWord: "اضغط كلمة النهاية لإكمال التحديد…",
