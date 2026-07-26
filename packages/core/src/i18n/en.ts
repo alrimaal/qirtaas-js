@@ -85,7 +85,7 @@ export default {
     searchError: "Search failed. Please try again.",
     selectionHint:
       "Tap any word to set the start, then tap another to set the end. Tap again to fine-tune.",
-    refineWords: "Partial verse",
+    refineWords: "Partial/Card",
     insert: "Insert",
     cancel: "Cancel",
     back: "Back",
@@ -139,6 +139,8 @@ export default {
     searchError: "Search failed. Please try again.",
     selectionHint: "Select part of the hadith or press Insert for all.",
     insert: "Insert",
+    insertInline: "Insert inline",
+    insertAsCard: "Insert as card",
   },
   hadithDetail: {
     ariaLabel: "Hadith details",
@@ -148,6 +150,7 @@ export default {
     book: "Book",
     grade: "Grade",
     translation: "Translation",
+    noTranslation: "No translation available.",
     error: "Failed to load hadith details.",
     retry: "Retry",
   },

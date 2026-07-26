@@ -28,6 +28,7 @@ const emit = defineEmits<{
       collectionNameEnglish: string;
       number: number | null;
       text: string;
+      displayMode: "inline" | "card";
     }
   ];
 }>();
@@ -136,7 +137,7 @@ function selectHadith(hadith: HadithResult) {
   selectedHadith.value = hadith;
 }
 
-function insertHadith() {
+function insertHadith(displayMode: "inline" | "card") {
   const hadith = selectedHadith.value;
   if (!hadith) return;
 
@@ -145,6 +146,7 @@ function insertHadith() {
     collectionNameEnglish: hadith.slug,
     number: hadith.number,
     text: selection.value?.text ?? hadithText.value,
+    displayMode,
   });
   close();
 }
@@ -257,16 +259,25 @@ function close() {
         {{ t("hadith.selectionHint") }}
       </p>
 
-      <div class="flex justify-end">
+      <div class="flex justify-end gap-2">
+        <Button
+          :label="t('hadith.insertAsCard')"
+          icon="pi pi-id-card"
+          size="small"
+          severity="secondary"
+          outlined
+          :disabled="!selection?.complete"
+          @click="insertHadith('card')"
+        />
         <Button
           ref="insertBtnEl"
-          :label="t('hadith.insert')"
+          :label="t('hadith.insertInline')"
           icon="pi pi-check"
           size="small"
           class="!bg-primary !text-white hover:!opacity-90"
           :disabled="!selection?.complete"
-          @click="insertHadith"
-          @keydown.enter.prevent="insertHadith"
+          @click="insertHadith('inline')"
+          @keydown.enter.prevent="insertHadith('inline')"
         />
       </div>
     </template>

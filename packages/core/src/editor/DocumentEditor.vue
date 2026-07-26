@@ -404,16 +404,29 @@ function insertHadith(data: {
   collectionNameEnglish: string;
   number: number | null;
   text: string;
+  displayMode?: "inline" | "card";
 }) {
+  const displayMode = data.displayMode ?? "inline";
   editor.value
     ?.chain()
     .focus()
     .insertContent({
       type: "hadithNode",
-      attrs: data,
+      attrs: {
+        ...data,
+        displayMode,
+        // Cards lead with the translation, so open the strip by default.
+        translationOpen: displayMode === "card",
+      },
     })
     .run();
   trackEvent("hadith_inserted", { collection: data.collectionNameEnglish });
+  // Additional card-specific event; inline inserts keep only the base event.
+  if (displayMode === "card") {
+    trackEvent("hadith_card_inserted", {
+      collection: data.collectionNameEnglish,
+    });
+  }
 }
 
 function insertQuranVerse(data: {
@@ -428,24 +441,40 @@ function insertQuranVerse(data: {
   text: string;
   displayMode?: "inline" | "card";
 }) {
+  const displayMode = data.displayMode ?? "inline";
   editor.value
     ?.chain()
     .focus()
     .insertContent({
       type: "quranVerse",
-      attrs: { ...data, encoding: "qpc_hafs", displayMode: data.displayMode ?? "inline" },
+      attrs: {
+        ...data,
+        encoding: "qpc_hafs",
+        displayMode,
+        // Cards lead with the translation, so open the strip by default.
+        translationOpen: displayMode === "card",
+      },
     })
     .run();
+  const range =
+    data.fromAyah != null &&
+    data.toAyah != null &&
+    data.fromAyah !== data.toAyah
+      ? `${data.fromAyah}-${data.toAyah}`
+      : undefined;
   trackEvent("quran_inserted", {
     surah: data.surah,
     ayah: data.ayah,
-    range:
-      data.fromAyah != null &&
-      data.toAyah != null &&
-      data.fromAyah !== data.toAyah
-        ? `${data.fromAyah}-${data.toAyah}`
-        : undefined,
+    range,
   });
+  // Additional card-specific event; inline inserts keep only the base event.
+  if (displayMode === "card") {
+    trackEvent("quran_verse_card_inserted", {
+      surah: data.surah,
+      ayah: data.ayah,
+      range,
+    });
+  }
   if (verseDetail.isOpen.value) {
     verseDetail.open(data.surah, data.fromAyah ?? data.ayah, locale.value);
   }

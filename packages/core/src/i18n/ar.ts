@@ -85,7 +85,7 @@ export default {
     searchError: "فشل البحث. يرجى المحاولة مرة أخرى.",
     selectionHint:
       "اضغط أي كلمة لتحديد البداية، ثم اضغط كلمة أخرى لتحديد النهاية. اضغط مرة أخرى للضبط.",
-    refineWords: "إدراج جزء من الآية",
+    refineWords: "جزئي/بطاقة",
     insert: "إدراج",
     cancel: "إلغاء",
     back: "رجوع",
@@ -137,6 +137,8 @@ export default {
     searchError: "فشل البحث. يرجى المحاولة مرة أخرى.",
     selectionHint: "حدد جزءًا من الحديث أو اضغط إدراج لإدراجه كاملًا.",
     insert: "إدراج",
+    insertInline: "إدراج ضمن النص",
+    insertAsCard: "إدراج كبطاقة",
   },
   hadithDetail: {
     ariaLabel: "تفاصيل الحديث",
@@ -146,6 +148,7 @@ export default {
     book: "الباب",
     grade: "الصحة",
     translation: "الترجمة",
+    noTranslation: "الترجمة غير متاحة",
     error: "تعذر تحميل تفاصيل الحديث.",
     retry: "إعادة المحاولة",
   },
