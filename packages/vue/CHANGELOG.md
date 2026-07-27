@@ -1,5 +1,16 @@
 # @qirtaas/vue
 
+## 0.4.0
+
+### Minor Changes
+
+- 055bb7c: Supports Quran/Hadith cards. Fixes debounced search. Improves UX.
+
+### Patch Changes
+
+- Updated dependencies [055bb7c]
+  - @qirtaas/core@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

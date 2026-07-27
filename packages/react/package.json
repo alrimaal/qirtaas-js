@@ -1,6 +1,6 @@
 {
   "name": "@qirtaas/react",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Idiomatic React components for the Qirtaas embeddable rich-text editor.",
   "license": "MIT",
   "author": "Alrimaal",
@@ -41,7 +41,7 @@
     "prepublishOnly": "vite build"
   },
   "dependencies": {
-    "@qirtaas/core": "^0.3.0"
+    "@qirtaas/core": "^0.4.0"
   },
   "peerDependencies": {
     "react": ">=18",

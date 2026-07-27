@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.4.0
+
+### Minor Changes
+
+- 055bb7c: Supports Quran/Hadith cards. Fixes debounced search. Improves UX.
+
 ## 0.3.0
 
 ### Minor Changes
