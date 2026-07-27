@@ -30,6 +30,8 @@ const listEl = ref<HTMLElement | null>(null);
 const inputEl = ref<(InstanceType<typeof InputText> & { $el: HTMLInputElement }) | null>(null);
 
 let debounce: ReturnType<typeof setTimeout> | null = null;
+// Guards against stale responses overwriting fresher ones.
+let searchSeq = 0;
 
 onMounted(() => {
   // Empty state shows the full surah index — no network call.
@@ -71,29 +73,28 @@ watch(query, (val) => {
     verseMatches.value = [];
     return;
   }
-  if (/^\d+:\d+$/.test(trimmed)) {
-    void doSearch(trimmed);
-    return;
-  }
   debounce = setTimeout(() => doSearch(trimmed), 350);
 });
 
 async function doSearch(q: string) {
+  const seq = ++searchSeq;
   loading.value = true;
   error.value = "";
   try {
     const { surahs, verses } = await searchQuran(q);
+    if (seq !== searchSeq) return; // superseded
     surahMatches.value = surahs;
     verseMatches.value = verses;
     if (verses.length === 0 && surahs.length === 0) {
       error.value = t("quran.noResults");
     }
   } catch {
+    if (seq !== searchSeq) return;
     error.value = t("quran.searchError");
     surahMatches.value = [];
     verseMatches.value = [];
   } finally {
-    loading.value = false;
+    if (seq === searchSeq) loading.value = false;
   }
 }
 
