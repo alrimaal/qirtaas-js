@@ -87,5 +87,11 @@ export interface RendererMountOptions {
 
 export interface RendererInstance {
   setTheme(theme: Theme): void;
+  /**
+   * True once every image in the rendered document has settled (loaded or
+   * failed). None is still loading. THis is useful for operations that
+   * can only be done after the document is ready like exporting as PDF
+   */
+  areImagesSettled(): boolean;
   destroy(): void;
 }

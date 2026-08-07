@@ -111,6 +111,20 @@ export function mountRenderer(
       liveState.theme = theme;
       setOverlayDark(theme === "dark");
     },
+    areImagesSettled: () => {
+      // True once every image in the rendered doc has stopped loading. Used by
+      // the PDF render page to hold the print until images actually paint.
+      // Two node-view flavours, so two checks:
+      //   • image-node-img resolves its URL asynchronously (getImageUrl) and
+      //     tracks data-state; a src-less <img> reports complete=true, so its
+      //     data-state ("loading" | "loaded" | "failed") is the only truth.
+      //   • quran-mushaf-img sets its src synchronously, so the DOM `complete`
+      //     flag is authoritative (true once loaded or errored).
+      const imgs = Array.from(target.querySelectorAll<HTMLImageElement>("img"));
+      return imgs.every((img) =>
+        img.dataset.state ? img.dataset.state !== "loading" : img.complete
+      );
+    },
     destroy: () => {
       app.unmount();
       releaseOverlayTarget();
