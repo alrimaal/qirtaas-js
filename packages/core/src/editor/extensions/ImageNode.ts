@@ -10,6 +10,11 @@ export interface ImageNodeAttributes {
   alt: string;
   width: number | null;
   height: number | null;
+  // Display width as a percentage of the content column. Preferred over the
+  // absolute `width`/`height` px when present, so the same fraction renders on
+  // any surface width (wide editor vs. narrow A4 PDF). Null on legacy images,
+  // which fall back to the px path until they are re-resized.
+  widthPercent: number | null;
   align: ImageAlign;
 }
 
@@ -53,6 +58,17 @@ export const ImageNode = Node.create<ImageNodeOptions>({
         },
         renderHTML: (attrs) =>
           attrs.height ? { "data-height": String(attrs.height) } : {},
+      },
+      widthPercent: {
+        default: null,
+        parseHTML: (el) => {
+          const v = el.getAttribute("data-width-percent");
+          return v ? Number(v) : null;
+        },
+        renderHTML: (attrs) =>
+          attrs.widthPercent
+            ? { "data-width-percent": String(attrs.widthPercent) }
+            : {},
       },
       align: {
         default: "center" as ImageAlign,

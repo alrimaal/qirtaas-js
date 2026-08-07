@@ -33,14 +33,21 @@ export function createResizableImageNodeView(opts: Options): NodeViewRenderer {
     const applySize = (n: PMNode) => {
       const w = n.attrs.width as number | null;
       const h = n.attrs.height as number | null;
-      if (w && h) {
-        img.style.width = `${w}px`;
+      const pct = n.attrs.widthPercent as number | null;
+      // The stored px width/height only ever supply the aspect-ratio now; the
+      // ratio holds the box shape while the width is expressed as a percentage.
+      const ratio = w && h ? `${w} / ${h}` : "";
+      if (pct) {
+        // Percentage of the content column — renders at the same fraction on any
+        // surface width (wide editor and narrow A4 PDF alike).
+        img.style.width = `${pct}%`;
         img.style.height = "auto";
-        img.style.aspectRatio = `${w} / ${h}`;
+        img.style.aspectRatio = ratio;
       } else if (w) {
+        // Legacy px width (images resized before widthPercent existed).
         img.style.width = `${w}px`;
         img.style.height = "auto";
-        img.style.aspectRatio = "";
+        img.style.aspectRatio = ratio;
       } else {
         img.style.width = "";
         img.style.height = "auto";
@@ -93,10 +100,19 @@ export function createResizableImageNodeView(opts: Options): NodeViewRenderer {
         const h = Math.round(rect.height);
         const pos = getPos();
         if (pos === undefined) return;
+        // Measure the fraction against the figure — the block the image lays out
+        // in, and the same box CSS resolves `width: %` against later. Store that
+        // percentage; keep the px width/height as the aspect-ratio source.
+        const columnWidth = wrapper.clientWidth || rect.width;
+        const percent = Math.max(
+          1,
+          Math.min(100, Math.round((rect.width / columnWidth) * 100)),
+        );
         editor.view.dispatch(
           editor.state.tr
             .setNodeAttribute(pos, "width", w)
-            .setNodeAttribute(pos, "height", h),
+            .setNodeAttribute(pos, "height", h)
+            .setNodeAttribute(pos, "widthPercent", percent),
         );
       });
 
