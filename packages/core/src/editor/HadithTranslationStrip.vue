@@ -16,6 +16,13 @@ const translation = ref<string | null>(null);
 const loading = ref(false);
 const error = ref(false);
 
+// Readiness signal for the PDF renderer: exposed as data-state on the wrapper
+// (see RendererInstance.isRenderSettled). "failed" counts as settled so a
+// broken fetch can never block the export.
+const state = computed(() =>
+  loading.value ? "loading" : error.value ? "failed" : "loaded"
+);
+
 const sanitized = computed(() =>
   translation.value
     ? DOMPurify.sanitize(translation.value, {
@@ -55,6 +62,8 @@ watch(() => [props.slug, props.number], load, { immediate: true });
   <span
     dir="ltr"
     contenteditable="false"
+    data-async-content
+    :data-state="state"
     class="block my-1.5 ps-3 pe-2 py-2 bg-bg-soft border-s-2 border-accent/60 rounded-e-md text-sm"
   >
     <span v-if="loading" class="block h-4 w-3/4 bg-border/40 rounded animate-pulse" />

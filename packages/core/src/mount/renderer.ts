@@ -111,19 +111,35 @@ export function mountRenderer(
       liveState.theme = theme;
       setOverlayDark(theme === "dark");
     },
-    areImagesSettled: () => {
-      // True once every image in the rendered doc has stopped loading. Used by
-      // the PDF render page to hold the print until images actually paint.
-      // Two node-view flavours, so two checks:
+    isRenderSettled: () => {
+      // True once every async part of the rendered doc has stopped loading.
+      // Used by the PDF render page to hold the print until content actually
+      // paints. We read state straight off the DOM (what page.pdf() captures),
+      // not off in-flight promises, so "settled" means "painted", not just
+      // "fetch resolved". A failed part counts as settled — it can never block.
+
+      // Images — two node-view flavours, so two checks:
       //   • image-node-img resolves its URL asynchronously (getImageUrl) and
       //     tracks data-state; a src-less <img> reports complete=true, so its
       //     data-state ("loading" | "loaded" | "failed") is the only truth.
       //   • quran-mushaf-img sets its src synchronously, so the DOM `complete`
       //     flag is authoritative (true once loaded or errored).
       const imgs = Array.from(target.querySelectorAll<HTMLImageElement>("img"));
-      return imgs.every((img) =>
+      const imagesSettled = imgs.every((img) =>
         img.dataset.state ? img.dataset.state !== "loading" : img.complete
       );
+
+      // Lazy node views (verse/hadith translation strips) fetch after mount and
+      // mark a `[data-async-content]` element with the same data-state contract.
+      // Anything not still "loading" (loaded OR failed) counts as settled.
+      const asyncNodes = Array.from(
+        target.querySelectorAll<HTMLElement>("[data-async-content]")
+      );
+      const asyncSettled = asyncNodes.every(
+        (el) => el.dataset.state !== "loading"
+      );
+
+      return imagesSettled && asyncSettled;
     },
     destroy: () => {
       app.unmount();
