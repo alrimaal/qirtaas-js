@@ -8,8 +8,10 @@ import {
   type AyahResult,
   type SurahMatch,
 } from "@qirtaas/core/services/quran";
+import { useQuranCollectionsHost } from "../runtime/context";
 
 const { t } = useI18n();
+const collectionsHost = useQuranCollectionsHost();
 
 const props = withDefaults(
   defineProps<{ active?: boolean }>(),
@@ -18,6 +20,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   selectVerse: [verse: AyahResult];
   browseSurah: [surah: SurahMatch];
+  browseCollections: [];
 }>();
 
 const query = ref("");
@@ -136,6 +139,22 @@ function scrollIntoView() {
       autofocus
       @keydown="onKeydown"
     />
+
+    <!-- Entry into Quran.com collection import — highlighted with a "New" badge
+         so the feature is discoverable, without the bulk of a full card. -->
+    <button
+      v-if="collectionsHost.enabled"
+      type="button"
+      class="self-start inline-flex items-center gap-2 mb-3 text-[13px] font-semibold text-primary hover:text-accent cursor-pointer font-[inherit] transition-colors"
+      @click="emit('browseCollections')"
+    >
+      <span
+        class="text-[9px] font-bold tracking-[0.05em] uppercase bg-primary/10 text-primary px-1.5 py-0.5 rounded-[5px]"
+        >{{ t("quran.badgeNew") }}</span
+      >
+      {{ t("quran.importCollectionLink") }}
+      <span class="opacity-70 text-[11px] [html[dir=rtl]_&]:rotate-180">→</span>
+    </button>
 
     <div v-if="loading" class="flex justify-center py-6">
       <i class="pi pi-spinner pi-spin text-xl text-muted" />

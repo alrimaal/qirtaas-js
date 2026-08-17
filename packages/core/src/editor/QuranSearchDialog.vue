@@ -6,14 +6,27 @@ import Dialog from "primevue/dialog";
 import QuranSearchStep from "./quran/QuranSearchStep.vue";
 import WordSelectStep from "./quran/WordSelectStep.vue";
 import SurahBrowserStep from "./quran/SurahBrowserStep.vue";
+import CollectionsStep from "./quran/CollectionsStep.vue";
 import type { AyahResult, SurahMatch } from "@qirtaas/core/services/quran";
 import type { Endpoint } from "./quran/useQuranSelection";
+import { useQuranCollectionsHost } from "./runtime/context";
 
 const { t } = useI18n();
+const collectionsHost = useQuranCollectionsHost();
 
-const props = defineProps<{ visible: boolean }>();
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    initialCollections?: boolean;
+  }>(),
+  { initialCollections: false }
+);
 const emit = defineEmits<{
   "update:visible": [value: boolean];
+  /** Bulk insert of verses imported from a Quran.com collection. */
+  insertVerses: [
+    payload: { verses: AyahResult[]; displayMode: "inline" | "card" }
+  ];
   // Inline insert — backwards-compatible with the old single-verse shape.
   insert: [
     data: {
@@ -42,7 +55,7 @@ const emit = defineEmits<{
   ];
 }>();
 
-type Step = "search" | "word" | "browse";
+type Step = "search" | "word" | "browse" | "collections";
 
 const step = ref<Step>("search");
 const selectedVerse = ref<AyahResult | null>(null);
@@ -53,7 +66,23 @@ const preselectVerse = ref<number | null>(null);
 const wordOrigin = ref<"search" | "browse">("search");
 const wordRange = ref<[number, number] | null>(null);
 
-const dialogWidth = computed(() => (step.value === "browse" ? "42rem" : "32rem"));
+const dialogWidth = computed(() => {
+  if (step.value === "browse") return "42rem";
+  if (step.value === "collections") return "36rem";
+  return "32rem";
+});
+
+function onBrowseCollections() {
+  step.value = "collections";
+}
+
+function onInsertVerses(payload: {
+  verses: AyahResult[];
+  displayMode: "inline" | "card";
+}) {
+  emit("insertVerses", payload);
+  close();
+}
 
 function onSelectVerse(v: AyahResult) {
   selectedVerse.value = v;
@@ -195,7 +224,12 @@ function close() {
 watch(
   () => props.visible,
   (v) => {
-    if (!v) back();
+    if (!v) {
+      back();
+    } else if (props.initialCollections && collectionsHost.enabled) {
+      // Resuming a collection import after re-authorization.
+      step.value = "collections";
+    }
   }
 );
 </script>
@@ -214,6 +248,13 @@ watch(
       :active="step === 'search'"
       @select-verse="onSelectVerse"
       @browse-surah="onBrowseSurah"
+      @browse-collections="onBrowseCollections"
+    />
+    <CollectionsStep
+      v-if="step === 'collections'"
+      :active="step === 'collections'"
+      @back="back"
+      @insert-verses="onInsertVerses"
     />
     <WordSelectStep
       v-if="step === 'word' && selectedVerse"

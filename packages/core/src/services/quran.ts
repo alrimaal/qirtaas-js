@@ -124,6 +124,16 @@ export async function getVerseRange(
   );
 }
 
+// A Quran.com collection summary. The fetchers + OAuth re-auth that populate
+// these are host-owned (see QuranCollectionsHost in editor/runtime/context) and
+// live in the SPA, so they don't ship in the core bundle.
+export interface QuranCollection {
+  id: string;
+  name: string;
+  // Verse count, when QF reports one for the collection — otherwise null.
+  count: number | null;
+}
+
 function pad3(n: number): string {
   return n.toString().padStart(3, "0");
 }

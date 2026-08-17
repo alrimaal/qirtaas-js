@@ -34,6 +34,7 @@ import { Honorific } from "./extensions/Honorific";
 import { ImageNode } from "./extensions/ImageNode";
 import { FileHandler } from "@tiptap/extension-file-handler";
 import QuranSearchDialog from "./QuranSearchDialog.vue";
+import type { AyahResult } from "@qirtaas/core/services/quran";
 import HadithSearchDialog from "./HadithSearchDialog.vue";
 import DocumentLinkPicker from "./DocumentLinkPicker.vue";
 import ImageUploadDialog from "./ImageUploadDialog.vue";
@@ -62,7 +63,11 @@ const props = withDefaults(
     autofocus?: boolean;
     documentId?: string;
   }>(),
-  { editable: true, autofocus: false, documentId: undefined }
+  {
+    editable: true,
+    autofocus: false,
+    documentId: undefined,
+  }
 );
 
 const emit = defineEmits<{
@@ -74,6 +79,9 @@ const emit = defineEmits<{
 const { t, locale } = useI18n();
 
 const quranDialogVisible = ref(false);
+// When true, the Quran dialog opens straight to the collections step — used to
+// resume a collection import after a Quran.com re-authorization round-trip.
+const quranInitialCollections = ref(false);
 const hadithDialogVisible = ref(false);
 const documentLinkPickerVisible = ref(false);
 const failedToLoad = ref(false);
@@ -391,7 +399,8 @@ function insertTable() {
   trackEvent("table_inserted");
 }
 
-function openQuranDialog() {
+function openQuranDialog(opts?: { collections?: boolean }) {
+  quranInitialCollections.value = !!opts?.collections;
   quranDialogVisible.value = true;
 }
 
@@ -478,6 +487,46 @@ function insertQuranVerse(data: {
   if (verseDetail.isOpen.value) {
     verseDetail.open(data.surah, data.fromAyah ?? data.ayah, locale.value);
   }
+}
+
+function insertQuranVerses(payload: {
+  verses: AyahResult[];
+  displayMode: "inline" | "card";
+}) {
+  const { verses, displayMode } = payload;
+  if (verses.length === 0) return;
+  // Each verse gets its own paragraph so imported collections are navigable
+  // (blank line between verses, cursor can land between them) rather than
+  // colliding as inline atoms in one block.
+  const nodes = verses.map((v) => ({
+    type: "paragraph",
+    content: [
+      {
+        type: "quranVerse",
+        attrs: {
+          surah: v.surah.number,
+          ayah: v.number,
+          fromAyah: null,
+          toAyah: null,
+          fromWord: null,
+          toWord: null,
+          surahNameArabic: v.surah.name_arabic,
+          surahNameEnglish: v.surah.name_english,
+          text: v.text,
+          encoding: "qpc_hafs",
+          displayMode,
+          // Cards lead with the translation, so open the strip by default.
+          translationOpen: displayMode === "card",
+        },
+      },
+    ],
+  }));
+  // Single insertContent call = one undo step for the whole collection.
+  editor.value?.chain().focus().insertContent(nodes).run();
+  trackEvent("quran_collection_imported", {
+    count: verses.length,
+    displayMode,
+  });
 }
 
 function insertQuranMushaf(data: {
@@ -631,8 +680,10 @@ function insertQuranMushaf(data: {
       <EditorContent :editor="editor" class="flex-1 px-3" />
       <QuranSearchDialog
         v-model:visible="quranDialogVisible"
+        :initial-collections="quranInitialCollections"
         @insert="insertQuranVerse"
         @insert-mushaf="insertQuranMushaf"
+        @insert-verses="insertQuranVerses"
       />
       <HadithSearchDialog
         v-model:visible="hadithDialogVisible"
