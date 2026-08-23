@@ -32,7 +32,7 @@ export default {
     },
     atom: {
       copy: "Copier",
-      delete: "Annuler",
+      delete: "Supprimer",
     },
     verse: {
       viewTafsir: "Tafsir",
@@ -94,10 +94,10 @@ export default {
     verses: "Versets",
     browse: "Rechercher",
     typeToSearch: "Tapez pour effectuer une recherche dans le Coran",
-    openSurahInMushaf: "Ouvrir {nom} en mode « mushaf »",
+    openSurahInMushaf: "Ouvrir {name} en mode « mushaf »",
     selectMoreVerses: "Sélectionnez d'autres versets de cette sourate",
     selectMoreVersesSub:
-      Ouvrez la vue « mushaf » et sélectionnez une partie comprenant plusieurs versets",
+      "Ouvrez la vue « mushaf » et sélectionnez une partie comprenant plusieurs versets",
     page: "Page",
     previousPage: "Page précédente",
     nextPage: "Page suivante",
@@ -125,7 +125,7 @@ export default {
     preview: "Aperçu",
     previewError: "Impossible de charger le texte du verset",
     insertText: "Insérer le texte",
-    insertMushafImage: "Insérez l’image du mushaf",
+    insertMushafImage: "Insérer l’image du mushaf",
     insertInline: "Insérer dans le texte",
     insertAsCard: "Insérer en tant que carte",
   },
@@ -137,7 +137,7 @@ export default {
     searchPlaceholder: "Rechercher par réf (Bukhari: 1) ou par texte… ",
     noResults: "Aucun hadith trouvé.",
     searchError: "Échec de la recherche. Veuillez réessayer.",
-    selectionHint: "Sélectionnez une partie du hadith ou appuyez Insérer pour tout insérer",
+    selectionHint: "Sélectionnez une partie du hadith ou appuyez sur Insérer pour tout insérer",
     insert: "Insérer",
     insertInline: "Insérer dans le texte",
     insertAsCard: "Insérer en tant que carte"
@@ -166,7 +166,7 @@ export default {
     error: "Échec du chargement des détails du verset.", 
     retry: "Réessayer",
     prev: "Verset précédent",
-    next: "Prochain verset",
+    next: "Verset suivant",
   },
   reportData: {
     tooltip: "Signaler une donnée incorrecte",
