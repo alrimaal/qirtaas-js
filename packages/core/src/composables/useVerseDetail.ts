@@ -53,6 +53,20 @@ function setSelectedTafsirLanguage(language: string) {
   }
 }
 
+// Maps a UI locale onto the tafsir/translation language it should default to.
+// Tafsir languages are named in English (e.g. "french"), independent of the
+// locale codes the app uses. Anything unmapped falls back to English.
+const LOCALE_TO_TAFSIR_LANGUAGE: Record<string, string> = {
+  ar: "arabic",
+  en: "english",
+  fr: "french",
+};
+
+/** The tafsir language a given UI locale prefers (English if unmapped). */
+export function localeToTafsirLanguage(uiLocale: string): string {
+  return LOCALE_TO_TAFSIR_LANGUAGE[uiLocale] ?? "english";
+}
+
 /** Unique tafsir languages available in the current verse response (unsorted). */
 const availableTafsirLanguages = computed<string[]>(() => {
   const tafsirs = data.value?.tafsirs ?? [];
@@ -72,7 +86,7 @@ function resolveTafsirLanguage(uiLocale: string): string | null {
   const stored = selectedTafsirLanguage.value;
   if (stored && available.includes(stored)) return stored;
 
-  const localeDefault = uiLocale === "ar" ? "arabic" : "english";
+  const localeDefault = localeToTafsirLanguage(uiLocale);
   if (available.includes(localeDefault)) return localeDefault;
 
   return available[0] ?? null;

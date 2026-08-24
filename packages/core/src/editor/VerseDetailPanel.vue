@@ -3,7 +3,10 @@ import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import DOMPurify from "dompurify";
 import Button from "primevue/button";
-import { useVerseDetail } from "@qirtaas/core/composables/useVerseDetail";
+import {
+  useVerseDetail,
+  localeToTafsirLanguage,
+} from "@qirtaas/core/composables/useVerseDetail";
 import ReportDataDialog from "./ReportDataDialog.vue";
 
 function sanitize(html: string): string {
@@ -81,9 +84,12 @@ function languageLabel(lang: string): string {
 }
 
 const languageOptions = computed(() => {
-  const localeDefault = locale.value === "ar" ? "arabic" : "english";
-  const other = localeDefault === "arabic" ? "english" : "arabic";
-  const priority = [localeDefault, other];
+  // The UI-locale's language leads, then the other two "core" languages, so a
+  // French reader sees Français first, then العربية / English. Deduped, so a
+  // locale that already maps to arabic/english doesn't repeat.
+  const priority = [
+    ...new Set([localeToTafsirLanguage(locale.value), "arabic", "english"]),
+  ];
 
   const sorted = [...availableTafsirLanguages.value].sort((a, b) => {
     const ai = priority.indexOf(a);

@@ -1,7 +1,7 @@
 // Public option/handle types for the embeddable editor + renderer mount APIs.
 export type Json = Record<string, unknown>;
 
-export type Locale = "en" | "ar";
+export type Locale = "en" | "ar" | "fr";
 export type Theme = "light" | "dark";
 
 /** Autosave/document lifecycle state, surfaced via onSaveStateChange. */

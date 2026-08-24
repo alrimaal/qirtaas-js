@@ -10,6 +10,7 @@ import Tooltip from "primevue/tooltip";
 import { embedPrimeVueOptions } from "../styles/primevuePreset";
 import en from "../i18n/en";
 import ar from "../i18n/ar";
+import fr from "../i18n/fr";
 import EmbedRendererApp from "../components/EmbedRendererApp.vue";
 import { setTransport } from "../services/transport";
 import { setTrackEvent } from "../editor/runtime/analytics";
@@ -96,7 +97,7 @@ export function mountRenderer(
       legacy: false,
       locale: options.locale ?? "en",
       fallbackLocale: "en",
-      messages: { en, ar },
+      messages: { en, ar, fr },
     })
   );
   app.use(PrimeVue, embedPrimeVueOptions());
