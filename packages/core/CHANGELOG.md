@@ -1,5 +1,12 @@
 # @qirtaas/core
 
+## 0.5.0
+
+### Minor Changes
+
+- 4061ee8: Support rediness probe for PDF rendering
+- c002e82: Support french locale
+
 ## 0.4.0
 
 ### Minor Changes

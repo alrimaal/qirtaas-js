@@ -1,5 +1,18 @@
 # @qirtaas/vue
 
+## 0.5.0
+
+### Minor Changes
+
+- 4061ee8: Support rediness probe for PDF rendering
+- c002e82: Support french locale
+
+### Patch Changes
+
+- Updated dependencies [4061ee8]
+- Updated dependencies [c002e82]
+  - @qirtaas/core@0.5.0
+
 ## 0.4.0
 
 ### Minor Changes
