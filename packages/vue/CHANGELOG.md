@@ -1,5 +1,16 @@
 # @qirtaas/vue
 
+## 0.6.0
+
+### Minor Changes
+
+- 800d886: Supports Quran collections. Simplifies SDK.
+
+### Patch Changes
+
+- Updated dependencies [800d886]
+  - @qirtaas/core@0.6.0
+
 ## 0.5.0
 
 ### Minor Changes

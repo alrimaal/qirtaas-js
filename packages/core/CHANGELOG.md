@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.6.0
+
+### Minor Changes
+
+- 800d886: Supports Quran collections. Simplifies SDK.
+
 ## 0.5.0
 
 ### Minor Changes
