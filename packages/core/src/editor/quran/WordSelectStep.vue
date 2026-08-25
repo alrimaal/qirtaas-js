@@ -117,13 +117,6 @@ function onInsert(displayMode: "inline" | "card") {
 
     <div class="flex justify-end gap-2">
       <Button
-        :label="t('quran.cancel')"
-        severity="secondary"
-        text
-        size="small"
-        @click="emit('back')"
-      />
-      <Button
         :label="t('quran.insertAsCard')"
         icon="pi pi-id-card"
         size="small"
