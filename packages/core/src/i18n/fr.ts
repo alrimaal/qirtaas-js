@@ -3,8 +3,8 @@
 // single source of truth for editor strings.
 export default {
   editor: {
-    placeholder: "Document sans titre", 
-    saving: "Enregistrement…", 
+    placeholder: "Document sans titre",
+    saving: "Enregistrement…",
     saved: "Enregistré",
     backIcon: "pi pi-arrow-left",
     backLabel: "Tableau de bord",
@@ -12,7 +12,7 @@ export default {
     failedToLoad: "Échec du chargement du document",
     tryAgainLater: "Veuillez réessayer plus tard",
     insert: "Insérer",
-    insertQuran: "Verset du Coran",
+    insertQuran: "Coran",
     insertHadith: "Hadith",
     insertJJ: "\uFDFB Jalla Jalaaluhu",
     insertSAW: "\uFDFA Sallallahu Alayhi Wasallam",
@@ -42,7 +42,7 @@ export default {
       tooLarge: "L’image est trop volumineuse (10 mo maximum).",
       singleOnly: "Une seule image peut être insérée à la fois.",
       failedToLoad: "Impossible de charger l’image",
-      rejectedTitle: "Image non intégrée", 
+      rejectedTitle: "Image non intégrée",
       rejectedDetail: "Échec de l’intégration de l’image",
     },
     atom: {
@@ -67,7 +67,8 @@ export default {
     findReplace: {
       title: "Rechercher et remplacer",
       findPlaceholder: "Mot-clé",
-      replacePlaceholder: "Remplacement (entrez :saw: pour les formules honorifiques)",
+      replacePlaceholder:
+        "Remplacement (entrez :saw: pour les formules honorifiques)",
       noResults: "Aucun résultat",
       next: "Résultat suivant",
       previous: "Résultat précédent",
@@ -84,7 +85,8 @@ export default {
       toggleHeader: "Afficher/masquer la ligne d’en-tête",
       deleteTable: "Supprimer le tableau",
     },
-    unsavedWarning: "Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?",
+    unsavedWarning:
+      "Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?",
     tapToResave: "Appuyez pour enregistrer à nouveau",
     tapToRetry: "Appuyez pour réessayer",
   },
@@ -116,7 +118,8 @@ export default {
     page: "Page",
     previousPage: "Page précédente",
     nextPage: "Page suivante",
-    pagePickerPlaceholder: "Aller à une page ou à un verset (par ex. 49 ou 2:255)",
+    pagePickerPlaceholder:
+      "Aller à une page ou à un verset (par ex. 49 ou 2:255)",
     noMatches: "Aucun résultat correspondant",
     tapWordToStart: "Appuyez sur un mot pour commencer votre sélection",
     tapWordToBegin:
@@ -130,9 +133,11 @@ export default {
     insertAs: "Insérer comme",
     inline: "Texte intégré",
     mushaf: "Mushaf",
-    inlineDescription: "Même sourate uniquement · Texte mis en forme avec référence",
+    inlineDescription:
+      "Même sourate uniquement · Texte mis en forme avec référence",
     mushafDescription: "Plusieurs sourates possibles · aperçu de la page",
-    snappedToFullVerses: "Sélection automatique des versets complets pour l’insertion dans le texte",
+    snappedToFullVerses:
+      "Sélection automatique des versets complets pour l’insertion dans le texte",
     inlineNoCrossSurah:
       "Le mode texte ne prend pas en charge la sélection de plusieurs sourates — passez au mode mushaf pour insérer sur plusieurs sourates",
     crossSurahBlocked:
@@ -145,17 +150,18 @@ export default {
     insertAsCard: "Insérer en tant que carte",
   },
   wordSelect: {
-    tapEndWord: "Appuyez sur un dernier mot pour terminer la sélection…", 
+    tapEndWord: "Appuyez sur un dernier mot pour terminer la sélection…",
   },
   hadith: {
     dialogTitle: "Insérer des Hadiths",
     searchPlaceholder: "Rechercher par réf (Bukhari: 1) ou par texte… ",
     noResults: "Aucun hadith trouvé.",
     searchError: "Échec de la recherche. Veuillez réessayer.",
-    selectionHint: "Sélectionnez une partie du hadith ou appuyez sur Insérer pour tout insérer",
+    selectionHint:
+      "Sélectionnez une partie du hadith ou appuyez sur Insérer pour tout insérer",
     insert: "Insérer",
     insertInline: "Insérer dans le texte",
-    insertAsCard: "Insérer en tant que carte"
+    insertAsCard: "Insérer en tant que carte",
   },
   hadithDetail: {
     ariaLabel: "Détails du hadith",
@@ -163,7 +169,7 @@ export default {
     openOnSunnah: "Ouvrir sur Sunnah.com",
     collection: "Collection",
     book: "Ouvrage",
-    grade: "Degré d'authenticité", 
+    grade: "Degré d'authenticité",
     translation: "Traduction",
     noTranslation: "Pas de traduction disponible.",
     error: "Échec du chargement des détails du hadith.",
@@ -178,7 +184,7 @@ export default {
     transliteration: "Translittération",
     tafsir: "Tafsir",
     tafsirLanguage: "Langue du tafsir",
-    error: "Échec du chargement des détails du verset.", 
+    error: "Échec du chargement des détails du verset.",
     retry: "Réessayer",
     prev: "Verset précédent",
     next: "Verset suivant",
