@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { SearchReplace } from "./extensions/SearchReplace";
@@ -227,6 +227,12 @@ function insertImageFromInput(file: File) {
   startImageUpload(picked, pos);
 }
 
+// ~1/3 of the viewport height, in px; the caret rests this far above the
+// bottom edge. Guarded for SSR where `window` is absent.
+function bottomAnchor(): number {
+  return typeof window !== "undefined" ? Math.round(window.innerHeight / 3) : 0;
+}
+
 const editor = useEditor({
   content: props.modelValue?.type ? props.modelValue : undefined, // Empty document gets empty object which breaks validity checks
   enableContentCheck: true,
@@ -328,6 +334,11 @@ const editor = useEditor({
   ],
   editable: props.editable,
   editorProps: {
+    // Keep the caret anchored ~1/3 from the bottom: when it enters the bottom
+    // band (scrollThreshold) ProseMirror scrolls and leaves that much space
+    // below it (scrollMargin). Values are px and recomputed on resize below.
+    scrollThreshold: { top: 0, right: 0, bottom: bottomAnchor(), left: 0 },
+    scrollMargin: { top: 0, right: 0, bottom: bottomAnchor(), left: 0 },
     attributes: {
       class: `outline-none min-h-[70vh] px-1 py-4${
         props.editable ? " pb-[33vh]" : ""
@@ -362,6 +373,18 @@ const editor = useEditor({
     onAtomAction(nodeType, attrs);
   },
 });
+
+// The scroll props are baked in at view creation, so recompute them when the
+// viewport changes (resize, mobile keyboard/orientation) to keep the anchor.
+function updateScrollAnchor() {
+  const bottom = bottomAnchor();
+  editor.value?.view.setProps({
+    scrollThreshold: { top: 0, right: 0, bottom, left: 0 },
+    scrollMargin: { top: 0, right: 0, bottom, left: 0 },
+  });
+}
+onMounted(() => window.addEventListener("resize", updateScrollAnchor));
+onBeforeUnmount(() => window.removeEventListener("resize", updateScrollAnchor));
 
 defineExpose({
   editor,
