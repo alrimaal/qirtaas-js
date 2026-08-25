@@ -160,6 +160,7 @@ function removeLink() {
   >
     <!-- Undo / Redo -->
     <Button
+      v-tooltip.bottom="t('editor.tooltips.undo')"
       severity="secondary"
       text
       rounded
@@ -181,6 +182,7 @@ function removeLink() {
       </svg>
     </Button>
     <Button
+      v-tooltip.bottom="t('editor.tooltips.redo')"
       severity="secondary"
       text
       rounded
@@ -276,6 +278,7 @@ function removeLink() {
 
     <!-- Text formatting -->
     <Button
+      v-tooltip.bottom="t('editor.tooltips.bold')"
       severity="secondary"
       text
       rounded
@@ -303,6 +306,7 @@ function removeLink() {
       size="small"
       class="shrink-0"
       :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('italic') }"
+      v-tooltip.bottom="t('editor.tooltips.italic')"
       @click="props.editor!.chain().focus().toggleItalic().run()"
     >
       <svg
@@ -324,6 +328,7 @@ function removeLink() {
       size="small"
       class="shrink-0"
       :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('underline') }"
+      v-tooltip.bottom="t('editor.tooltips.underline')"
       @click="props.editor!.chain().focus().toggleUnderline().run()"
     >
       <svg
@@ -345,6 +350,7 @@ function removeLink() {
       size="small"
       class="shrink-0"
       :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('strike') }"
+      v-tooltip.bottom="t('editor.tooltips.strikethrough')"
       @click="props.editor!.chain().focus().toggleStrike().run()"
     >
       <span class="text-sm line-through">S</span>
@@ -352,6 +358,7 @@ function removeLink() {
 
     <!-- Link -->
     <Button
+      v-tooltip.bottom="t('editor.tooltips.link')"
       icon="pi pi-link"
       severity="secondary"
       text
@@ -389,6 +396,7 @@ function removeLink() {
 
     <!-- Highlight -->
     <Button
+      v-tooltip.bottom="t('editor.tooltips.highlight')"
       severity="secondary"
       text
       rounded
@@ -424,6 +432,7 @@ function removeLink() {
 
     <!-- Headings dropdown -->
     <Button
+      v-tooltip.bottom="t('editor.tooltips.heading')"
       severity="secondary"
       text
       rounded
@@ -462,6 +471,7 @@ function removeLink() {
 
     <!-- Alignment dropdown -->
     <Button
+      v-tooltip.bottom="t('editor.tooltips.align')"
       severity="secondary"
       text
       rounded
@@ -497,6 +507,7 @@ function removeLink() {
 
     <!-- Block elements -->
     <Button
+      v-tooltip.bottom="t('editor.tooltips.bulletList')"
       icon="pi pi-list"
       severity="secondary"
       text
@@ -513,6 +524,7 @@ function removeLink() {
       size="small"
       class="shrink-0"
       :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('orderedList') }"
+      v-tooltip.bottom="t('editor.tooltips.orderedList')"
       @click="props.editor!.chain().focus().toggleOrderedList().run()"
     >
       <ListOrdered :size="16" />
@@ -524,6 +536,7 @@ function removeLink() {
       size="small"
       class="shrink-0"
       :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('blockquote') }"
+      v-tooltip.bottom="t('editor.tooltips.blockquote')"
       @click="props.editor!.chain().focus().toggleBlockquote().run()"
     >
       <svg
