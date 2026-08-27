@@ -24,7 +24,12 @@ const emit = defineEmits<{
       "
       @click="emit('select', item)"
     >
-      <i :class="item.icon" class="text-sm text-muted" />
+      <span
+        v-if="item.glyph"
+        class="honorific-glyph w-4 text-center text-base leading-none"
+        >{{ item.glyph }}</span
+      >
+      <i v-else :class="item.icon" class="text-sm text-muted" />
       <span>{{ item.label }}</span>
     </button>
     <div v-if="items.length === 0" class="py-2 px-3 text-xs text-muted">
@@ -32,3 +37,12 @@ const emit = defineEmits<{
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Honorific code points render as tofu in the default font; Kitab (the same
+   @font-face declared in HonorificView) covers them. unicode-range keeps Kitab
+   scoped to those glyphs, so non-honorific text is unaffected. */
+.honorific-glyph {
+  font-family: "Kitab", serif;
+}
+</style>

@@ -13,8 +13,6 @@ export default {
     insert: "إدراج",
     insertQuran: "آية قرآنية",
     insertHadith: "حديث",
-    insertJJ: "\uFDFB جل جلاله",
-    insertSAW: "\uFDFA صلى الله عليه وسلم",
     insertToggleList: "قائمة مسدولة",
     insertTable: "جدول",
     insertImage: "صورة",

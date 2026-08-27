@@ -25,7 +25,7 @@ defineEmits<{
       "
       @click="$emit('select', item)"
     >
-      <span class="text-base">{{ item.emoji }}</span>
+      <span class="glyph text-base">{{ item.emoji }}</span>
       <span class="truncate">{{ item.name }}</span>
     </button>
     <div v-if="items.length === 0" class="px-3 py-2 text-sm text-muted">
@@ -33,3 +33,14 @@ defineEmits<{
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Honorific items show a Unicode honorific glyph as their "emoji"; the newer
+   code points render as tofu in the default font, so Kitab (unicode-range
+   scoped to honorific glyphs — see HonorificView) leads the stack. Regular
+   emoji fall through to the platform emoji fonts. */
+.glyph {
+  font-family: "Kitab", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji", sans-serif;
+}
+</style>

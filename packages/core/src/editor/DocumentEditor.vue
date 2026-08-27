@@ -30,7 +30,7 @@ import { QuranMushaf } from "./extensions/QuranMushaf";
 import { HadithNode } from "./extensions/HadithNode";
 import { DocumentLink } from "./extensions/DocumentLink";
 import { SlashCommand } from "./extensions/SlashCommand";
-import { Honorific } from "./extensions/Honorific";
+import { Honorific, isHonorificType } from "./extensions/Honorific";
 import { ImageNode } from "./extensions/ImageNode";
 import { FileHandler } from "@tiptap/extension-file-handler";
 import QuranSearchDialog from "./QuranSearchDialog.vue";
@@ -322,7 +322,7 @@ const editor = useEditor({
           hadithDialogVisible.value = true;
         } else if (commandId === "page") {
           documentLinkPickerVisible.value = true;
-        } else if (commandId === "jj" || commandId === "saw") {
+        } else if (isHonorificType(commandId)) {
           editor
             ?.chain()
             .focus()

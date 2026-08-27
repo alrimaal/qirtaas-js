@@ -2,19 +2,19 @@ import { Node, mergeAttributes, InputRule, nodePasteRule } from "@tiptap/core";
 import { Fragment, type Schema } from "@tiptap/pm/model";
 import { VueNodeViewRenderer } from "@tiptap/vue-3";
 import HonorificView from "../HonorificView.vue";
+import {
+  HONORIFIC_SHORTCODE_MAP,
+  HONORIFIC_TYPES,
+  isHonorificType,
+  type HonorificType,
+} from "../honorifics";
 
-export type HonorificType = "jj" | "saw";
+// The honorific registry (glyphs, labels, shortcodes) lives in ../honorifics;
+// re-exported here so existing importers of "./extensions/Honorific" keep working.
+export { HONORIFIC_TYPES, isHonorificType };
+export type { HonorificType };
 
-const SHORTCODE_MAP: Record<string, HonorificType> = {
-  // جل جلاله
-  jj: "jj",
-  جل: "jj",
-  // صلى الله عليه وسلم
-  saw: "saw",
-  saws: "saw",
-  صلع: "saw",
-  صلى: "saw",
-};
+const SHORTCODE_MAP = HONORIFIC_SHORTCODE_MAP;
 
 const shortcodeKeys = Object.keys(SHORTCODE_MAP)
   .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))

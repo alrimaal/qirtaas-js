@@ -14,8 +14,6 @@ export default {
     insert: "Insérer",
     insertQuran: "Coran",
     insertHadith: "Hadith",
-    insertJJ: "\uFDFB Jalla Jalaaluhu",
-    insertSAW: "\uFDFA Sallallahu Alayhi Wasallam",
     insertToggleList: "Menu dépliant",
     insertTable: "Tableau",
     insertImage: "Image",

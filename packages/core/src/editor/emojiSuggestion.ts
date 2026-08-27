@@ -4,6 +4,7 @@ import { getOverlayTarget } from "../mount/overlay";
 import EmojiMenu from "./EmojiMenu.vue";
 import type { EmojiItem } from "@tiptap/extension-emoji";
 import type { Editor, Range } from "@tiptap/core";
+import { HONORIFICS, type HonorificType } from "./honorifics";
 
 type MenuItem = (EmojiItem | HonorificMenuItem) & { emoji?: string };
 
@@ -13,27 +14,17 @@ type HonorificMenuItem = {
   shortcodes: string[];
   tags: string[];
   isHonorific: true;
-  honorificType: "jj" | "saw";
+  honorificType: HonorificType;
 };
 
-const HONORIFIC_ITEMS: HonorificMenuItem[] = [
-  {
-    name: "saw - صلى",
-    emoji: "ﷺ",
-    shortcodes: ["saw", "saws", "صلع", "صلى"],
-    tags: ["honorific", "saw", "prophet", "muhammad", "salawat"],
-    isHonorific: true,
-    honorificType: "saw",
-  },
-  {
-    name: "jj - جل",
-    emoji: "ﷻ",
-    shortcodes: ["jj", "جل"],
-    tags: ["honorific", "jj", "allah", "jalla", "jalaluhu"],
-    isHonorific: true,
-    honorificType: "jj",
-  },
-];
+const HONORIFIC_ITEMS: HonorificMenuItem[] = HONORIFICS.map((h) => ({
+  name: `${h.en} — ${h.ar}`,
+  emoji: h.glyph,
+  shortcodes: [...h.shortcodes],
+  tags: ["honorific", h.id, ...h.tags],
+  isHonorific: true,
+  honorificType: h.id,
+}));
 
 type SuggestionProps = {
   clientRect?: (() => DOMRect | null) | null;
@@ -52,9 +43,12 @@ export const emojiSuggestion = {
       h.name.includes(q) ||
       h.shortcodes.some((sc) => sc.toLowerCase().includes(q)) ||
       h.tags.some((tag) => tag.includes(q));
-    const honorifics: MenuItem[] = q
-      ? HONORIFIC_ITEMS.filter(matchHonorific)
-      : [...HONORIFIC_ITEMS];
+    // Honorifics take priority but are capped so a bare `:` (empty query) can't
+    // flood the menu now that there are many of them; the rest of the 8 slots
+    // are filled with emoji matches.
+    const honorifics: MenuItem[] = (
+      q ? HONORIFIC_ITEMS.filter(matchHonorific) : HONORIFIC_ITEMS
+    ).slice(0, 8);
     const emojis = storage.emojis
       .filter(
         (item) =>
@@ -62,7 +56,7 @@ export const emojiSuggestion = {
           item.shortcodes.some((sc) => sc.includes(q)) ||
           item.tags.some((tag) => tag.includes(q))
       )
-      .slice(0, 8 - honorifics.length);
+      .slice(0, Math.max(0, 8 - honorifics.length));
     return [...honorifics, ...emojis];
   },
 

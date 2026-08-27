@@ -8,6 +8,7 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Popover from "primevue/popover";
 import { Search, ListCollapse, ListOrdered, Highlighter } from "lucide-vue-next";
+import { HONORIFICS } from "./honorifics";
 
 const props = defineProps<{ editor: Editor | undefined }>();
 const emit = defineEmits<{
@@ -32,6 +33,9 @@ function onImageChosen(event: Event) {
 }
 const { t, locale } = useI18n();
 const isDark = useIsDark();
+
+// Honorifics offered in the Insert menu, from the shared registry.
+const honorifics = HONORIFICS;
 
 const alignments = computed(() => {
   const items = [
@@ -225,7 +229,7 @@ function removeLink() {
       <span class="text-xs ms-1 font-medium">{{ t("editor.insert") }}</span>
     </Button>
     <Popover :append-to="getOverlayAppendTo()" ref="insertPopover">
-      <div class="flex flex-col min-w-48 p-1">
+      <div class="flex flex-col min-w-48 p-1 max-h-80 overflow-y-auto">
         <button
           class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
           @click="
@@ -247,18 +251,15 @@ function removeLink() {
           <span>{{ t("editor.insertHadith") }}</span>
         </button>
         <button
+          v-for="h in honorifics"
+          :key="h.id"
           class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
-          @click="insertHonorific('jj')"
+          @click="insertHonorific(h.id)"
         >
-          <i class="pi pi-pencil text-sm text-muted" />
-          <span>{{ t("editor.insertJJ") }}</span>
-        </button>
-        <button
-          class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
-          @click="insertHonorific('saw')"
-        >
-          <i class="pi pi-pencil text-sm text-muted" />
-          <span>{{ t("editor.insertSAW") }}</span>
+          <span class="honorific-glyph w-5 text-center text-base leading-none">{{
+            h.glyph
+          }}</span>
+          <span>{{ locale === "ar" ? h.ar : h.en }}</span>
         </button>
       </div>
     </Popover>
@@ -604,3 +605,12 @@ function removeLink() {
     />
   </div>
 </template>
+
+<style scoped>
+/* Insert-menu honorific glyphs: newer code points are tofu in the default font,
+   so Kitab (@font-face declared in HonorificView, unicode-range scoped to
+   honorific glyphs) renders them. */
+.honorific-glyph {
+  font-family: "Kitab", serif;
+}
+</style>

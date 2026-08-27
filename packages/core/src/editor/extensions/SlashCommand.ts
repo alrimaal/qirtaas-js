@@ -8,11 +8,16 @@ import { createApp, h, ref, type App } from "vue";
 import { getOverlayTarget } from "../../mount/overlay";
 import SlashMenu from "../SlashMenu.vue";
 
+import { HONORIFICS } from "../honorifics";
+
 export interface SlashCommandItem {
   id: string;
   label: string;
   searchTerms: string[];
   icon: string;
+  // Honorific glyph shown before the label, rendered in the Kitab font by
+  // SlashMenu (newer code points would be tofu in the default font).
+  glyph?: string;
 }
 
 interface CommandDef {
@@ -20,9 +25,11 @@ interface CommandDef {
   labelEn: string;
   labelAr: string;
   icon: string;
+  glyph?: string;
+  searchTerms?: string[];
 }
 
-const COMMAND_DEFS: CommandDef[] = [
+const BASE_COMMANDS: CommandDef[] = [
   { id: "quran", labelEn: "Quran", labelAr: "قرآن", icon: "pi pi-book" },
   { id: "hadith", labelEn: "Hadith", labelAr: "حديث", icon: "pi pi-comment" },
   {
@@ -31,19 +38,21 @@ const COMMAND_DEFS: CommandDef[] = [
     labelAr: "ربط صفحة",
     icon: "pi pi-file",
   },
-  {
-    id: "jj",
-    labelEn: "ﷻ Jalla Jalaaluhu",
-    labelAr: "ﷻ جل جلاله",
-    icon: "pi pi-pencil",
-  },
-  {
-    id: "saw",
-    labelEn: "ﷺ Sallallahu Alayhi Wasallam",
-    labelAr: "ﷺ صلى الله عليه وسلم",
-    icon: "pi pi-pencil",
-  },
 ];
+
+// Honorifics come from the shared registry. `id` is the HonorificType the
+// onCommand handler inserts; the glyph is rendered separately in Kitab so it
+// never tofus; shortcodes become search terms so `/ra`, `/swt` etc. match.
+const HONORIFIC_COMMANDS: CommandDef[] = HONORIFICS.map((h) => ({
+  id: h.id,
+  labelEn: h.en,
+  labelAr: h.ar,
+  icon: "pi pi-pencil",
+  glyph: h.glyph,
+  searchTerms: [h.en.toLowerCase(), h.ar, ...h.shortcodes],
+}));
+
+const COMMAND_DEFS: CommandDef[] = [...BASE_COMMANDS, ...HONORIFIC_COMMANDS];
 
 function buildCommands(
   locale: string,
@@ -53,8 +62,9 @@ function buildCommands(
   return COMMAND_DEFS.filter((cmd) => commandFilter(cmd.id)).map((cmd) => ({
     id: cmd.id,
     label: isAr ? cmd.labelAr : cmd.labelEn,
-    searchTerms: [cmd.labelEn.toLowerCase(), cmd.labelAr],
+    searchTerms: cmd.searchTerms ?? [cmd.labelEn.toLowerCase(), cmd.labelAr],
     icon: cmd.icon,
+    glyph: cmd.glyph,
   }));
 }
 
