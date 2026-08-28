@@ -30,7 +30,11 @@ import { QuranMushaf } from "./extensions/QuranMushaf";
 import { HadithNode } from "./extensions/HadithNode";
 import { DocumentLink } from "./extensions/DocumentLink";
 import { SlashCommand } from "./extensions/SlashCommand";
-import { Honorific, isHonorificType } from "./extensions/Honorific";
+import {
+  Honorific,
+  isHonorificType,
+  trackHonorificInserted,
+} from "./extensions/Honorific";
 import { ImageNode } from "./extensions/ImageNode";
 import { FileHandler } from "@tiptap/extension-file-handler";
 import QuranSearchDialog from "./QuranSearchDialog.vue";
@@ -328,6 +332,7 @@ const editor = useEditor({
             .focus()
             .insertContent({ type: "honorific", attrs: { type: commandId } })
             .run();
+          trackHonorificInserted(commandId, "slash");
         }
       },
     }),

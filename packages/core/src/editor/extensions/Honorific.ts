@@ -2,6 +2,7 @@ import { Node, mergeAttributes, InputRule, nodePasteRule } from "@tiptap/core";
 import { Fragment, type Schema } from "@tiptap/pm/model";
 import { VueNodeViewRenderer } from "@tiptap/vue-3";
 import HonorificView from "../HonorificView.vue";
+import { trackEvent } from "../runtime/analytics";
 import {
   HONORIFIC_SHORTCODE_MAP,
   HONORIFIC_TYPES,
@@ -15,6 +16,30 @@ export { HONORIFIC_TYPES, isHonorificType };
 export type { HonorificType };
 
 const SHORTCODE_MAP = HONORIFIC_SHORTCODE_MAP;
+
+/** Where a honorific insertion originated, for analytics segmentation. */
+export type HonorificInsertSource =
+  | "shortcode" // typed `:saw:` (input rule)
+  | "menu" // `:` emoji/honorific suggestion menu
+  | "toolbar" // Insert-menu button
+  | "slash" // `/` slash command
+  | "paste" // pasted text containing `:saw:`
+  | "find_replace"; // Find & Replace substitution
+
+// Every insertion path funnels through here so typing `:saw:`, the `:` menu, the
+// toolbar, slash commands, etc. all emit the same per-honorific event. The event
+// name carries the honorific id (its canonical shortcode); `type`/`source` are
+// duplicated as properties so the data can also be queried without the suffix.
+export function trackHonorificInserted(
+  type: HonorificType | undefined,
+  source: HonorificInsertSource
+): void {
+  // Callers pass a `SHORTCODE_MAP[...]` lookup, typed as possibly-undefined; in
+  // practice the regexes only match known shortcodes, but guard rather than emit
+  // a `honourifics_inserted_undefined` event.
+  if (!type) return;
+  trackEvent(`honourifics_inserted_${type}`, { type, source });
+}
 
 const shortcodeKeys = Object.keys(SHORTCODE_MAP)
   .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
@@ -43,6 +68,7 @@ export function parseReplacementText(text: string, schema: Schema): Fragment {
     const honorificType = SHORTCODE_MAP[shortcode];
     if (honorificType) {
       nodes.push(schema.nodes.honorific.create({ type: honorificType }));
+      trackHonorificInserted(honorificType, "find_replace");
     }
     lastIndex = match.index! + match[0].length;
   }
@@ -87,7 +113,9 @@ export const Honorific = Node.create({
         type: this.type,
         getAttributes: (match) => {
           const shortcode = match[0].slice(1, -1);
-          return { type: SHORTCODE_MAP[shortcode] };
+          const honorificType = SHORTCODE_MAP[shortcode];
+          trackHonorificInserted(honorificType, "paste");
+          return { type: honorificType };
         },
       }),
     ];
@@ -107,6 +135,7 @@ export const Honorific = Node.create({
           const node = nodeType.create({ type: honorificType });
           state.tr.replaceWith(range.from, range.to, node);
           state.tr.setMeta("honorific", true);
+          trackHonorificInserted(honorificType, "shortcode");
         },
       }),
     ];

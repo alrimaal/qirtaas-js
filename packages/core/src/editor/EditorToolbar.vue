@@ -8,7 +8,8 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Popover from "primevue/popover";
 import { Search, ListCollapse, ListOrdered, Highlighter } from "lucide-vue-next";
-import { HONORIFICS } from "./honorifics";
+import { HONORIFICS, isHonorificType } from "./honorifics";
+import { trackHonorificInserted } from "./extensions/Honorific";
 
 const props = defineProps<{ editor: Editor | undefined }>();
 const emit = defineEmits<{
@@ -118,6 +119,7 @@ function insertHonorific(type: string) {
     .focus()
     .insertContent({ type: "honorific", attrs: { type } })
     .run();
+  if (isHonorificType(type)) trackHonorificInserted(type, "toolbar");
   insertPopover.value.hide();
 }
 

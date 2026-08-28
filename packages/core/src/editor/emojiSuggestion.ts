@@ -5,6 +5,7 @@ import EmojiMenu from "./EmojiMenu.vue";
 import type { EmojiItem } from "@tiptap/extension-emoji";
 import type { Editor, Range } from "@tiptap/core";
 import { HONORIFICS, type HonorificType } from "./honorifics";
+import { trackHonorificInserted } from "./extensions/Honorific";
 
 type MenuItem = (EmojiItem | HonorificMenuItem) & { emoji?: string };
 
@@ -86,6 +87,7 @@ export const emojiSuggestion = {
             attrs: { type: honorificType },
           })
           .run();
+        trackHonorificInserted(honorificType, "menu");
         tippyInstance?.hide();
         return;
       }
