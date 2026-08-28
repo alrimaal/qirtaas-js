@@ -1,5 +1,16 @@
 # @qirtaas/react
 
+## 0.7.0
+
+### Minor Changes
+
+- 4bbba5c: Extends honourifics list.
+
+### Patch Changes
+
+- Updated dependencies [4bbba5c]
+  - @qirtaas/core@0.7.0
+
 ## 0.6.0
 
 ### Minor Changes
