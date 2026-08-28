@@ -38,7 +38,7 @@ export function trackHonorificInserted(
   // practice the regexes only match known shortcodes, but guard rather than emit
   // a `honourifics_inserted_undefined` event.
   if (!type) return;
-  trackEvent(`honourifics_inserted_${type}`, { type, source });
+  trackEvent(`honourifics_inserted`, { type, source });
 }
 
 const shortcodeKeys = Object.keys(SHORTCODE_MAP)
