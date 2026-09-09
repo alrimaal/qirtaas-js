@@ -52,6 +52,15 @@ export async function updateDocument(
   return { ...data, rejected_image_ids: data.rejected_image_ids ?? [] };
 }
 
+export async function renameDocument(
+  id: string,
+  title: string
+): Promise<QirtaasDocument> {
+  return await getTransport().data.patch<QirtaasDocument>(`/documents/${id}/`, {
+    title,
+  });
+}
+
 export async function deleteDocument(id: string): Promise<void> {
   await getTransport().data.delete(`/documents/${id}/`);
 }

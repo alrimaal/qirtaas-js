@@ -10,6 +10,8 @@
 import { mountEditor } from "./mount/editor";
 import { mountRenderer } from "./mount/renderer";
 import { deleteDocument } from "./mount/deleteDocument";
+import { renameDocument } from "./mount/renameDocument";
+import type { QirtaasDocument } from "./mount/renameDocument";
 import { duplicateDocument } from "./mount/duplicateDocument";
 import type { DuplicateDocumentResult } from "./mount/duplicateDocument";
 import { listDocuments } from "./mount/listDocuments";
@@ -51,6 +53,8 @@ export interface QirtaasClient {
   listDocuments(): Promise<DocumentSummary[]>;
   /** Delete a document over the embed-token channel (no mount required). */
   deleteDocument(documentId: string): Promise<void>;
+  /** Rename a document over the embed-token channel (no mount required). */
+  renameDocument(documentId: string, title: string): Promise<QirtaasDocument>;
   /**
    * Copy a document's content into a new document, returning the new id. Lets a
    * host keep a stable published document while the author edits a private clone.
@@ -92,6 +96,13 @@ export function createQirtaasClient(config: QirtaasClientOptions = {}): QirtaasC
       listDocuments({ apiUrl, getToken: requireToken("listDocuments") }),
     deleteDocument: (documentId) =>
       deleteDocument({ apiUrl, documentId, getToken: requireToken("deleteDocument") }),
+    renameDocument: (documentId, title) =>
+      renameDocument({
+        apiUrl,
+        documentId,
+        title,
+        getToken: requireToken("renameDocument"),
+      }),
     duplicateDocument: (documentId) =>
       duplicateDocument({
         apiUrl,
