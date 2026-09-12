@@ -1,5 +1,5 @@
 import tippy, { type Instance as TippyInstance } from "tippy.js";
-import { createApp, h, ref, type App } from "vue";
+import { VueRenderer } from "@tiptap/vue-3";
 import { getOverlayTarget } from "../mount/overlay";
 import EmojiMenu from "./EmojiMenu.vue";
 import type { EmojiItem } from "@tiptap/extension-emoji";
@@ -63,10 +63,9 @@ export const emojiSuggestion = {
 
   render: () => {
     let tippyInstance: TippyInstance | null = null;
-    let vueApp: App | null = null;
-    let container: HTMLElement | null = null;
-    const selectedIndex = ref(0);
-    const items = ref<MenuItem[]>([]);
+    let renderer: VueRenderer | null = null;
+    let selectedIndex = 0;
+    let items: MenuItem[] = [];
     let commandCallback: ((item: MenuItem) => void) | null = null;
     let currentEditor: Editor | null = null;
     let currentRange: Range | null = null;
@@ -94,42 +93,42 @@ export const emojiSuggestion = {
       commandCallback?.(item);
     };
 
-    function mountMenu() {
-      if (!container) return;
-      vueApp?.unmount();
-      vueApp = createApp({
-        render: () =>
-          h(EmojiMenu, {
-            items: items.value,
-            selectedIndex: selectedIndex.value,
-            onSelect: (item: { name: string; emoji?: string }) =>
-              selectItem(item as MenuItem),
-          }),
-      });
-      vueApp.mount(container);
-
+    // Patches the mounted menu's props; Vue diffs from there. The menu is
+    // created once per session, in onStart.
+    function paint() {
+      renderer?.updateProps({ items, selectedIndex });
       requestAnimationFrame(() => {
-        container
-          ?.querySelector(`[data-index="${selectedIndex.value}"]`)
+        renderer?.el
+          ?.querySelector(`[data-index="${selectedIndex}"]`)
           ?.scrollIntoView({ block: "nearest" });
       });
     }
 
     return {
       onStart: (props: SuggestionProps) => {
-        items.value = props.items;
-        selectedIndex.value = 0;
+        items = props.items;
+        selectedIndex = 0;
         commandCallback = props.command;
         currentEditor = props.editor;
         currentRange = props.range;
 
-        container = document.createElement("div");
-        mountMenu();
+        // VueRenderer (not createApp) so the menu inherits the host app's
+        // context — i18n, PrimeVue, provides — via editor.appContext.
+        renderer = new VueRenderer(EmojiMenu, {
+          editor: props.editor,
+          props: {
+            items,
+            selectedIndex,
+            onSelect: (item: { name: string; emoji?: string }) =>
+              selectItem(item as MenuItem),
+          },
+        });
+        paint();
 
         tippyInstance = tippy(document.body, {
           getReferenceClientRect: props.clientRect as () => DOMRect,
           appendTo: () => getOverlayTarget(),
-          content: container,
+          content: renderer.el as Element,
           showOnCreate: true,
           interactive: true,
           trigger: "manual",
@@ -138,12 +137,12 @@ export const emojiSuggestion = {
       },
 
       onUpdate: (props: SuggestionProps) => {
-        items.value = props.items;
-        selectedIndex.value = 0;
+        items = props.items;
+        selectedIndex = 0;
         commandCallback = props.command;
         currentEditor = props.editor;
         currentRange = props.range;
-        mountMenu();
+        paint();
 
         if (tippyInstance && props.clientRect) {
           tippyInstance.setProps({
@@ -155,18 +154,17 @@ export const emojiSuggestion = {
       onKeyDown: (props: { event: KeyboardEvent }) => {
         const { event } = props;
         if (event.key === "ArrowDown") {
-          selectedIndex.value = (selectedIndex.value + 1) % items.value.length;
-          mountMenu();
+          selectedIndex = (selectedIndex + 1) % items.length;
+          paint();
           return true;
         }
         if (event.key === "ArrowUp") {
-          selectedIndex.value =
-            (selectedIndex.value - 1 + items.value.length) % items.value.length;
-          mountMenu();
+          selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+          paint();
           return true;
         }
         if (event.key === "Enter") {
-          const item = items.value[selectedIndex.value];
+          const item = items[selectedIndex];
           if (item) selectItem(item);
           return true;
         }
@@ -179,10 +177,9 @@ export const emojiSuggestion = {
 
       onExit: () => {
         tippyInstance?.destroy();
-        vueApp?.unmount();
+        renderer?.destroy();
         tippyInstance = null;
-        vueApp = null;
-        container = null;
+        renderer = null;
         currentEditor = null;
         currentRange = null;
       },

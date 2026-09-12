@@ -8,7 +8,7 @@ export default {
     saved: "Enregistré",
     backIcon: "pi pi-arrow-left",
     backLabel: "Tableau de bord",
-    slashHint: "Appuyez sur '/' pour afficher les commandes",
+    slashHint: "Appuyez sur '/' pour les commandes, '{'@'}' pour le Coran",
     failedToLoad: "Échec du chargement du document",
     tryAgainLater: "Veuillez réessayer plus tard",
     insert: "Insérer",
@@ -105,7 +105,8 @@ export default {
     },
     shortcuts: {
       title: "Raccourcis clavier et syntaxe en ligne",
-      subtitle: "Chaque commande est aussi dans la palette de commandes ({key}).",
+      subtitle:
+        "Chaque commande est aussi dans la palette de commandes ({key}).",
       tooltip: "Raccourcis clavier",
       groups: {
         inline: "À taper directement",
@@ -115,7 +116,7 @@ export default {
       },
       inline: {
         commands: "Menu de commandes",
-        verse: "Verset coranique",
+        verse: "Verset du Coran",
         hadith: "Hadith",
         pageLink: "Lien vers une page",
         honorific: "Glyphe honorifique",
@@ -209,6 +210,11 @@ export default {
       "La sélection de plusieurs sourates n'est pas disponible pour l'insertion dans le texte. Passez au mode mushaf ou appuyez sur Réinitialiser pour commencer une nouvelle sélection.",
     preview: "Aperçu",
     previewError: "Impossible de charger le texte du verset",
+    refPromptTitle: "Insérer un verset du Coran",
+    refPromptHint: "Saisissez le numéro de la sourate, ex. 24:30",
+    refEnterToInsert: "Appuyez sur Entrée pour insérer",
+    refEnterForVerse: "Appuyez sur Entrée, puis le numéro du verset",
+    refTypeVerse: "Saisissez le numéro du verset",
     insertText: "Insérer le texte",
     insertMushafImage: "Insérer l’image du mushaf",
     insertInline: "Insérer dans le texte",

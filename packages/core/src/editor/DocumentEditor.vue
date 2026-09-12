@@ -30,6 +30,7 @@ import { QuranMushaf } from "./extensions/QuranMushaf";
 import { HadithNode } from "./extensions/HadithNode";
 import { DocumentLink } from "./extensions/DocumentLink";
 import { SlashCommand } from "./extensions/SlashCommand";
+import { QuranReference } from "./extensions/QuranReference";
 import {
   Honorific,
   isHonorificType,
@@ -392,6 +393,11 @@ const editor = useEditor({
     SearchReplace.configure({
       searchResultClass: "search-result",
     }),
+    QuranReference.configure({
+      locale: locale.value,
+      translate: (key: string) => t(key),
+      onInsert: insertQuranVerse,
+    }),
     SlashCommand.configure({
       locale: locale.value,
       translate: (key: string) => t(key),
@@ -550,6 +556,7 @@ function insertQuranVerse(data: {
   surahNameEnglish: string;
   text: string;
   displayMode?: "inline" | "card";
+  isRef?: boolean | null;
 }) {
   const displayMode = data.displayMode ?? "inline";
   editor.value
@@ -572,18 +579,26 @@ function insertQuranVerse(data: {
     data.fromAyah !== data.toAyah
       ? `${data.fromAyah}-${data.toAyah}`
       : undefined;
-  trackEvent("quran_inserted", {
-    surah: data.surah,
-    ayah: data.ayah,
-    range,
-  });
-  // Additional card-specific event; inline inserts keep only the base event.
-  if (displayMode === "card") {
-    trackEvent("quran_verse_card_inserted", {
+  if (data.isRef !== null && data.isRef) {
+    trackEvent("quran_verse_ref_inserted", {
       surah: data.surah,
       ayah: data.ayah,
       range,
     });
+  } else {
+    trackEvent("quran_inserted", {
+      surah: data.surah,
+      ayah: data.ayah,
+      range,
+    });
+    // Additional card-specific event; inline inserts keep only the base event.
+    if (displayMode === "card") {
+      trackEvent("quran_verse_card_inserted", {
+        surah: data.surah,
+        ayah: data.ayah,
+        range,
+      });
+    }
   }
   if (verseDetail.isOpen.value) {
     verseDetail.open(data.surah, data.fromAyah ?? data.ayah, locale.value);

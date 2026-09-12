@@ -10,7 +10,7 @@ const { t } = useI18n();
 // Syntax rows (mono hint) — things you type inline.
 const inlineRows = [
   { label: t("editor.shortcuts.inline.commands"), syntax: "/" },
-  { label: t("editor.shortcuts.inline.verse"), syntax: "#24:30" },
+  { label: t("editor.shortcuts.inline.verse"), syntax: "@24:30" },
   { label: t("editor.shortcuts.inline.hadith"), syntax: "/hadith" },
   { label: t("editor.shortcuts.inline.pageLink"), syntax: "/page" },
   { label: t("editor.shortcuts.inline.honorific"), syntax: ":saw:" },

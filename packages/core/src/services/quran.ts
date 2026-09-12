@@ -38,6 +38,17 @@ interface VerseDetailResponse {
   tafseer: Record<string, VerseTafsir>;
 }
 
+/**
+ * Arabic-Indic (٠-٩) and Persian (۰-۹) digits → ASCII, so verse references
+ * typed on an Arabic keyboard parse like their Latin-numeral equivalents.
+ */
+export function toLatinDigits(input: string): string {
+  return input.replace(/[\u0660-\u0669\u06f0-\u06f9]/g, (digit) => {
+    const code = digit.charCodeAt(0);
+    return String(code - (code >= 0x06f0 ? 0x06f0 : 0x0660));
+  });
+}
+
 export async function getVerseDetail(
   surah: number,
   ayah: number,
