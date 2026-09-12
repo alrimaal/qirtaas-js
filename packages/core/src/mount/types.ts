@@ -62,6 +62,8 @@ export interface EditorInstance {
   setEditable(editable: boolean): void;
   /** Switch theme live. */
   setTheme(theme: Theme): void;
+  /** Open the keyboard-shortcuts & inline-syntax reference dialog. */
+  openShortcuts(): void;
   /** Tear down the editor and release the shared overlay root. */
   destroy(): void;
 }

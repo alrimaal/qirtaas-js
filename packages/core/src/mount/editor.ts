@@ -25,6 +25,7 @@ interface EmbedAppExposed {
   getJSON(): Json | null;
   save(): Promise<void>;
   setEditable(editable: boolean): void;
+  openShortcuts(): void;
 }
 
 /**
@@ -122,6 +123,7 @@ export function mountEditor(
       liveState.theme = theme;
       setOverlayDark(theme === "dark");
     },
+    openShortcuts: () => appApi.value?.openShortcuts(),
     destroy: () => {
       app.unmount();
       releaseOverlayTarget();

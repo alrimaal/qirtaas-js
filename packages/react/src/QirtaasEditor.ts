@@ -45,6 +45,7 @@ export interface QirtaasEditorHandle {
   save: () => Promise<void>;
   setEditable: (editable: boolean) => void;
   setTheme: (theme: Theme) => void;
+  openShortcuts: () => void;
 }
 
 export const QirtaasEditor = forwardRef<QirtaasEditorHandle, QirtaasEditorProps>(
@@ -100,6 +101,7 @@ export const QirtaasEditor = forwardRef<QirtaasEditorHandle, QirtaasEditorProps>
         save: () => instance.current?.save() ?? Promise.resolve(),
         setEditable: (editable: boolean) => instance.current?.setEditable(editable),
         setTheme: (theme: Theme) => instance.current?.setTheme(theme),
+        openShortcuts: () => instance.current?.openShortcuts(),
       }),
       []
     );

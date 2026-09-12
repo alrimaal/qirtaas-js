@@ -83,6 +83,7 @@ defineExpose({
   save: () => instance?.save() ?? Promise.resolve(),
   setEditable: (editable: boolean) => instance?.setEditable(editable),
   setTheme: (theme: Theme) => instance?.setTheme(theme),
+  openShortcuts: () => instance?.openShortcuts(),
 });
 </script>
 

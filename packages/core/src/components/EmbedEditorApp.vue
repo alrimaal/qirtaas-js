@@ -179,6 +179,7 @@ defineExpose({
   save: autosave.saveNow,
   setEditable: (editable: boolean) =>
     editorRef.value?.editor?.setEditable(editable),
+  openShortcuts: () => editorRef.value?.openShortcuts(),
 });
 </script>
 

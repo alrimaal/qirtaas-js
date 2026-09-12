@@ -42,6 +42,7 @@ import type { AyahResult } from "@qirtaas/core/services/quran";
 import HadithSearchDialog from "./HadithSearchDialog.vue";
 import DocumentLinkPicker from "./DocumentLinkPicker.vue";
 import ImageUploadDialog from "./ImageUploadDialog.vue";
+import KeyboardShortcuts from "./KeyboardShortcuts.vue";
 import {
   useDocumentLinkHost,
   type DocumentLinkDocMeta,
@@ -88,7 +89,12 @@ const quranDialogVisible = ref(false);
 const quranInitialCollections = ref(false);
 const hadithDialogVisible = ref(false);
 const documentLinkPickerVisible = ref(false);
+const shortcutsVisible = ref(false);
 const failedToLoad = ref(false);
+
+function openShortcuts() {
+  shortcutsVisible.value = true;
+}
 
 const documentLinkHost = useDocumentLinkHost();
 
@@ -395,6 +401,7 @@ defineExpose({
   editor,
   openQuranDialog,
   openHadithDialog,
+  openShortcuts,
   insertTable,
   insertImageFromInput,
 });
@@ -728,6 +735,7 @@ function insertQuranMushaf(data: {
         @uploaded="onImageUploaded"
         @cancel="onImageUploadCancelled"
       />
+      <KeyboardShortcuts v-model:visible="shortcutsVisible" />
     </template>
   </div>
 </template>
