@@ -43,6 +43,8 @@ import HadithSearchDialog from "./HadithSearchDialog.vue";
 import DocumentLinkPicker from "./DocumentLinkPicker.vue";
 import ImageUploadDialog from "./ImageUploadDialog.vue";
 import KeyboardShortcuts from "./KeyboardShortcuts.vue";
+import CommandPalette from "./CommandPalette.vue";
+import { buildCommands, COMMAND_DEFS, type ResolvedCommand } from "./commands";
 import {
   useDocumentLinkHost,
   type DocumentLinkDocMeta,
@@ -79,6 +81,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: Record<string, unknown>];
   /** Fired once the TipTap instance is created and usable. */
   ready: [];
+  "open-find-replace": [];
 }>();
 
 const { t, locale } = useI18n();
@@ -90,13 +93,81 @@ const quranInitialCollections = ref(false);
 const hadithDialogVisible = ref(false);
 const documentLinkPickerVisible = ref(false);
 const shortcutsVisible = ref(false);
+const paletteVisible = ref(false);
+const activeCommandIds = ref<Set<string>>(new Set());
 const failedToLoad = ref(false);
 
 function openShortcuts() {
   shortcutsVisible.value = true;
 }
 
+function openCommandPalette(source: "shortcut" | "button" = "button") {
+  const ed = editor.value;
+  activeCommandIds.value = new Set(
+    ed ? COMMAND_DEFS.filter((c) => c.isActive?.(ed)).map((c) => c.id) : []
+  );
+  trackEvent("command_palette_opened", { source });
+  paletteVisible.value = true;
+}
+
 const documentLinkHost = useDocumentLinkHost();
+
+const paletteCommands = computed<ResolvedCommand[]>(() =>
+  buildCommands({
+    locale: locale.value,
+    t,
+    surface: "palette",
+    commandFilter,
+  })
+);
+
+const commandFilter = (id: string) => id !== "page" || documentLinkHost.enabled;
+
+function runCommand(
+  commandId: string,
+  ed: import("@tiptap/core").Editor,
+  source: "slash" | "palette"
+) {
+  const own = COMMAND_DEFS.find((c) => c.id === commandId)?.run;
+  if (own) {
+    own(ed);
+    return;
+  }
+  if (commandId === "quran") {
+    quranDialogVisible.value = true;
+  } else if (commandId === "hadith") {
+    hadithDialogVisible.value = true;
+  } else if (commandId === "page") {
+    documentLinkPickerVisible.value = true;
+  } else if (commandId === "table") {
+    insertTable();
+  } else if (commandId === "findReplace") {
+    emit("open-find-replace");
+  } else if (commandId === "shortcuts") {
+    openShortcuts();
+  } else if (isHonorificType(commandId)) {
+    ed.chain()
+      .focus()
+      .insertContent({ type: "honorific", attrs: { type: commandId } })
+      .run();
+    trackHonorificInserted(commandId, source);
+  }
+}
+
+function onPaletteRun(command: ResolvedCommand) {
+  const ed = editor.value;
+  if (!ed) return;
+  trackEvent("command_palette_command", { command: command.id });
+  runCommand(command.id, ed, "palette");
+}
+
+function onCommandPaletteShortcut(e: KeyboardEvent) {
+  if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+  if (e.key !== "k" && e.key !== "K") return;
+  e.preventDefault();
+  if (paletteVisible.value) paletteVisible.value = false;
+  else openCommandPalette("shortcut");
+}
 
 function insertDocumentLink(doc: DocumentLinkDocMeta) {
   editor.value
@@ -323,23 +394,11 @@ const editor = useEditor({
     }),
     SlashCommand.configure({
       locale: locale.value,
-      commandFilter: (id: string) => id !== "page" || documentLinkHost.enabled,
-      onCommand: (commandId: string, editor: import("@tiptap/core").Editor) => {
+      translate: (key: string) => t(key),
+      commandFilter,
+      onCommand: (commandId: string, ed: import("@tiptap/core").Editor) => {
         trackEvent("slash_command", { command: commandId });
-        if (commandId === "quran") {
-          quranDialogVisible.value = true;
-        } else if (commandId === "hadith") {
-          hadithDialogVisible.value = true;
-        } else if (commandId === "page") {
-          documentLinkPickerVisible.value = true;
-        } else if (isHonorificType(commandId)) {
-          editor
-            ?.chain()
-            .focus()
-            .insertContent({ type: "honorific", attrs: { type: commandId } })
-            .run();
-          trackHonorificInserted(commandId, "slash");
-        }
+        runCommand(commandId, ed, "slash");
       },
     }),
   ],
@@ -394,14 +453,21 @@ function updateScrollAnchor() {
     scrollMargin: { top: 0, right: 0, bottom, left: 0 },
   });
 }
-onMounted(() => window.addEventListener("resize", updateScrollAnchor));
-onBeforeUnmount(() => window.removeEventListener("resize", updateScrollAnchor));
+onMounted(() => {
+  window.addEventListener("resize", updateScrollAnchor);
+  window.addEventListener("keydown", onCommandPaletteShortcut);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateScrollAnchor);
+  window.removeEventListener("keydown", onCommandPaletteShortcut);
+});
 
 defineExpose({
   editor,
   openQuranDialog,
   openHadithDialog,
   openShortcuts,
+  openCommandPalette,
   insertTable,
   insertImageFromInput,
 });
@@ -736,6 +802,12 @@ function insertQuranMushaf(data: {
         @cancel="onImageUploadCancelled"
       />
       <KeyboardShortcuts v-model:visible="shortcutsVisible" />
+      <CommandPalette
+        v-model:visible="paletteVisible"
+        :commands="paletteCommands"
+        :active-ids="activeCommandIds"
+        @run="onPaletteRun"
+      />
     </template>
   </div>
 </template>

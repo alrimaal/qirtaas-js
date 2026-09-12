@@ -84,6 +84,7 @@ defineExpose({
   setEditable: (editable: boolean) => instance?.setEditable(editable),
   setTheme: (theme: Theme) => instance?.setTheme(theme),
   openShortcuts: () => instance?.openShortcuts(),
+  openCommandPalette: () => instance?.openCommandPalette(),
 });
 </script>
 

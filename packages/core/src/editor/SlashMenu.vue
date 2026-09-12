@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { SlashCommandItem } from "./extensions/SlashCommand";
+import type { ResolvedCommand } from "./commands";
 
 defineProps<{
-  items: SlashCommandItem[];
+  items: ResolvedCommand[];
   selectedIndex: number;
 }>();
 
 const emit = defineEmits<{
-  select: [item: SlashCommandItem];
+  select: [item: ResolvedCommand];
 }>();
 </script>
 

@@ -7,66 +7,9 @@ const SlashCommandPluginKey = new PluginKey("slashCommand");
 import { createApp, h, ref, type App } from "vue";
 import { getOverlayTarget } from "../../mount/overlay";
 import SlashMenu from "../SlashMenu.vue";
+import { buildCommands, filterCommands, type ResolvedCommand } from "../commands";
 
-import { HONORIFICS } from "../honorifics";
-
-export interface SlashCommandItem {
-  id: string;
-  label: string;
-  searchTerms: string[];
-  icon: string;
-  // Honorific glyph shown before the label, rendered in the Kitab font by
-  // SlashMenu (newer code points would be tofu in the default font).
-  glyph?: string;
-}
-
-interface CommandDef {
-  id: string;
-  labelEn: string;
-  labelAr: string;
-  icon: string;
-  glyph?: string;
-  searchTerms?: string[];
-}
-
-const BASE_COMMANDS: CommandDef[] = [
-  { id: "quran", labelEn: "Quran", labelAr: "قرآن", icon: "pi pi-book" },
-  { id: "hadith", labelEn: "Hadith", labelAr: "حديث", icon: "pi pi-comment" },
-  {
-    id: "page",
-    labelEn: "Link to page",
-    labelAr: "ربط صفحة",
-    icon: "pi pi-file",
-  },
-];
-
-// Honorifics come from the shared registry. `id` is the HonorificType the
-// onCommand handler inserts; the glyph is rendered separately in Kitab so it
-// never tofus; shortcodes become search terms so `/ra`, `/swt` etc. match.
-const HONORIFIC_COMMANDS: CommandDef[] = HONORIFICS.map((h) => ({
-  id: h.id,
-  labelEn: h.en,
-  labelAr: h.ar,
-  icon: "pi pi-pencil",
-  glyph: h.glyph,
-  searchTerms: [h.en.toLowerCase(), h.ar, ...h.shortcodes],
-}));
-
-const COMMAND_DEFS: CommandDef[] = [...BASE_COMMANDS, ...HONORIFIC_COMMANDS];
-
-function buildCommands(
-  locale: string,
-  commandFilter: (id: string) => boolean
-): SlashCommandItem[] {
-  const isAr = locale === "ar";
-  return COMMAND_DEFS.filter((cmd) => commandFilter(cmd.id)).map((cmd) => ({
-    id: cmd.id,
-    label: isAr ? cmd.labelAr : cmd.labelEn,
-    searchTerms: cmd.searchTerms ?? [cmd.labelEn.toLowerCase(), cmd.labelAr],
-    icon: cmd.icon,
-    glyph: cmd.glyph,
-  }));
-}
+export type SlashCommandItem = ResolvedCommand;
 
 export const SlashCommand = Extension.create({
   name: "slashCommand",
@@ -74,6 +17,7 @@ export const SlashCommand = Extension.create({
   addOptions() {
     return {
       locale: "en" as string,
+      translate: ((key: string) => key) as (key: string) => string,
       // Lets hosts drop commands whose backing capability is unavailable
       // (e.g. /page when no document-link host is provided).
       commandFilter: ((_id: string) => true) as (id: string) => boolean,
@@ -86,7 +30,12 @@ export const SlashCommand = Extension.create({
 
   addProseMirrorPlugins() {
     const onCommand = this.options.onCommand;
-    const commands = buildCommands(this.options.locale, this.options.commandFilter);
+    const commands = buildCommands({
+      locale: this.options.locale,
+      t: this.options.translate,
+      surface: "slash",
+      commandFilter: this.options.commandFilter,
+    });
 
     return [
       Suggestion({
@@ -94,12 +43,8 @@ export const SlashCommand = Extension.create({
         editor: this.editor,
         char: "/",
         startOfLine: false,
-        items: ({ query }: { query: string }): SlashCommandItem[] => {
-          const q = query.toLowerCase();
-          return commands.filter((cmd) =>
-            cmd.searchTerms.some((term) => term.includes(q)),
-          );
-        },
+        items: ({ query }: { query: string }): SlashCommandItem[] =>
+          filterCommands(commands, query),
         render: () => {
           let tippyInstance: TippyInstance | null = null;
           let vueApp: App | null = null;

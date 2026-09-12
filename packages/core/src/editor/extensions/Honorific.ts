@@ -23,6 +23,7 @@ export type HonorificInsertSource =
   | "menu" // `:` emoji/honorific suggestion menu
   | "toolbar" // Insert-menu button
   | "slash" // `/` slash command
+  | "palette" // ⌘K command palette
   | "paste" // pasted text containing `:saw:`
   | "find_replace"; // Find & Replace substitution
 

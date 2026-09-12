@@ -180,6 +180,7 @@ defineExpose({
   setEditable: (editable: boolean) =>
     editorRef.value?.editor?.setEditable(editable),
   openShortcuts: () => editorRef.value?.openShortcuts(),
+  openCommandPalette: () => editorRef.value?.openCommandPalette(),
 });
 </script>
 
@@ -231,6 +232,7 @@ defineExpose({
           :document-id="docId ?? undefined"
           @update:model-value="onContentUpdate"
           @ready="onReady?.()"
+          @open-find-replace="openFindReplace"
         />
       </div>
       <!-- Mobile toolbar (bottom), mirroring the SPA's bottom bar. -->

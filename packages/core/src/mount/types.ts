@@ -64,6 +64,8 @@ export interface EditorInstance {
   setTheme(theme: Theme): void;
   /** Open the keyboard-shortcuts & inline-syntax reference dialog. */
   openShortcuts(): void;
+  /** Open the ⌘K command palette. */
+  openCommandPalette(): void;
   /** Tear down the editor and release the shared overlay root. */
   destroy(): void;
 }

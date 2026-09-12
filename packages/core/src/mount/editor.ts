@@ -26,6 +26,7 @@ interface EmbedAppExposed {
   save(): Promise<void>;
   setEditable(editable: boolean): void;
   openShortcuts(): void;
+  openCommandPalette(): void;
 }
 
 /**
@@ -124,6 +125,7 @@ export function mountEditor(
       setOverlayDark(theme === "dark");
     },
     openShortcuts: () => appApi.value?.openShortcuts(),
+    openCommandPalette: () => appApi.value?.openCommandPalette(),
     destroy: () => {
       app.unmount();
       releaseOverlayTarget();

@@ -2,26 +2,10 @@
 import { getOverlayAppendTo } from "../mount/overlay";
 import { useI18n } from "vue-i18n";
 import Dialog from "primevue/dialog";
+import { formatCombo as fmt, mod, modShift, type Combo } from "./keyboard";
 
 const visible = defineModel<boolean>("visible", { default: false });
 const { t } = useI18n();
-
-// StarterKit binds formatting to Mod (⌘ on macOS, Ctrl elsewhere).
-const isMac =
-  typeof navigator !== "undefined" &&
-  navigator.platform.toUpperCase().includes("MAC");
-
-type Combo = { mods: ("mod" | "shift" | "alt")[]; key: string };
-
-function fmt({ mods, key }: Combo): string {
-  const glyphs = isMac
-    ? { mod: "⌘", shift: "⇧", alt: "⌥" }
-    : { mod: "Ctrl", shift: "Shift", alt: "Alt" };
-  return [...mods.map((m) => glyphs[m]), key].join(isMac ? "" : "+");
-}
-
-const mod = (key: string): Combo => ({ mods: ["mod"], key });
-const modShift = (key: string): Combo => ({ mods: ["mod", "shift"], key });
 
 // Syntax rows (mono hint) — things you type inline.
 const inlineRows = [

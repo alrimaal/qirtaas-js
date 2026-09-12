@@ -9,6 +9,7 @@ import InputText from "primevue/inputtext";
 import Popover from "primevue/popover";
 import { Search, ListCollapse, ListOrdered, Highlighter } from "lucide-vue-next";
 import { HONORIFICS, isHonorificType } from "./honorifics";
+import { HIGHLIGHT_COLORS, insertToggleList } from "./commands";
 import { trackHonorificInserted } from "./extensions/Honorific";
 
 const props = defineProps<{ editor: Editor | undefined }>();
@@ -54,14 +55,7 @@ const highlightPopover = ref();
 const linkPopover = ref();
 const linkUrl = ref("");
 
-const highlightColors = [
-  { name: "Yellow", color: "#fef08a", dark: "#ca8a04" },
-  { name: "Green", color: "#bbf7d0", dark: "#15803d" },
-  { name: "Blue", color: "#bfdbfe", dark: "#1d4ed8" },
-  { name: "Pink", color: "#fbcfe8", dark: "#be185d" },
-  { name: "Orange", color: "#fed7aa", dark: "#c2410c" },
-  { name: "Purple", color: "#e9d5ff", dark: "#7e22ce" },
-];
+const highlightColors = HIGHLIGHT_COLORS;
 
 const activeHeadingLabel = computed(() => {
   const e = props.editor;
@@ -88,25 +82,8 @@ function toggleAlignPopover(event: Event) {
   alignPopover.value.toggle(event);
 }
 
-function insertToggleList() {
-  const editor = props.editor!;
-  const { $from } = editor.state.selection;
-  // Workaround: https://github.com/ueberdosis/tiptap/issues/7122
-  // Details collapses on type if it's the first node in the document.
-  if ($from.depth === 1 && $from.index(0) === 0) {
-    editor
-      .chain()
-      .focus()
-      .command(({ tr, state }) => {
-        tr.insert(0, state.schema.nodes.paragraph!.create());
-        return true;
-      })
-      .setTextSelection($from.pos + 2)
-      .setDetails()
-      .run();
-  } else {
-    editor.chain().focus().setDetails().run();
-  }
+function onInsertToggleList() {
+  insertToggleList(props.editor!);
 }
 
 function toggleInsertPopover(event: Event) {
@@ -414,12 +391,12 @@ function removeLink() {
       <div class="flex items-center gap-2 p-1">
         <button
           v-for="c in highlightColors"
-          :key="c.color"
+          :key="c.id"
           class="w-6 h-6 rounded-full border-2 cursor-pointer transition-transform hover:scale-110"
-          :class="props.editor!.isActive('highlight', { color: c.color }) ? 'border-accent' : 'border-transparent'"
-          :style="{ backgroundColor: isDark ? c.dark : c.color }"
-          :title="c.name"
-          @click="applyHighlight(c.color)"
+          :class="props.editor!.isActive('highlight', { color: c.light }) ? 'border-accent' : 'border-transparent'"
+          :style="{ backgroundColor: isDark ? c.dark : c.light }"
+          :title="t(`editor.highlights.${c.id}`)"
+          @click="applyHighlight(c.light)"
         />
         <button
           class="w-6 h-6 rounded-full border-2 border-border cursor-pointer flex items-center justify-center bg-transparent hover:bg-bg-soft"
@@ -563,7 +540,7 @@ function removeLink() {
       size="small"
       class="shrink-0"
       :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('details') }"
-      @click="insertToggleList()"
+      @click="onInsertToggleList()"
     >
       <ListCollapse :size="16" />
     </Button>
