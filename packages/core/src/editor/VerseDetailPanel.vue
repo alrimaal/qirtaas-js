@@ -302,6 +302,7 @@ function onKeydown(e: KeyboardEvent) {
                 option-group-label="label"
                 option-group-children="resources"
                 filter
+                reset-filter-on-hide
                 :filter-fields="EDITION_FILTER_FIELDS"
                 :filter-placeholder="t('verseDetail.searchEditions')"
                 :append-to="getOverlayAppendTo()"
