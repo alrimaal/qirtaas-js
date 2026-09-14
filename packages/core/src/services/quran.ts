@@ -19,6 +19,16 @@ export interface VerseTafsir {
   text: string;
 }
 
+/** One translation edition's metadata, plus its text for the verse at hand. */
+export interface VerseTranslation {
+  resource_id: number;
+  name: string;
+  author_name: string;
+  language: string;
+  slug: string;
+  text: string;
+}
+
 export interface VerseDetail {
   surah: number;
   ayah: number;
@@ -26,6 +36,8 @@ export interface VerseDetail {
   surah_name_english: string;
   arabic_text: string;
   translation_en: string;
+  /** The requested edition. `translation_en` is the same text, minus the metadata. */
+  translation: VerseTranslation | null;
   tafsirs: VerseTafsir[];
 }
 
@@ -34,8 +46,11 @@ interface VerseDetailResponse {
   surah: SurahBrief;
   number: number;
   text: string;
+  // Legacy pair, still served; phase 3 drops them for `translation`/`tafsirs`.
   translation_en: string;
   tafseer: Record<string, VerseTafsir>;
+  translation?: VerseTranslation;
+  tafsirs?: VerseTafsir[];
 }
 
 /**
@@ -52,10 +67,11 @@ export function toLatinDigits(input: string): string {
 export async function getVerseDetail(
   surah: number,
   ayah: number,
-  _locale: string
+  translationId?: number
 ): Promise<VerseDetail> {
   const raw = await getTransport().content.get<VerseDetailResponse>(
-    `/quran/verses/${surah}:${ayah}/`
+    `/quran/verses/${surah}:${ayah}/`,
+    translationId ? { params: { translation: translationId } } : undefined
   );
   return {
     surah: raw.surah.number,
@@ -64,8 +80,45 @@ export async function getVerseDetail(
     surah_name_english: raw.surah.name_english,
     arabic_text: raw.text,
     translation_en: raw.translation_en,
-    tafsirs: Object.values(raw.tafseer ?? {}),
+    translation: raw.translation ?? null,
+    tafsirs: raw.tafsirs ?? Object.values(raw.tafseer ?? {}),
   };
+}
+
+/** A translation or tafsir edition, metadata only — never content. */
+export interface QuranResource {
+  resource_id: number;
+  name: string;
+  author_name: string;
+  language: string;
+  slug: string;
+}
+
+export interface QuranResources {
+  translations: QuranResource[];
+  tafsirs: QuranResource[];
+}
+
+// ~170 rows that change only when the sync worker picks up a new edition, so
+// one in-flight/resolved promise is shared by every picker on the page.
+let resourcesPromise: Promise<QuranResources> | null = null;
+
+/** Every edition the backend holds, for the edition pickers. */
+export function getQuranResources(): Promise<QuranResources> {
+  if (!resourcesPromise) {
+    resourcesPromise = getTransport()
+      .content.get<QuranResources>("/quran/resources/")
+      .then((data) => ({
+        translations: data.translations ?? [],
+        tafsirs: data.tafsirs ?? [],
+      }))
+      .catch((err) => {
+        // Don't cache a failure — the next picker that opens should retry.
+        resourcesPromise = null;
+        throw err;
+      });
+  }
+  return resourcesPromise;
 }
 
 export interface SurahMatch {
@@ -84,10 +137,9 @@ export async function searchQuran(query: string): Promise<QuranSearchResponse> {
   const trimmed = query.trim();
   const isVerse = /^\d+:\d+$/.test(trimmed);
   const params = isVerse ? { verse: trimmed } : { q: trimmed };
-  const data = await getTransport().content.get<QuranSearchResponse | AyahResult>(
-    "/quran/search/",
-    { params }
-  );
+  const data = await getTransport().content.get<
+    QuranSearchResponse | AyahResult
+  >("/quran/search/", { params });
   if (isVerse) {
     // Verse-lookup endpoint returns a single AyahResult; normalize to the
     // unified response shape so callers don't branch on input.
@@ -114,13 +166,13 @@ export interface VerseRangeResult {
 export async function getVerseRange(
   surah: number,
   fromAyah: number,
-  toAyah: number,
+  toAyah: number
 ): Promise<VerseRangeResult> {
   if (fromAyah === toAyah) {
     // Backend's range endpoint rejects from == to; the single-verse endpoint
     // is the documented path for this case.
     const raw = await getTransport().content.get<VerseDetailResponse>(
-      `/quran/verses/${surah}:${fromAyah}/`,
+      `/quran/verses/${surah}:${fromAyah}/`
     );
     return {
       surah: raw.surah,
@@ -131,7 +183,7 @@ export async function getVerseRange(
   }
   return await getTransport().content.get<VerseRangeResult>(
     "/quran/verses/range/",
-    { params: { from: `${surah}:${fromAyah}`, to: `${surah}:${toAyah}` } },
+    { params: { from: `${surah}:${fromAyah}`, to: `${surah}:${toAyah}` } }
   );
 }
 
@@ -165,5 +217,7 @@ export function mushafClipUrl(ref: ClipRef): string {
     line_start: String(ref.lineStart),
     line_end: String(ref.lineEnd),
   });
-  return `${getTransport().content.apiUrl}/quran/clips.png?${params.toString()}`;
+  return `${
+    getTransport().content.apiUrl
+  }/quran/clips.png?${params.toString()}`;
 }

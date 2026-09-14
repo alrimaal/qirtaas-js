@@ -1,10 +1,11 @@
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import {
   getVerseDetail,
   type VerseDetail,
   type VerseTafsir,
 } from "@qirtaas/core/services/quran";
 import { SURAHS } from "@qirtaas/core/data/mushaf";
+import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
 import { trackEvent } from "@qirtaas/core/editor/runtime/analytics";
 
 // Module-level state — shared across all consumers (singleton).
@@ -14,7 +15,7 @@ const error = ref(false);
 const data = ref<VerseDetail | null>(null);
 const activeSurah = ref<number | null>(null);
 const activeAyah = ref<number | null>(null);
-const currentLocale = ref<string>("en");
+const { selectedTranslationId } = useTranslationEdition();
 
 const TAFSIR_SLUG_STORAGE_KEY = "verseDetail.selectedTafsirSlug";
 const TAFSIR_LANGUAGE_STORAGE_KEY = "verseDetail.selectedTafsirLanguage";
@@ -98,7 +99,7 @@ function tafsirsForLanguage(language: string | null): VerseTafsir[] {
   return (data.value?.tafsirs ?? []).filter((tf) => tf.language === language);
 }
 
-async function fetchActive(locale: string) {
+async function fetchActive() {
   if (activeSurah.value == null || activeAyah.value == null) return;
   loading.value = true;
   error.value = false;
@@ -107,7 +108,7 @@ async function fetchActive(locale: string) {
     data.value = await getVerseDetail(
       activeSurah.value,
       activeAyah.value,
-      locale
+      selectedTranslationId.value
     );
   } catch {
     error.value = true;
@@ -116,21 +117,26 @@ async function fetchActive(locale: string) {
   }
 }
 
-async function open(surah: number, ayah: number, locale: string) {
+// Repaint an open panel when the edition changes under it (the sidebar picker
+// can fire while the panel is showing a verse).
+watch(selectedTranslationId, () => {
+  if (isOpen.value) void fetchActive();
+});
+
+async function open(surah: number, ayah: number, _locale?: string) {
   activeSurah.value = surah;
   activeAyah.value = ayah;
-  currentLocale.value = locale;
   isOpen.value = true;
   trackEvent("verse_panel_opened", { surah, ayah });
-  await fetchActive(locale);
+  await fetchActive();
 }
 
 function close() {
   isOpen.value = false;
 }
 
-function retry(locale: string) {
-  return fetchActive(locale);
+function retry(_locale?: string) {
+  return fetchActive();
 }
 
 const hasPrev = computed(
@@ -157,7 +163,7 @@ async function goPrev() {
     activeSurah.value = prev.number;
     activeAyah.value = prev.verse_count;
   }
-  await fetchActive(currentLocale.value);
+  await fetchActive();
 }
 
 async function goNext() {
@@ -172,7 +178,7 @@ async function goNext() {
     activeSurah.value = next.number;
     activeAyah.value = 1;
   }
-  await fetchActive(currentLocale.value);
+  await fetchActive();
 }
 
 export function useVerseDetail() {

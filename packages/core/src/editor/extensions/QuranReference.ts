@@ -10,6 +10,7 @@ import {
   type SurahInfo,
   type VerseDetail,
 } from "@qirtaas/core/services/quran";
+import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
 import { getOverlayTarget } from "../../mount/overlay";
 import QuranRefMenu from "../QuranRefMenu.vue";
 
@@ -73,6 +74,7 @@ export const QuranReference = Extension.create({
   addProseMirrorPlugins() {
     const editor = this.editor;
     const { locale, translate, onInsert } = this.options;
+    const { selectedTranslationId } = useTranslationEdition();
     const surahName = (info: SurahInfo) =>
       locale.startsWith("ar") ? info.name_arabic : info.name_english;
 
@@ -144,7 +146,7 @@ export const QuranReference = Extension.create({
                 const loaded = await getVerseDetail(
                   verse.surah,
                   verse.ayah,
-                  locale
+                  selectedTranslationId.value
                 );
                 if (id !== lookupId) return;
                 detail = loaded;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import DOMPurify from "dompurify";
 import Button from "primevue/button";
@@ -7,6 +7,15 @@ import {
   useVerseDetail,
   localeToTafsirLanguage,
 } from "@qirtaas/core/composables/useVerseDetail";
+import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
+import { useQuranEditions } from "@qirtaas/core/composables/useQuranEditions";
+import Select from "primevue/select";
+import { getOverlayAppendTo } from "../mount/overlay";
+import {
+  EDITION_FILTER_FIELDS,
+  groupByLanguage,
+  languageLabel,
+} from "./quran/languageLabels";
 import ReportDataDialog from "./ReportDataDialog.vue";
 
 function sanitize(html: string): string {
@@ -65,24 +74,6 @@ const verseReference = computed(
   () => `${activeSurah.value ?? ""}:${activeAyah.value ?? ""}`
 );
 
-// Native-script labels so each language is self-descriptive regardless of UI locale.
-const LANGUAGE_LABELS: Record<string, string> = {
-  arabic: "العربية",
-  english: "English",
-  urdu: "اردو",
-  french: "Français",
-  spanish: "Español",
-  indonesian: "Bahasa Indonesia",
-  turkish: "Türkçe",
-  russian: "Русский",
-  bengali: "বাংলা",
-  chinese: "中文",
-};
-
-function languageLabel(lang: string): string {
-  return LANGUAGE_LABELS[lang] ?? lang.charAt(0).toUpperCase() + lang.slice(1);
-}
-
 const languageOptions = computed(() => {
   // The UI-locale's language leads, then the other two "core" languages, so a
   // French reader sees Français first, then العربية / English. Deduped, so a
@@ -102,6 +93,24 @@ const languageOptions = computed(() => {
 
   return sorted.map((lang) => ({ value: lang, label: languageLabel(lang) }));
 });
+
+const { editions: translationEditions, loadEditions } = useQuranEditions();
+const { selectedTranslationId, setSelectedTranslationId } =
+  useTranslationEdition();
+
+onMounted(loadEditions);
+
+// The reader's own language leads here, unlike the card's shared default.
+const editionGroups = computed(() =>
+  groupByLanguage(translationEditions.value, [
+    localeToTafsirLanguage(locale.value),
+    "english",
+  ])
+);
+
+/** The edition actually on screen, per the response. Never a guess: while the
+ *  catalogue is still loading this is all we can honestly name. */
+const servedEditionName = computed(() => data.value?.translation?.name ?? "");
 
 const activeLanguage = computed<string | null>({
   get() {
@@ -281,12 +290,39 @@ function onKeydown(e: KeyboardEvent) {
           >
             <div class="flex items-baseline justify-between gap-2">
               <h3
-                class="text-[0.7rem] font-semibold uppercase tracking-wider text-muted"
+                class="text-[0.7rem] font-semibold uppercase tracking-wider text-muted shrink-0"
               >
                 {{ t("verseDetail.translation") }}
               </h3>
-              <span class="text-[0.65rem] text-muted/80 italic truncate">
-                {{ t("verseDetail.translationSource") }}
+              <!-- Searchable edition picker, grouped by language: 144 editions
+                   is far too many to scroll blind. -->
+              <Select
+                v-if="editionGroups.length > 0"
+                size="small"
+                :model-value="selectedTranslationId"
+                :options="editionGroups"
+                option-label="name"
+                option-value="resource_id"
+                option-group-label="label"
+                option-group-children="resources"
+                filter
+                :filter-fields="EDITION_FILTER_FIELDS"
+                :filter-placeholder="t('verseDetail.searchEditions')"
+                :append-to="getOverlayAppendTo()"
+                :aria-label="t('verseDetail.translationEdition')"
+                class="min-w-0 max-w-[60%] !bg-bg !border-border hover:!border-accent/50"
+                :pt="{
+                  label: { class: '!text-xs !py-1 !ps-2 !pe-0 truncate' },
+                  dropdown: { class: '!w-6' },
+                  overlay: { class: 'text-sm' },
+                }"
+                @update:model-value="setSelectedTranslationId"
+              />
+              <span
+                v-else-if="servedEditionName"
+                class="text-[0.65rem] text-muted/80 italic truncate"
+              >
+                {{ servedEditionName }}
               </span>
             </div>
             <div
@@ -311,7 +347,11 @@ function onKeydown(e: KeyboardEvent) {
                 :aria-label="t('verseDetail.tafsirLanguage')"
                 class="text-xs border border-border rounded-md bg-bg text-ink ps-2 pe-1 py-1 cursor-pointer hover:border-accent/50 focus:border-accent outline-none transition-colors"
               >
-                <option v-for="o in languageOptions" :key="o.value" :value="o.value">
+                <option
+                  v-for="o in languageOptions"
+                  :key="o.value"
+                  :value="o.value"
+                >
                   {{ o.label }}
                 </option>
               </select>
