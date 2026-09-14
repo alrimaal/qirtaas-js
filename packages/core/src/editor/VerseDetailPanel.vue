@@ -283,11 +283,7 @@ function onKeydown(e: KeyboardEvent) {
         </section>
 
         <div class="px-5 py-5 space-y-6">
-          <!-- Translation -->
-          <section
-            v-if="data.translation_en && locale !== 'ar'"
-            class="space-y-2"
-          >
+          <section v-if="locale !== 'ar'" class="space-y-2">
             <div class="flex items-baseline justify-between gap-2">
               <h3
                 class="text-[0.7rem] font-semibold uppercase tracking-wider text-muted shrink-0"
@@ -326,9 +322,13 @@ function onKeydown(e: KeyboardEvent) {
               </span>
             </div>
             <div
+              v-if="data.translation_en"
               class="text-sm text-ink leading-relaxed"
               v-html="sanitize(data.translation_en)"
             />
+            <p v-else class="text-sm text-muted italic">
+              {{ t("verseDetail.noTranslation") }}
+            </p>
           </section>
 
           <!-- Tafsir -->

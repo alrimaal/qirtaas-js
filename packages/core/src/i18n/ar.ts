@@ -260,6 +260,8 @@ export default {
     close: "إغلاق",
     openOnQuranCom: "فتح في Quran.com",
     translation: "الترجمة",
+    noTranslation:
+      "لا تتوفر ترجمة لهذه الآية في هذا الإصدار. جرّب إصدارًا آخر.",
     transliteration: "النقحرة",
     tafsir: "التفسير",
     tafsirLanguage: "لغة التفسير",

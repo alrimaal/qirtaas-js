@@ -262,6 +262,8 @@ export default {
     close: "Close",
     openOnQuranCom: "Open on Quran.com",
     translation: "Translation",
+    noTranslation:
+      "This edition has no translation for this verse. Try another edition.",
     transliteration: "Transliteration",
     tafsir: "Tafsir",
     tafsirLanguage: "Tafsir language",

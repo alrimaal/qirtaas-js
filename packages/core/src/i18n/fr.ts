@@ -251,6 +251,8 @@ export default {
     close: "Fermer",
     openOnQuranCom: "Ouvrir sur Quran.com",
     translation: "Traduction",
+    noTranslation:
+      "Cette édition ne propose pas de traduction pour ce verset. Essayez une autre édition.",
     transliteration: "Translittération",
     tafsir: "Tafsir",
     tafsirLanguage: "Langue du tafsir",
