@@ -8,14 +8,10 @@ import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import WordRangePicker from "./WordRangePicker.vue";
 import DOMPurify from "dompurify";
+import SanitizedHtml from "./SanitizedHtml.vue";
 
 const cleanText = (raw: string) =>
   DOMPurify.sanitize(raw ?? "", { ALLOWED_TAGS: [], KEEP_CONTENT: true });
-
-// Backend-built excerpt: matched words are wrapped in <mark>. DOMPurify strips
-// any other tags (same as cleanText), keeping only <mark> for the highlight.
-const highlightedText = (raw: string) =>
-  DOMPurify.sanitize(raw ?? "", { ALLOWED_TAGS: ["mark"], KEEP_CONTENT: true });
 
 const { t } = useI18n();
 
@@ -216,11 +212,12 @@ function close() {
               hadith.collection_name_english
             }}) — #{{ hadith.number }}
           </span>
-          <span
+          <SanitizedHtml
             v-if="hadith.text_highlighted"
+            policy="highlight"
+            :html="hadith.text_highlighted"
             class="text-sm text-ink line-clamp-3 hadith-excerpt"
             dir="rtl"
-            v-html="highlightedText(hadith.text_highlighted)"
           />
           <span v-else class="text-sm text-ink line-clamp-2" dir="rtl">
             {{ cleanText(hadith.text) }}

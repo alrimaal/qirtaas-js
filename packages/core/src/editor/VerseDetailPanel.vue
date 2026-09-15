@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import DOMPurify from "dompurify";
 import Button from "primevue/button";
 import {
   useVerseDetail,
@@ -17,31 +16,7 @@ import {
   languageLabel,
 } from "./quran/languageLabels";
 import ReportDataDialog from "./ReportDataDialog.vue";
-
-function sanitize(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      "p",
-      "br",
-      "b",
-      "i",
-      "em",
-      "strong",
-      "sup",
-      "sub",
-      "span",
-      "div",
-      "h1",
-      "h2",
-      "h3",
-      "h4",
-      "ol",
-      "ul",
-      "li",
-    ],
-    ALLOWED_ATTR: ["dir", "class"],
-  });
-}
+import SanitizedHtml from "./SanitizedHtml.vue";
 
 const { t, locale } = useI18n();
 const {
@@ -322,10 +297,10 @@ function onKeydown(e: KeyboardEvent) {
                 {{ servedEditionName }}
               </span>
             </div>
-            <div
+            <SanitizedHtml
               v-if="data.translation_en"
+              :html="data.translation_en"
               class="text-sm text-ink leading-relaxed"
-              v-html="sanitize(data.translation_en)"
             />
             <p v-else class="text-sm text-muted italic">
               {{ t("verseDetail.noTranslation") }}
@@ -383,9 +358,9 @@ function onKeydown(e: KeyboardEvent) {
               :dir="activeTafsir.language === 'arabic' ? 'rtl' : 'ltr'"
               class="rounded-lg bg-bg border border-border p-4"
             >
-              <div
+              <SanitizedHtml
+                :html="activeTafsir.text"
                 class="text-sm text-ink leading-relaxed whitespace-pre-line"
-                v-html="sanitize(activeTafsir.text)"
               />
             </div>
           </section>

@@ -1,20 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import DOMPurify from "dompurify";
 import Button from "primevue/button";
 import { useHadithDetail } from "@qirtaas/core/composables/useHadithDetail";
 import ReportDataDialog from "./ReportDataDialog.vue";
-
-function sanitize(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      "p", "br", "b", "i", "em", "strong", "sup", "sub",
-      "span", "div", "h1", "h2", "h3", "h4", "ol", "ul", "li",
-    ],
-    ALLOWED_ATTR: ["dir", "class"],
-  });
-}
+import SanitizedHtml from "./SanitizedHtml.vue";
 
 const { t, locale } = useI18n();
 const {
@@ -161,9 +151,10 @@ function onKeydown(e: KeyboardEvent) {
           dir="rtl"
           class="px-5 py-6 bg-gradient-to-b from-accent/5 to-transparent border-b border-border"
         >
-          <p
+          <SanitizedHtml
+            as="p"
+            :html="data.text"
             class="text-xl leading-[2.4] text-primary text-center"
-            v-html="sanitize(data.text)"
           />
         </section>
 
@@ -216,9 +207,9 @@ function onKeydown(e: KeyboardEvent) {
             >
               {{ t("hadithDetail.translation") }}
             </h3>
-            <div
+            <SanitizedHtml
+              :html="data.translation_en"
               class="text-sm text-ink leading-relaxed"
-              v-html="sanitize(data.translation_en)"
             />
           </section>
         </div>

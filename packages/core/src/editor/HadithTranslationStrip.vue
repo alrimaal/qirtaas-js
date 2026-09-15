@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
 import { useI18n } from "vue-i18n";
-import DOMPurify from "dompurify";
 import { getHadithByRef } from "@qirtaas/core/services/hadith";
+import SanitizedHtml from "./SanitizedHtml.vue";
 
 // Shows the English translation of a SINGLE hadith — no navigation.
 const props = defineProps<{ slug: string; number: number }>();
@@ -21,15 +21,6 @@ const error = ref(false);
 // broken fetch can never block the export.
 const state = computed(() =>
   loading.value ? "loading" : error.value ? "failed" : "loaded"
-);
-
-const sanitized = computed(() =>
-  translation.value
-    ? DOMPurify.sanitize(translation.value, {
-        ALLOWED_TAGS: ["p", "br", "b", "i", "em", "strong", "sup", "sub", "span"],
-        ALLOWED_ATTR: ["dir", "class"],
-      })
-    : ""
 );
 
 async function load() {
@@ -77,10 +68,11 @@ watch(() => [props.slug, props.number], load, { immediate: true });
         {{ t("hadithDetail.retry") }}
       </button>
     </span>
-    <span
-      v-else-if="sanitized"
+    <SanitizedHtml
+      v-else-if="translation"
+      policy="inline"
+      :html="translation"
       class="block text-ink/90 leading-relaxed italic"
-      v-html="sanitized"
     />
     <span v-else class="block text-muted italic">
       {{ t("hadithDetail.noTranslation") }}

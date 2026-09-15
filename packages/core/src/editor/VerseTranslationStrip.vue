@@ -13,6 +13,7 @@ import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { getVerseDetail } from "@qirtaas/core/services/quran";
 import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
+import SanitizedHtml from "./SanitizedHtml.vue";
 
 // Shows the translation of a SINGLE verse — no navigation, no switching.
 const props = defineProps<{ surah: number; ayah: number }>();
@@ -91,8 +92,11 @@ watch(
         {{ t("verseDetail.retry") }}
       </button>
     </span>
-    <span v-else class="block text-ink/90 leading-relaxed italic">
-      {{ translation }}
-    </span>
+    <SanitizedHtml
+      v-else
+      policy="inline"
+      :html="translation"
+      class="block text-ink/90 leading-relaxed italic"
+    />
   </span>
 </template>

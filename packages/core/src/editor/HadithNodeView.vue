@@ -4,8 +4,8 @@ import { NodeViewWrapper } from "@tiptap/vue-3";
 import { NodeSelection } from "@tiptap/pm/state";
 import type { Editor } from "@tiptap/core";
 import { useI18n } from "vue-i18n";
-import DOMPurify from "dompurify";
 import HadithTranslationStrip from "./HadithTranslationStrip.vue";
+import SanitizedHtml from "./SanitizedHtml.vue";
 
 const props = defineProps<{
   node: {
@@ -27,12 +27,6 @@ const props = defineProps<{
 const { t } = useI18n();
 
 const isCard = computed(() => props.node.attrs.displayMode === "card");
-
-const sanitizedText = computed(() =>
-  DOMPurify.sanitize(props.node.attrs.text ?? "", {
-    FORBID_TAGS: ["sup", "p", "br"],
-  }),
-);
 
 // slug is stored as collectionNameEnglish (see HadithSearchDialog.insertHadith).
 const slug = computed(() => props.node.attrs.collectionNameEnglish);
@@ -100,10 +94,11 @@ const selectNode = () => {
       class="block w-full text-start px-4 py-3 cursor-pointer"
       @click="selectNode"
     >
-      <span
+      <SanitizedHtml
+        policy="compact"
+        :html="props.node.attrs.text"
         dir="rtl"
         class="block text-right text-lg leading-loose text-hadith-text"
-        v-html="sanitizedText"
       />
     </button>
     <span v-if="open" class="block px-4 pb-3" @mousedown.stop>
@@ -121,8 +116,11 @@ const selectNode = () => {
         <span class="text-[1.4em] leading-[0] text-accent/60 align-middle"
           >«</span
         >
-        <span class="text-hadith-text" v-html="sanitizedText"></span
-        ><span class="text-[1.4em] leading-[0] text-accent/60 align-middle"
+        <SanitizedHtml
+          policy="compact"
+          :html="props.node.attrs.text"
+          class="text-hadith-text"
+        /><span class="text-[1.4em] leading-[0] text-accent/60 align-middle"
           >»</span
         >
       </span>
