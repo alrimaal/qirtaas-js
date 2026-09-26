@@ -1,18 +1,17 @@
 # Qirtaas SDK
 
-Embeddable rich-text editor for Islamic scholarly writing — Qur'an verse and
-hadith insertion, mushaf pages, and first-class Arabic/RTL typography. Mount it
-on any page with a bounded-height element; it ships its own scoped styles and
-never fights the host's CSS or framework.
+Embeddable rich-text editor for Islamic writing. Supports Quran verse and
+hadith insertion, mushaf pages, 150+ translations and tafsirs, and Arabic/RTL typography.
 
-This repository is the public home of the Qirtaas SDK packages. Issues and pull
-requests are welcome here.
+The same SDK is used for [Qirtaas.io](https://qirtaas.io) and [Bunyaan.space](https://bunyaan.space).
 
-| Package | Description |
-| --- | --- |
-| [`@qirtaas/core`](packages/core) | Framework-agnostic mount API + CDN/UMD bundle |
-| [`@qirtaas/vue`](packages/vue) | Idiomatic Vue 3 components (shares the host's Vue) |
-| [`@qirtaas/react`](packages/react) | Idiomatic React components (no Vue required in the host) |
+## Overview
+
+Qirtaas SDK is the SDK powering [Qirtaas.io](https://qirtaas.io). The SDK maintains enough flexibility to be used in different types of applications:
+
+- `QirtaasRenderer` for readonly embeds e.x: static articles and publications
+- Server-side token minting for gatekeeping documents behind authorisation
+- HMAC signautres for fine-grained ACLs for multi-user applications.
 
 ## Quickstart
 
@@ -33,8 +32,21 @@ qirtaas.mountEditor("#editor", { documentId, locale: "ar", theme: "light" });
 qirtaas.mountRenderer("#renderer", { shareToken }); // read-only, no user token
 ```
 
-Full documentation — embedding guides, token exchange, and the hosted API —
-lives at **[docs.qirtaas.io](https://docs.qirtaas.io)**.
+Full documentation at **[docs.qirtaas.io](https://docs.qirtaas.io)**.
+
+## Embed readonly documents
+
+If you have a document (created via the SDK or [Qirtaas.io](https://qirtaas.io)) with public shareable URL, you can embed it using `QirtaasRenderer`. React example:
+
+```js
+import { QirtaasRenderer } from "@qirtaas/react";
+
+const shareToken = "iM2F1gU"; // Document url: qirtaas.io/iM2F1gU
+export function SharedNote({ shareToken }: { shareToken: string }) {
+  // No documentId needed — the token resolves the document.
+  return <QirtaasRenderer shareToken={shareToken} locale="ar" theme="light" />;
+}
+```
 
 ## Self-hosting (bring your own backend)
 
@@ -43,12 +55,13 @@ The SDK talks to any backend implementing the documented `/v1` contract
 implementation; Qur'an/hadith/mushaf content is served by the hosted content
 API. See the backend docs at [docs.qirtaas.io](https://docs.qirtaas.io).
 
-## Developing
+## Packages
 
-```sh
-npm install
-npm run build   # builds core, then the vue and react wrappers
-```
+| Package                            | Description                                              |
+| ---------------------------------- | -------------------------------------------------------- |
+| [`@qirtaas/core`](packages/core)   | Framework-agnostic mount API + CDN/UMD bundle            |
+| [`@qirtaas/vue`](packages/vue)     | Idiomatic Vue 3 components (shares the host's Vue)       |
+| [`@qirtaas/react`](packages/react) | Idiomatic React components (no Vue required in the host) |
 
 ## Contributing
 
@@ -57,3 +70,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 [MIT](LICENSE)
+
+⭐ **Star this repo** if you found it useful!
