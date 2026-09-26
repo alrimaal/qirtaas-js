@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.8.0
+
+### Minor Changes
+
+- 6d82493: Adds keyboard shortcuts. Supports all quran.com translations. Supports custom document title.
+
 ## 0.7.0
 
 ### Minor Changes
