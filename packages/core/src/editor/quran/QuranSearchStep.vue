@@ -27,10 +27,9 @@ const translationDir = computed(() =>
 );
 const collectionsHost = useQuranCollectionsHost();
 
-const props = withDefaults(
-  defineProps<{ active?: boolean }>(),
-  { active: true },
-);
+const props = withDefaults(defineProps<{ active?: boolean }>(), {
+  active: true,
+});
 const emit = defineEmits<{
   selectVerse: [verse: AyahResult];
   browseSurah: [surah: SurahMatch];
@@ -44,7 +43,9 @@ const loading = ref(false);
 const error = ref("");
 const activeIdx = ref(0);
 const listEl = ref<HTMLElement | null>(null);
-const inputEl = ref<(InstanceType<typeof InputText> & { $el: HTMLInputElement }) | null>(null);
+const inputEl = ref<
+  (InstanceType<typeof InputText> & { $el: HTMLInputElement }) | null
+>(null);
 
 let debounce: ReturnType<typeof setTimeout> | null = null;
 // Guards against stale responses overwriting fresher ones.
@@ -71,7 +72,7 @@ watch(
     });
     const trimmed = query.value.trim();
     if (trimmed) void doSearch(trimmed);
-  },
+  }
 );
 
 watch(query, (val) => {
@@ -145,9 +146,8 @@ function onKeydown(e: KeyboardEvent) {
 
 function scrollIntoView() {
   nextTick(() => {
-    const rows = listEl.value?.querySelectorAll<HTMLElement>(
-      "[data-verse-row]"
-    );
+    const rows =
+      listEl.value?.querySelectorAll<HTMLElement>("[data-verse-row]");
     rows?.[activeIdx.value]?.scrollIntoView({ block: "nearest" });
   });
 }
@@ -173,12 +173,10 @@ function scrollIntoView() {
         class="inline-flex items-center gap-2 text-[13px] font-semibold text-primary hover:text-accent cursor-pointer font-[inherit] transition-colors"
         @click="emit('browseCollections')"
       >
-        <span
-          class="text-[9px] font-bold tracking-[0.05em] uppercase bg-primary/10 text-primary px-1.5 py-0.5 rounded-[5px]"
-          >{{ t("quran.badgeNew") }}</span
-        >
         {{ t("quran.importCollectionLink") }}
-        <span class="opacity-70 text-[11px] [html[dir=rtl]_&]:rotate-180">→</span>
+        <span class="opacity-70 text-[11px] [html[dir=rtl]_&]:rotate-180"
+          >→</span
+        >
       </button>
       <span class="flex-1" />
       <TranslationEditionSelect variant="pill" />
@@ -192,7 +190,11 @@ function scrollIntoView() {
       {{ error }}
     </div>
 
-    <div v-else ref="listEl" class="flex flex-col gap-1 max-h-80 overflow-y-auto">
+    <div
+      v-else
+      ref="listEl"
+      class="flex flex-col gap-1 max-h-80 overflow-y-auto"
+    >
       <!-- Surah-name matches -->
       <template v-if="surahMatches.length > 0">
         <div
@@ -227,7 +229,8 @@ function scrollIntoView() {
           <span
             class="inline-flex items-center gap-1 px-2.5 py-1 text-[11.5px] font-semibold text-primary bg-bg border border-primary/25 rounded-full whitespace-nowrap"
           >
-            {{ t("quran.browse") }} <span class="[html[dir=rtl]_&]:rotate-180">→</span>
+            {{ t("quran.browse") }}
+            <span class="[html[dir=rtl]_&]:rotate-180">→</span>
           </span>
         </button>
       </template>
@@ -261,7 +264,9 @@ function scrollIntoView() {
             <button
               type="button"
               class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary/10 hover:bg-primary/20 cursor-pointer font-[inherit] transition-colors"
-              :title="t('quran.openSurahInMushaf', { name: v.surah.name_english })"
+              :title="
+                t('quran.openSurahInMushaf', { name: v.surah.name_english })
+              "
               @click.stop="
                 emit('browseSurah', {
                   number: v.surah.number,
@@ -303,7 +308,6 @@ function scrollIntoView() {
           </template>
         </div>
       </template>
-
     </div>
   </div>
 </template>

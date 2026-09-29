@@ -217,7 +217,7 @@ export default {
     insertAsCard: "Insert as card",
     importCollectionTitle: "Import Quran.com collection",
     importCollectionSubtitle: "Bring in every verse you've saved on Quran.com",
-    importCollectionLink: "Import from your Quran.com collections",
+    importCollectionLink: "Import Quran.com collections",
     badgeNew: "New",
     collectionsTitle: "Quran.com collections",
     collectionsError: "Couldn't load your collections. Please try again.",
