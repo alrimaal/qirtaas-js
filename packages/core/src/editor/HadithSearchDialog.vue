@@ -226,7 +226,14 @@ function close() {
             {{ cleanText(hadith.text) }}
           </span>
           <SanitizedHtml
-            v-if="showTranslation && hadith.translation_en"
+            v-if="showTranslation && hadith.translation_highlighted"
+            policy="highlight"
+            :html="hadith.translation_highlighted"
+            class="text-[13px] text-muted leading-relaxed line-clamp-2 hadith-excerpt"
+            dir="ltr"
+          />
+          <SanitizedHtml
+            v-else-if="showTranslation && hadith.translation_en"
             policy="compact"
             :html="hadith.translation_en"
             class="text-[13px] text-muted leading-relaxed line-clamp-2"

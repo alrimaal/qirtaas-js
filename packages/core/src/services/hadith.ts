@@ -15,6 +15,8 @@ export interface HadithResult {
   english_grade: string;
   /** Trimmed excerpt with matched words wrapped in <mark>; null for ref lookups. */
   text_highlighted?: string | null;
+  /** Same as `text_highlighted`, over the translation, for English queries. */
+  translation_highlighted?: string | null;
 }
 
 export async function searchHadith(query: string): Promise<HadithResult[]> {
