@@ -6,15 +6,9 @@ import {
   useVerseDetail,
   localeToTafsirLanguage,
 } from "@qirtaas/core/composables/useVerseDetail";
-import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
 import { useQuranEditions } from "@qirtaas/core/composables/useQuranEditions";
-import Select from "primevue/select";
-import { getOverlayAppendTo } from "../mount/overlay";
-import {
-  EDITION_FILTER_FIELDS,
-  groupByLanguage,
-  languageLabel,
-} from "./quran/languageLabels";
+import { languageLabel } from "./quran/languageLabels";
+import TranslationEditionSelect from "./quran/TranslationEditionSelect.vue";
 import ReportDataDialog from "./ReportDataDialog.vue";
 import SanitizedHtml from "./SanitizedHtml.vue";
 
@@ -70,18 +64,7 @@ const languageOptions = computed(() => {
 });
 
 const { editions: translationEditions, loadEditions } = useQuranEditions();
-const { selectedTranslationId, setSelectedTranslationId } =
-  useTranslationEdition();
-
 onMounted(loadEditions);
-
-// The reader's own language leads here, unlike the card's shared default.
-const editionGroups = computed(() =>
-  groupByLanguage(translationEditions.value, [
-    localeToTafsirLanguage(locale.value),
-    "english",
-  ])
-);
 
 /** The edition actually on screen, per the response. Never a guess: while the
  *  catalogue is still loading this is all we can honestly name. */
@@ -267,28 +250,10 @@ function onKeydown(e: KeyboardEvent) {
               </h3>
               <!-- Searchable edition picker, grouped by language: 144 editions
                    is far too many to scroll blind. -->
-              <Select
-                v-if="editionGroups.length > 0"
-                size="small"
-                :model-value="selectedTranslationId"
-                :options="editionGroups"
-                option-label="name"
-                option-value="resource_id"
-                option-group-label="label"
-                option-group-children="resources"
-                filter
-                reset-filter-on-hide
-                :filter-fields="EDITION_FILTER_FIELDS"
-                :filter-placeholder="t('verseDetail.searchEditions')"
-                :append-to="getOverlayAppendTo()"
-                :aria-label="t('verseDetail.translationEdition')"
-                class="min-w-0 max-w-[60%] !bg-bg !border-border hover:!border-accent/50"
-                :pt="{
-                  label: { class: '!text-xs !py-1 !ps-2 !pe-0 truncate' },
-                  dropdown: { class: '!w-6' },
-                  overlay: { class: 'text-sm' },
-                }"
-                @update:model-value="setSelectedTranslationId"
+              <TranslationEditionSelect
+                v-if="translationEditions.length > 0"
+                variant="field"
+                priority="locale"
               />
               <span
                 v-else-if="servedEditionName"

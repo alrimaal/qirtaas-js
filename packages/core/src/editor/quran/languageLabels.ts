@@ -84,3 +84,19 @@ export const EDITION_FILTER_FIELDS = [
   "languageLabel",
   "language",
 ];
+
+const RTL_LANGUAGES = new Set([
+  "arabic",
+  "urdu",
+  "persian",
+  "pashto",
+  "sindhi",
+  "kurdish",
+  "dhivehi",
+  "uyghur",
+  "hebrew",
+]);
+
+export function languageDir(lang: string | undefined): "rtl" | "ltr" {
+  return lang && RTL_LANGUAGES.has(lang) ? "rtl" : "ltr";
+}

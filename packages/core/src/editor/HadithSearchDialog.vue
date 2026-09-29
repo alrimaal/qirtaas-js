@@ -9,11 +9,14 @@ import Button from "primevue/button";
 import WordRangePicker from "./WordRangePicker.vue";
 import DOMPurify from "dompurify";
 import SanitizedHtml from "./SanitizedHtml.vue";
+import TranslationStripPanel from "./TranslationStripPanel.vue";
+import HadithTranslationStrip from "./HadithTranslationStrip.vue";
 
 const cleanText = (raw: string) =>
   DOMPurify.sanitize(raw ?? "", { ALLOWED_TAGS: [], KEEP_CONTENT: true });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const showTranslation = computed(() => locale.value !== "ar");
 
 const props = defineProps<{ visible: boolean }>();
 const emit = defineEmits<{
@@ -222,6 +225,13 @@ function close() {
           <span v-else class="text-sm text-ink line-clamp-2" dir="rtl">
             {{ cleanText(hadith.text) }}
           </span>
+          <SanitizedHtml
+            v-if="showTranslation && hadith.translation_en"
+            policy="compact"
+            :html="hadith.translation_en"
+            class="text-[13px] text-muted leading-relaxed line-clamp-2"
+            dir="ltr"
+          />
         </button>
       </div>
     </template>
@@ -251,6 +261,19 @@ function close() {
         :text="hadithText"
         @change="selection = $event"
       />
+
+      <TranslationStripPanel
+        v-if="showTranslation"
+        :label="t('hadith.translation')"
+        class="mb-3"
+      >
+        <HadithTranslationStrip
+          :slug="selectedHadith.slug"
+          :number="selectedHadith.number"
+          :text="selectedHadith.translation_en"
+          bare
+        />
+      </TranslationStripPanel>
 
       <p class="text-xs text-muted mb-4">
         {{ t("hadith.selectionHint") }}

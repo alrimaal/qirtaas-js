@@ -163,6 +163,8 @@ export default {
   },
   quran: {
     dialogTitle: "Insérer des versets du Coran",
+    translation: "Traduction",
+    noTranslation: "Pas de traduction disponible.",
     searchPlaceholder: "Rechercher par sourate, verset (2:255), ou texte...",
     noResults: "Aucun verset trouvé.",
     searchError: "Échec de la recherche. Veuillez réessayer.",
@@ -225,6 +227,7 @@ export default {
   },
   hadith: {
     dialogTitle: "Insérer des Hadiths",
+    translation: "Traduction",
     searchPlaceholder: "Rechercher par réf (Bukhari: 1) ou par texte… ",
     noResults: "Aucun hadith trouvé.",
     searchError: "Échec de la recherche. Veuillez réessayer.",

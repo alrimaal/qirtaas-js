@@ -160,6 +160,8 @@ export default {
   },
   quran: {
     dialogTitle: "إدراج آية قرآنية",
+    translation: "الترجمة",
+    noTranslation: "الترجمة غير متاحة",
     searchPlaceholder: "ابحث باسم سورة أو آية (2:255) أو بالنص...",
     noResults: "لم يتم العثور على آيات.",
     searchError: "فشل البحث. يرجى المحاولة مرة أخرى.",
@@ -235,6 +237,7 @@ export default {
   },
   hadith: {
     dialogTitle: "إدراج حديث",
+    translation: "الترجمة",
     searchPlaceholder: "ابحث بالمرجع (bukhari:1) أو بالنص...",
     noResults: "لم يتم العثور على أحاديث.",
     searchError: "فشل البحث. يرجى المحاولة مرة أخرى.",

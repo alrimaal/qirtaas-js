@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { NodeViewWrapper } from "@tiptap/vue-3";
 import { NodeSelection } from "@tiptap/pm/state";
 import type { Editor } from "@tiptap/core";
 import { useI18n } from "vue-i18n";
 import { formatReference, shortReference } from "./quran/formatReference";
-import Select from "primevue/select";
-import { getOverlayAppendTo } from "../mount/overlay";
-import { EDITION_FILTER_FIELDS } from "./quran/languageLabels";
-import { useQuranEditions } from "@qirtaas/core/composables/useQuranEditions";
-import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
+import TranslationEditionSelect from "./quran/TranslationEditionSelect.vue";
 import VerseTranslationStrip from "./VerseTranslationStrip.vue";
 
 const props = defineProps<{
@@ -68,16 +64,6 @@ function toggle() {
   }
 }
 
-const { selectedTranslationId, setSelectedTranslationId } =
-  useTranslationEdition();
-
-const { editions, loadEditions, defaultGroups } = useQuranEditions();
-onMounted(loadEditions);
-
-const currentEdition = computed(() =>
-  editions.value.find((r) => r.resource_id === selectedTranslationId.value)
-);
-
 const selectNode = () => {
   const pos = props.getPos();
   const tr = props.editor.state.tr.setSelection(
@@ -124,35 +110,11 @@ const selectNode = () => {
       <!-- Searchable edition picker. appendTo the scoped overlay root so the
            panel escapes the card's clipping in embeds. data-screen-only keeps
            it out of exported PDFs (see RenderDocumentView's print block). -->
-      <Select
-        v-if="currentEdition"
+      <TranslationEditionSelect
+        variant="pill"
         data-screen-only
-        size="small"
-        :model-value="selectedTranslationId"
-        :options="defaultGroups"
-        option-label="name"
-        option-value="resource_id"
-        option-group-label="label"
-        option-group-children="resources"
-        filter
-        reset-filter-on-hide
-        :filter-fields="EDITION_FILTER_FIELDS"
-        :filter-placeholder="t('verseDetail.searchEditions')"
-        :append-to="getOverlayAppendTo()"
-        :aria-label="t('verseDetail.translationEdition')"
-        :title="`${currentEdition.name} · ${currentEdition.language}`"
-        class="max-w-[11rem] !rounded-full !bg-bg-soft !border-border hover:!border-accent/60"
-        :pt="{
-          label: {
-            class:
-              '!text-[0.65rem] !font-semibold !text-accent !py-0.5 !ps-2 !pe-0 truncate',
-          },
-          dropdown: { class: '!w-5 !text-accent' },
-          overlay: { class: 'text-sm' },
-        }"
         @mousedown.stop
         @click.stop
-        @update:model-value="setSelectedTranslationId"
       />
     </span>
     <button

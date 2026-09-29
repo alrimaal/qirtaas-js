@@ -6,6 +6,16 @@
 // Keyed by edition too: without that, switching edition serves stale text.
 // Values are just the translation string, so it stays small.
 const cache = new Map<string, string>();
+
+/** Seed the cache from text already in hand (e.g. search results). */
+export function primeVerseTranslation(
+  edition: number,
+  surah: number,
+  ayah: number,
+  text: string
+) {
+  cache.set(`${edition}:${surah}:${ayah}`, text);
+}
 </script>
 
 <script setup lang="ts">
@@ -13,13 +23,28 @@ import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { getVerseDetail } from "@qirtaas/core/services/quran";
 import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
+import { useQuranEditions } from "@qirtaas/core/composables/useQuranEditions";
+import { languageDir } from "./quran/languageLabels";
 import SanitizedHtml from "./SanitizedHtml.vue";
 
 // Shows the translation of a SINGLE verse — no navigation, no switching.
-const props = defineProps<{ surah: number; ayah: number }>();
+const props = defineProps<{
+  surah: number;
+  ayah: number;
+  /** Drop the strip's own border and background (inside a panel). */
+  bare?: boolean;
+}>();
 
 const { t } = useI18n();
 const { selectedTranslationId } = useTranslationEdition();
+const { editions } = useQuranEditions();
+
+const dir = computed(() =>
+  languageDir(
+    editions.value.find((r) => r.resource_id === selectedTranslationId.value)
+      ?.language
+  )
+);
 
 // Guards against an out-of-order reply: switching edition while a fetch is in
 // flight means a slow response for the OLD edition can land after the new one
@@ -75,11 +100,16 @@ watch(
 
 <template>
   <span
-    dir="ltr"
+    :dir="dir"
     contenteditable="false"
     data-async-content
     :data-state="state"
-    class="block my-1.5 ps-3 pe-2 py-2 bg-bg-soft border-s-2 border-accent/60 rounded-e-md text-sm"
+    class="block text-sm"
+    :class="
+      bare
+        ? ''
+        : 'my-1.5 ps-3 pe-2 py-2 bg-bg-soft border-s-2 border-accent/60 rounded-e-md'
+    "
   >
     <span v-if="loading" class="block h-4 w-3/4 bg-border/40 rounded animate-pulse" />
     <span v-else-if="error" class="flex items-center gap-2 text-muted">

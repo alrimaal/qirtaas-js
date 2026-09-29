@@ -10,6 +10,7 @@ export interface AyahResult {
   surah: SurahBrief;
   number: number;
   text: string;
+  translation?: string;
 }
 
 export interface VerseTafsir {
@@ -133,10 +134,16 @@ export interface QuranSearchResponse {
   verses: AyahResult[];
 }
 
-export async function searchQuran(query: string): Promise<QuranSearchResponse> {
+export async function searchQuran(
+  query: string,
+  translationId?: number
+): Promise<QuranSearchResponse> {
   const trimmed = query.trim();
   const isVerse = /^\d+:\d+$/.test(trimmed);
-  const params = isVerse ? { verse: trimmed } : { q: trimmed };
+  const params: Record<string, string | number> = isVerse
+    ? { verse: trimmed }
+    : { q: trimmed };
+  if (translationId) params.translation = translationId;
   const data = await getTransport().content.get<
     QuranSearchResponse | AyahResult
   >("/quran/search/", { params });

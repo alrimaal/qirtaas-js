@@ -160,6 +160,8 @@ export default {
   },
   quran: {
     dialogTitle: "Insert Quran Verses",
+    translation: "Translation",
+    noTranslation: "No translation available.",
     searchPlaceholder: "Search by surah, verse (2:255), or text...",
     noResults: "No verses found.",
     searchError: "Search failed. Please try again.",
@@ -237,6 +239,7 @@ export default {
   },
   hadith: {
     dialogTitle: "Insert Hadiths",
+    translation: "Translation",
     searchPlaceholder: "Search by ref (bukhari:1) or text...",
     noResults: "No hadiths found.",
     searchError: "Search failed. Please try again.",
