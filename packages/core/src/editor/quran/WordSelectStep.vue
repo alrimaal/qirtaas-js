@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "primevue/button";
 import WordRangePicker from "../WordRangePicker.vue";
@@ -8,8 +8,7 @@ import VerseTranslationStrip from "../VerseTranslationStrip.vue";
 import TranslationEditionSelect from "./TranslationEditionSelect.vue";
 import type { AyahResult } from "@qirtaas/core/services/quran";
 
-const { t, locale } = useI18n();
-const showTranslation = computed(() => locale.value !== "ar");
+const { t } = useI18n();
 
 const props = defineProps<{
   verse: AyahResult;
@@ -96,7 +95,6 @@ function onInsert(displayMode: "inline" | "card") {
     />
 
     <TranslationStripPanel
-      v-if="showTranslation"
       :label="t('quran.translation')"
       class="mb-3"
     >

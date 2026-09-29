@@ -3,6 +3,9 @@ import { ref } from "vue";
 /** M.A.S. Abdel Haleem — the edition the backend serves when none is named. */
 export const DEFAULT_TRANSLATION_ID = 85;
 
+/** Fallback for Arabic-locale readers with no stored choice. */
+export const ARABIC_TRANSLATION_ID = 1014;
+
 const STORAGE_KEY = "quran.selectedTranslationId";
 
 function readStored(): number {
@@ -10,7 +13,10 @@ function readStored(): number {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const id = raw == null ? NaN : Number(raw);
-    return Number.isInteger(id) && id > 0 ? id : DEFAULT_TRANSLATION_ID;
+    if (Number.isInteger(id) && id > 0) return id;
+    return localStorage.getItem("locale") === "ar"
+      ? ARABIC_TRANSLATION_ID
+      : DEFAULT_TRANSLATION_ID;
   } catch {
     return DEFAULT_TRANSLATION_ID;
   }

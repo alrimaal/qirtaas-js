@@ -16,8 +16,7 @@ import SanitizedHtml from "../SanitizedHtml.vue";
 import { primeVerseTranslation } from "../VerseTranslationStrip.vue";
 import { languageDir } from "./languageLabels";
 
-const { t, locale } = useI18n();
-const showTranslation = computed(() => locale.value !== "ar");
+const { t } = useI18n();
 const { selectedTranslationId } = useTranslationEdition();
 const { editions } = useQuranEditions();
 const translationDir = computed(() =>
@@ -167,10 +166,7 @@ function scrollIntoView() {
 
     <!-- Entry into Quran.com collection import — highlighted with a "New" badge
          so the feature is discoverable, without the bulk of a full card. -->
-    <div
-      v-if="collectionsHost.enabled || showTranslation"
-      class="flex items-center gap-2 mb-3"
-    >
+    <div class="flex items-center gap-2 mb-3">
       <button
         v-if="collectionsHost.enabled"
         type="button"
@@ -185,7 +181,7 @@ function scrollIntoView() {
         <span class="opacity-70 text-[11px] [html[dir=rtl]_&]:rotate-180">→</span>
       </button>
       <span class="flex-1" />
-      <TranslationEditionSelect v-if="showTranslation" variant="pill" />
+      <TranslationEditionSelect variant="pill" />
     </div>
 
     <div v-if="loading" class="flex justify-center py-6">
@@ -293,7 +289,7 @@ function scrollIntoView() {
           >
             {{ v.text }}
           </div>
-          <template v-if="showTranslation && v.translation != null">
+          <template v-if="v.translation != null">
             <SanitizedHtml
               v-if="v.translation"
               policy="inline"

@@ -241,7 +241,7 @@ function onKeydown(e: KeyboardEvent) {
         </section>
 
         <div class="px-5 py-5 space-y-6">
-          <section v-if="locale !== 'ar'" class="space-y-2">
+          <section class="space-y-2">
             <div class="flex items-baseline justify-between gap-2">
               <h3
                 class="text-[0.7rem] font-semibold uppercase tracking-wider text-muted shrink-0"
