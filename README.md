@@ -1,3 +1,5 @@
+[![Support Qirtaas](https://img.buymeacoffee.com/button-api/?text=Support%20Qirtaas&emoji=&slug=qirtaas&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/qirtaas)
+
 # Qirtaas SDK
 
 Embeddable rich-text editor for Islamic writing. Supports Quran verse and
