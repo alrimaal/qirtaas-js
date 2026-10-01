@@ -70,11 +70,14 @@ const props = withDefaults(
     editable?: boolean;
     autofocus?: boolean;
     documentId?: string;
+    /** Size to content with no page-level caret anchoring, for small embeds. */
+    compact?: boolean;
   }>(),
   {
     editable: true,
     autofocus: false,
     documentId: undefined,
+    compact: false,
   }
 );
 
@@ -312,7 +315,15 @@ function insertImageFromInput(file: File) {
 // ~1/3 of the viewport height, in px; the caret rests this far above the
 // bottom edge. Guarded for SSR where `window` is absent.
 function bottomAnchor(): number {
-  return typeof window !== "undefined" ? Math.round(window.innerHeight / 3) : 0;
+  if (props.compact || typeof window === "undefined") return 0;
+  return Math.round(window.innerHeight / 3);
+}
+
+function contentClass(): string {
+  if (props.compact) return "outline-none px-1 pt-4 pb-10";
+  return `outline-none min-h-[70vh] px-1 py-4${
+    props.editable ? " pb-[33vh]" : ""
+  }`;
 }
 
 const editor = useEditor({
@@ -416,9 +427,7 @@ const editor = useEditor({
     scrollThreshold: { top: 0, right: 0, bottom: bottomAnchor(), left: 0 },
     scrollMargin: { top: 0, right: 0, bottom: bottomAnchor(), left: 0 },
     attributes: {
-      class: `outline-none min-h-[70vh] px-1 py-4${
-        props.editable ? " pb-[33vh]" : ""
-      }`,
+      class: contentClass(),
     },
   },
   autofocus: props.autofocus ? "end" : false,
@@ -460,7 +469,7 @@ function updateScrollAnchor() {
   });
 }
 onMounted(() => {
-  window.addEventListener("resize", updateScrollAnchor);
+  if (!props.compact) window.addEventListener("resize", updateScrollAnchor);
   window.addEventListener("keydown", onCommandPaletteShortcut);
 });
 onBeforeUnmount(() => {
