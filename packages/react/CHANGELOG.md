@@ -1,5 +1,13 @@
 # @qirtaas/react
 
+## 0.8.1
+
+### Patch Changes
+
+- fd4e679: Improves Hadith and Quran searching by rendering translation with marking.
+- Updated dependencies [fd4e679]
+  - @qirtaas/core@0.8.1
+
 ## 0.8.0
 
 ### Minor Changes
