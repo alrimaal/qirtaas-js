@@ -2,6 +2,12 @@
 
 # Qirtaas SDK
 
+<p align="center">
+<video src="https://github.com/alrimaal/qirtaas-js/raw/main/media/english_preview.mp4"
+       poster="https://github.com/alrimaal/qirtaas-js/raw/main/media/en_poster.jpg"
+       controls width="800"></video>
+</p>
+
 Embeddable rich-text editor for Islamic writing. Supports Quran verse and
 hadith insertion, mushaf pages, 150+ translations and tafsirs, and Arabic/RTL typography.
 
