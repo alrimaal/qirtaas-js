@@ -1,17 +1,16 @@
-[![Support Qirtaas](https://img.buymeacoffee.com/button-api/?text=Support%20Qirtaas&emoji=&slug=qirtaas&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/qirtaas)
-
 # Qirtaas SDK
 
 <p align="center">
-<video src="https://github.com/alrimaal/qirtaas-js/raw/main/media/english_preview.mp4"
-       poster="https://github.com/alrimaal/qirtaas-js/raw/main/media/en_poster.jpg"
-       controls width="800"></video>
+  <img src="media/demo.gif" width="800"
+       alt="Inserting a Quran verse, a hadith and a mushaf page in the Qirtaas editor">
 </p>
 
 Embeddable rich-text editor for Islamic writing. Supports Quran verse and
 hadith insertion, mushaf pages, 150+ translations and tafsirs, and Arabic/RTL typography.
 
 The same SDK is used for [Qirtaas.io](https://qirtaas.io) and [Bunyaan.space](https://bunyaan.space).
+
+[![Support Qirtaas](https://img.buymeacoffee.com/button-api/?text=Support%20Qirtaas&emoji=&slug=qirtaas&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/qirtaas)
 
 ## Overview
 
