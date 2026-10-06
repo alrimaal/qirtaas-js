@@ -349,7 +349,9 @@ const editor = useEditor({
       suggestion: emojiSuggestion,
     }),
     Placeholder.configure({
-      placeholder: ({ editor: ed, pos }) => {
+      placeholder: ({ editor: ed, node, pos }) => {
+        if (pos === 0 && node.type.name === "heading")
+          return t("editor.pageLink.untitled");
         if (ed.state.doc.childCount === 1) return t("editor.placeholder");
         return t("editor.slashHint");
       },

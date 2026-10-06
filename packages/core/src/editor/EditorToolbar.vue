@@ -7,6 +7,7 @@ import { useIsDark } from "./runtime/context";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Popover from "primevue/popover";
+import SplitButton from "primevue/splitbutton";
 import { Search, ListCollapse, ListOrdered, Highlighter } from "lucide-vue-next";
 import { HONORIFICS, isHonorificType } from "./honorifics";
 import { HIGHLIGHT_COLORS, insertToggleList } from "./commands";
@@ -37,7 +38,13 @@ const { t, locale } = useI18n();
 const isDark = useIsDark();
 
 // Honorifics offered in the Insert menu, from the shared registry.
-const honorifics = HONORIFICS;
+const honorificItems = computed(() =>
+  HONORIFICS.map((h) => ({
+    label: locale.value === "ar" ? h.ar : h.en,
+    glyph: h.glyph,
+    command: () => insertHonorific(h.id),
+  }))
+);
 
 const alignments = computed(() => {
   const items = [
@@ -48,7 +55,6 @@ const alignments = computed(() => {
   return locale.value === "ar" ? [...items].reverse() : items;
 });
 
-const insertPopover = ref();
 const headingPopover = ref();
 const alignPopover = ref();
 const highlightPopover = ref();
@@ -86,10 +92,6 @@ function onInsertToggleList() {
   insertToggleList(props.editor!);
 }
 
-function toggleInsertPopover(event: Event) {
-  insertPopover.value.toggle(event);
-}
-
 function insertHonorific(type: string) {
   props
     .editor!.chain()
@@ -97,7 +99,6 @@ function insertHonorific(type: string) {
     .insertContent({ type: "honorific", attrs: { type } })
     .run();
   if (isHonorificType(type)) trackHonorificInserted(type, "toolbar");
-  insertPopover.value.hide();
 }
 
 function toggleHighlightPopover(event: Event) {
@@ -139,13 +140,13 @@ function removeLink() {
 <template>
   <div
     v-if="props.editor"
-    class="flex items-center gap-1 px-0 py-1.5 overflow-x-auto flex-nowrap md:flex-wrap md:overflow-visible scrollbar-hide"
+    class="flex items-center gap-1 px-0 py-2 overflow-x-auto flex-nowrap scrollbar-hide"
   >
     <!-- Quran / Hadith -->
     <Button
       size="small"
       severity="secondary"
-      class="shrink-0 !bg-primary/10 !text-primary !border-0 hover:!bg-primary/20"
+      class="shrink-0 !bg-primary !text-on-accent !border-primary hover:!opacity-90"
       @click="emit('open-quran')"
     >
       <i class="pi pi-book text-xs" />
@@ -154,37 +155,33 @@ function removeLink() {
     <Button
       size="small"
       severity="secondary"
-      class="shrink-0 !bg-primary/10 !text-primary !border-0 hover:!bg-primary/20"
+      class="shrink-0 !bg-primary !text-on-accent !border-primary hover:!opacity-90"
       @click="emit('open-hadith')"
     >
       <span class="font-[Noto_Naskh_Arabic,serif] text-base leading-none">ح</span>
       <span class="text-xs font-medium">{{ t("editor.insertHadith") }}</span>
     </Button>
-    <Button
+    <!-- Honorifics: ﷺ inserts directly, the dropdown offers the rest -->
+    <SplitButton
       v-tooltip.bottom="t('editor.insert')"
-      icon="pi pi-plus"
+      :model="honorificItems"
+      :append-to="getOverlayAppendTo()"
       severity="secondary"
       text
-      rounded
       size="small"
       class="shrink-0"
-      @click="toggleInsertPopover"
-    />
-    <Popover :append-to="getOverlayAppendTo()" ref="insertPopover">
-      <div class="flex flex-col min-w-48 p-1 max-h-80 overflow-y-auto">
-        <button
-          v-for="h in honorifics"
-          :key="h.id"
-          class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
-          @click="insertHonorific(h.id)"
-        >
-          <span class="honorific-glyph w-5 text-center text-base leading-none">{{
-            h.glyph
-          }}</span>
-          <span>{{ locale === "ar" ? h.ar : h.en }}</span>
-        </button>
-      </div>
-    </Popover>
+      @click="insertHonorific('saw')"
+    >
+      <span class="honorific-glyph text-base leading-none">ﷺ</span>
+      <template #item="{ item, props: itemProps }">
+        <a v-bind="itemProps.action" class="flex items-center gap-2">
+          <span class="honorific-glyph w-5 text-center text-base leading-none">
+            {{ item.glyph }}
+          </span>
+          <span>{{ item.label }}</span>
+        </a>
+      </template>
+    </SplitButton>
 
     <span class="w-px h-5 bg-border mx-1 shrink-0" />
 
