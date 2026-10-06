@@ -139,8 +139,55 @@ function removeLink() {
 <template>
   <div
     v-if="props.editor"
-    class="flex items-center gap-1 px-0 py-2 overflow-x-auto flex-nowrap scrollbar-hide"
+    class="flex items-center gap-1 px-0 py-1.5 overflow-x-auto flex-nowrap md:flex-wrap md:overflow-visible scrollbar-hide"
   >
+    <!-- Quran / Hadith -->
+    <Button
+      size="small"
+      severity="secondary"
+      class="shrink-0 !bg-primary/10 !text-primary !border-0 hover:!bg-primary/20"
+      @click="emit('open-quran')"
+    >
+      <i class="pi pi-book text-xs" />
+      <span class="text-xs font-medium">{{ t("editor.insertQuran") }}</span>
+    </Button>
+    <Button
+      size="small"
+      severity="secondary"
+      class="shrink-0 !bg-primary/10 !text-primary !border-0 hover:!bg-primary/20"
+      @click="emit('open-hadith')"
+    >
+      <span class="font-[Noto_Naskh_Arabic,serif] text-base leading-none">ح</span>
+      <span class="text-xs font-medium">{{ t("editor.insertHadith") }}</span>
+    </Button>
+    <Button
+      v-tooltip.bottom="t('editor.insert')"
+      icon="pi pi-plus"
+      severity="secondary"
+      text
+      rounded
+      size="small"
+      class="shrink-0"
+      @click="toggleInsertPopover"
+    />
+    <Popover :append-to="getOverlayAppendTo()" ref="insertPopover">
+      <div class="flex flex-col min-w-48 p-1 max-h-80 overflow-y-auto">
+        <button
+          v-for="h in honorifics"
+          :key="h.id"
+          class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
+          @click="insertHonorific(h.id)"
+        >
+          <span class="honorific-glyph w-5 text-center text-base leading-none">{{
+            h.glyph
+          }}</span>
+          <span>{{ locale === "ar" ? h.ar : h.en }}</span>
+        </button>
+      </div>
+    </Popover>
+
+    <span class="w-px h-5 bg-border mx-1 shrink-0" />
+
     <!-- Undo / Redo -->
     <Button
       v-tooltip.bottom="t('editor.tooltips.undo')"
@@ -187,73 +234,6 @@ function removeLink() {
       </svg>
     </Button>
 
-    <span class="w-px h-5 bg-border mx-1 shrink-0" />
-
-    <!-- Insert menu -->
-    <Button
-      rounded
-      size="small"
-      class="shrink-0 !bg-primary !text-on-accent hover:!opacity-90"
-      @click="toggleInsertPopover"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        height="16"
-        viewBox="0 -960 960 960"
-        width="16"
-        fill="currentColor"
-      >
-        <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-      </svg>
-      <span class="text-xs ms-1 font-medium">{{ t("editor.insert") }}</span>
-    </Button>
-    <Popover :append-to="getOverlayAppendTo()" ref="insertPopover">
-      <div class="flex flex-col min-w-48 p-1 max-h-80 overflow-y-auto">
-        <button
-          class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
-          @click="
-            emit('open-quran');
-            insertPopover.hide();
-          "
-        >
-          <i class="pi pi-book text-sm text-muted" />
-          <span>{{ t("editor.insertQuran") }}</span>
-        </button>
-        <button
-          class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
-          @click="
-            emit('open-hadith');
-            insertPopover.hide();
-          "
-        >
-          <i class="pi pi-comment text-sm text-muted" />
-          <span>{{ t("editor.insertHadith") }}</span>
-        </button>
-        <button
-          v-for="h in honorifics"
-          :key="h.id"
-          class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-sm text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
-          @click="insertHonorific(h.id)"
-        >
-          <span class="honorific-glyph w-5 text-center text-base leading-none">{{
-            h.glyph
-          }}</span>
-          <span>{{ locale === "ar" ? h.ar : h.en }}</span>
-        </button>
-      </div>
-    </Popover>
-    <!-- Find & Replace -->
-    <Button
-      v-tooltip.bottom="t('editor.findReplace.title')"
-      severity="secondary"
-      text
-      rounded
-      size="small"
-      class="shrink-0"
-      @click="emit('open-find-replace')"
-    >
-      <Search :size="16" />
-    </Button>
     <span class="w-px h-5 bg-border mx-1 shrink-0" />
 
     <!-- Text formatting -->
@@ -582,6 +562,18 @@ function removeLink() {
       class="hidden"
       @change="onImageChosen"
     />
+    <!-- Find & Replace -->
+    <Button
+      v-tooltip.bottom="t('editor.findReplace.title')"
+      severity="secondary"
+      text
+      rounded
+      size="small"
+      class="shrink-0 ms-auto"
+      @click="emit('open-find-replace')"
+    >
+      <Search :size="16" />
+    </Button>
   </div>
 </template>
 

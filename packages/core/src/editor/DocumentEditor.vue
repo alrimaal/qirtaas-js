@@ -948,13 +948,19 @@ function insertQuranMushaf(data: {
   font-weight: 700;
 }
 
+.tiptap h1,
+.tiptap h2 {
+  font-family: "Instrument Serif", "Noto Naskh Arabic", Georgia, serif;
+  font-weight: 400;
+  line-height: 1.15;
+}
 .tiptap h1 {
-  font-size: 1.75rem;
+  font-size: 2.75rem;
   margin: 1.5rem 0 0.75rem;
 }
 .tiptap h2 {
-  font-size: 1.375rem;
-  margin: 1.25rem 0 0.625rem;
+  font-size: 1.75rem;
+  margin: 1.5rem 0 0.75rem;
 }
 .tiptap h3 {
   font-size: 1.125rem;
