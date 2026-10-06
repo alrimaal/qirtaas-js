@@ -301,7 +301,7 @@ function close() {
           :label="t('hadith.insertInline')"
           icon="pi pi-check"
           size="small"
-          class="!bg-primary !text-white hover:!opacity-90"
+          class="!bg-primary !text-on-accent hover:!opacity-90"
           :disabled="!selection?.complete"
           @click="insertHadith('inline')"
           @keydown.enter.prevent="insertHadith('inline')"

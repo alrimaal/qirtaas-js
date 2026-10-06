@@ -115,7 +115,7 @@ function cancel() {
           <Button
             size="small"
             icon="pi pi-refresh"
-            class="!bg-primary !text-white hover:!opacity-90"
+            class="!bg-primary !text-on-accent hover:!opacity-90"
             :label="t('editor.image.retry')"
             @click="retry"
           />

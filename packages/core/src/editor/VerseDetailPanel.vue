@@ -309,7 +309,7 @@ function onKeydown(e: KeyboardEvent) {
                 class="px-2.5 py-1 text-xs font-medium rounded-full border cursor-pointer transition-colors"
                 :class="
                   activeTafsirSlug === tf.slug
-                    ? 'bg-primary text-white! border-primary'
+                    ? 'bg-primary text-on-accent! border-primary'
                     : 'bg-transparent text-muted border-border hover:text-accent hover:border-accent/50'
                 "
                 @click="activeTafsirSlug = tf.slug"

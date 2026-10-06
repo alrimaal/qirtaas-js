@@ -12,25 +12,59 @@ import { Theme } from "@primeuix/styled";
 // embed owns the only PrimeVue instance and must theme it itself.
 declare const __QIRTAAS_HOST_PRIMEVUE__: boolean | undefined;
 
-const lightPrimary = palette("#410322") as Record<string, string>;
-const darkPrimary = palette("#ae3773") as Record<string, string>;
+// Paper (light) / Night (dark) palettes; mirror the tokens in main.css + embed.css.
+const primary = palette("#5d1d3d") as Record<string, string>;
+
+const paperSurface = {
+  0: "#fffdf9",
+  50: "#fcf9f4",
+  100: "#f4eee5",
+  200: "#e7ddd0",
+  300: "#d6c9ba",
+  400: "#b3a39a",
+  500: "#8e7e7f",
+  600: "#6f6064",
+  700: "#55474b",
+  800: "#3d3034",
+  900: "#2b1e23",
+  950: "#1d1418",
+};
+
+const nightSurface = {
+  0: "#ffffff",
+  50: "#f2e8db",
+  100: "#e3d6cb",
+  200: "#cbbcb6",
+  300: "#b6a6aa",
+  400: "#968689",
+  500: "#77686c",
+  600: "#5a4b51",
+  700: "#3e2f36",
+  800: "#271b21",
+  900: "#1d1418",
+  950: "#170f13",
+};
 
 export const qirtaasPreset = definePreset(Aura, {
   semantic: {
-    primary: lightPrimary,
+    primary,
     colorScheme: {
       light: {
+        surface: paperSurface,
         primary: {
-          ...lightPrimary,
-          contrastColor: "#ffffff",
-          hoverColor: lightPrimary["600"],
+          color: "#5d1d3d",
+          contrastColor: "#fbf3ec",
+          hoverColor: "#4a1731",
+          activeColor: "#410322",
         },
       },
       dark: {
+        surface: nightSurface,
         primary: {
-          ...darkPrimary,
-          contrastColor: "#ffffff",
-          hoverColor: darkPrimary["400"],
+          color: "#edc5d9",
+          contrastColor: "#3a0d22",
+          hoverColor: "#f5dbe8",
+          activeColor: "#e0aec7",
         },
       },
     },

@@ -124,7 +124,7 @@ function chipState(
         tabindex="0"
         class="cursor-pointer rounded px-0.5 transition-colors"
         :class="{
-          'bg-primary text-white px-1.5 py-0.5': [
+          'bg-primary text-on-accent px-1.5 py-0.5': [
             'start',
             'end',
             'only',

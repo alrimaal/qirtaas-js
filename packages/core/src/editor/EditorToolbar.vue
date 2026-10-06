@@ -193,7 +193,7 @@ function removeLink() {
     <Button
       rounded
       size="small"
-      class="shrink-0 !bg-primary !text-white hover:!opacity-90"
+      class="shrink-0 !bg-primary !text-on-accent hover:!opacity-90"
       @click="toggleInsertPopover"
     >
       <svg
@@ -360,7 +360,7 @@ function removeLink() {
         <Button
           icon="pi pi-check"
           size="small"
-          class="!bg-primary !text-white hover:!opacity-90"
+          class="!bg-primary !text-on-accent hover:!opacity-90"
           @click="applyLink"
         />
         <Button

@@ -480,7 +480,7 @@ function onRefineWords() {
           "
           icon="pi pi-check"
           size="small"
-          class="!bg-primary !text-white hover:!opacity-90"
+          class="!bg-primary !text-on-accent hover:!opacity-90"
           :disabled="
             !sel.hasSelection.value ||
             inserting ||

@@ -325,7 +325,7 @@ function importSelected() {
           </div>
           <button
             type="button"
-            class="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-primary hover:bg-accent text-white text-[13px] font-semibold cursor-pointer font-[inherit] whitespace-nowrap transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-[9px] bg-primary hover:bg-accent text-on-accent text-[13px] font-semibold cursor-pointer font-[inherit] whitespace-nowrap transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
             :disabled="selectedCount === 0"
             @click="importSelected"
           >

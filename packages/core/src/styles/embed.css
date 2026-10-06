@@ -33,24 +33,28 @@
 }
 
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
     "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
   --font-quran: "Uthmanic Hafs", serif;
   --font-quran-uthmani: "Geeza Pro", "Scheherazade New", serif;
   --color-primary: #5d1d3d;
   --color-accent: #410322;
   --color-accent-hover: #edc5d9;
-  --color-bg: #ffffff;
-  --color-bg-soft: #f8fafc;
-  --color-ink: #0f172a;
-  --color-muted: #64748b;
-  --color-on-accent: #ffffff;
-  --color-border: #e2e8f0;
+  --color-bg: #fcf9f4;
+  --color-bg-soft: #f4eee5;
+  --color-raise: #fffdf9;
+  --color-tint: #f1e3e6;
+  --color-hover: rgba(93, 29, 61, 0.055);
+  --color-ink: #2b1e23;
+  --color-muted: #6f6064;
+  --color-on-accent: #fbf3ec;
+  --color-border: #e7ddd0;
+  --color-ref: #8a6a35;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
   --color-error-text: #b91c1c;
-  --color-hadith-text: #14532d;
-  --shadow-card-hover: 0 4px 24px rgba(93, 29, 61, 0.08);
+  --color-hadith-text: #4f5b2c;
+  --shadow-card-hover: 0 14px 36px -10px rgba(60, 30, 30, 0.22);
 }
 
 /* Scoped reset — re-establishes a clean baseline INSIDE every Qirtaas root so
@@ -178,20 +182,24 @@
    The SPA keeps its own .dark-mode rules in apps/web/src/assets/main.css. */
 @layer qirtaas {
   .qirtaas-dark {
-    --color-primary: #ce6499;
+    --color-primary: #edc5d9;
     --color-accent: #edc5d9;
     --color-accent-hover: #edc5d9;
-    --color-bg: #111111;
-    --color-bg-soft: #1c1c24;
-    --color-ink: #e2e8f0;
-    --color-muted: #dfe6ec;
-    --color-on-accent: #ffffff;
-    --color-border: #b0b0b0;
+    --color-bg: #1d1418;
+    --color-bg-soft: #170f13;
+    --color-raise: #271b21;
+    --color-tint: rgba(237, 197, 217, 0.12);
+    --color-hover: rgba(243, 233, 220, 0.06);
+    --color-ink: #f2e8db;
+    --color-muted: #b6a6aa;
+    --color-on-accent: #3a0d22;
+    --color-border: rgba(243, 233, 220, 0.11);
+    --color-ref: oklch(0.78 0.1 75);
     --color-error-bg: #872c38;
     --color-error-border: #912121;
     --color-error-text: #fca5a5;
-    --color-hadith-text: #86efac;
-    --shadow-card-hover: 0 4px 24px rgba(212, 132, 158, 0.15);
+    --color-hadith-text: #c9cf9a;
+    --shadow-card-hover: 0 18px 44px -10px rgba(0, 0, 0, 0.6);
   }
 
   .qirtaas-dark .tiptap mark[data-color="#fef08a"] {
