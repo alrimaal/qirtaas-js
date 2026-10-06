@@ -156,6 +156,23 @@ export default {
     tapToResave: "Appuyez pour enregistrer à nouveau",
     tapToRetry: "Appuyez pour réessayer",
   },
+  referenceColor: {
+    label: "Couleur",
+    useDefault: "Votre couleur par défaut",
+    names: {
+      plum: "Prune",
+      olive: "Olive",
+      red: "Rouge",
+      orange: "Orange",
+      gold: "Or",
+      green: "Vert",
+      teal: "Sarcelle",
+      blue: "Bleu",
+      violet: "Violet",
+      pink: "Rose",
+      ink: "Encre",
+    },
+  },
   errors: {
     loadDocument: "Impossible de charger le document.",
     saveFailed: "Impossible d’enregistrer vos modifications.",

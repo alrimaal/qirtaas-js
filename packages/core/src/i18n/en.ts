@@ -153,6 +153,23 @@ export default {
     tapToResave: "Tap to re-save",
     tapToRetry: "Tap to re-try",
   },
+  referenceColor: {
+    label: "Colour",
+    useDefault: "Your default",
+    names: {
+      plum: "Plum",
+      olive: "Olive",
+      red: "Red",
+      orange: "Orange",
+      gold: "Gold",
+      green: "Green",
+      teal: "Teal",
+      blue: "Blue",
+      violet: "Violet",
+      pink: "Pink",
+      ink: "Ink",
+    },
+  },
   errors: {
     loadDocument: "Couldn't load the document.",
     saveFailed: "Couldn't save your changes.",

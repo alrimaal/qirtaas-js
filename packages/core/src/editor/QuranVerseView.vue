@@ -7,6 +7,10 @@ import { useI18n } from "vue-i18n";
 import { formatReference, shortReference } from "./quran/formatReference";
 import TranslationEditionSelect from "./quran/TranslationEditionSelect.vue";
 import VerseTranslationStrip from "./VerseTranslationStrip.vue";
+import {
+  resolveReferenceColor,
+  referenceColorVar,
+} from "../composables/useReferenceColors";
 
 const props = defineProps<{
   node: {
@@ -23,6 +27,7 @@ const props = defineProps<{
       encoding: "uthmani" | "qpc_hafs";
       translationOpen: boolean;
       displayMode: "inline" | "card";
+      color: string | null;
     };
   };
   editor: Editor;
@@ -36,6 +41,10 @@ const { t } = useI18n();
 const reference = computed(() => formatReference(props.node.attrs));
 const refNumber = computed(() => shortReference(props.node.attrs));
 const isCard = computed(() => props.node.attrs.displayMode === "card");
+
+const textStyle = computed(() => ({
+  color: referenceColorVar(resolveReferenceColor("quran", props.node.attrs.color)),
+}));
 
 const fontClass = computed(() =>
   props.node.attrs.encoding === "qpc_hafs" ? "font-quran" : "font-quran-uthmani"
@@ -124,7 +133,8 @@ const selectNode = () => {
       <span
         dir="rtl"
         :class="fontClass"
-        class="block text-right text-lg leading-loose text-primary"
+        :style="textStyle"
+        class="block text-right text-lg leading-loose"
       >
         {{ props.node.attrs.text }}
       </span>
@@ -144,7 +154,7 @@ const selectNode = () => {
         <span class="text-[1.8em] leading-[0] text-accent/60 align-middle"
           >﴿
         </span>
-        <span class="text-primary">{{ props.node.attrs.text }}</span
+        <span :style="textStyle">{{ props.node.attrs.text }}</span
         ><span class="text-[1.8em] leading-[0] text-accent/60 align-middle">
           ﴾</span
         ></span

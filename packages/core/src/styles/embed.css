@@ -181,7 +181,33 @@
 /* Embed dark mode keys on .qirtaas-dark (host owns theme via options.theme).
    The SPA keeps its own .dark-mode rules in apps/web/src/assets/main.css. */
 @layer qirtaas {
+  /* Verse/hadith text palette (see useReferenceColors). */
+  .qirtaas-scope {
+    --color-reference-plum: #5d1d3d;
+    --color-reference-olive: #4f5b2c;
+    --color-reference-red: #d01f2f;
+    --color-reference-orange: #d9480f;
+    --color-reference-gold: #b07800;
+    --color-reference-green: #2b8a3e;
+    --color-reference-teal: #0b7a8a;
+    --color-reference-blue: #1d4ed8;
+    --color-reference-violet: #7c3aed;
+    --color-reference-pink: #c2185b;
+    --color-reference-ink: #1f1418;
+  }
+
   .qirtaas-dark {
+    --color-reference-plum: #edc5d9;
+    --color-reference-olive: #c9cf9a;
+    --color-reference-red: #ff6b78;
+    --color-reference-orange: #ff922b;
+    --color-reference-gold: #fcc419;
+    --color-reference-green: #51cf66;
+    --color-reference-teal: #3bc9db;
+    --color-reference-blue: #6ea8ff;
+    --color-reference-violet: #b197fc;
+    --color-reference-pink: #f783ac;
+    --color-reference-ink: #f7efe4;
     --color-primary: #edc5d9;
     --color-accent: #edc5d9;
     --color-accent-hover: #edc5d9;

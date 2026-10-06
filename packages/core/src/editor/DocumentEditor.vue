@@ -19,6 +19,13 @@ import {
 } from "@tiptap/extension-table";
 import TableBubbleMenu from "./TableBubbleMenu.vue";
 import AtomBubbleMenu from "./AtomBubbleMenu.vue";
+import ReferenceColorPicker from "./ReferenceColorPicker.vue";
+import {
+  isReferenceColor,
+  resolveReferenceColor,
+  referenceColorVar,
+  type ReferenceColor,
+} from "@qirtaas/core/composables/useReferenceColors";
 import Button from "primevue/button";
 import {
   Details,
@@ -489,6 +496,23 @@ defineExpose({
   insertImageFromInput,
 });
 
+// ---- Per-node verse/hadith colour (atom bubble menu) ----
+
+const colorPanelOpen = ref(false);
+
+function selectedReferenceColor(attrs: Record<string, unknown> | null) {
+  return attrs && isReferenceColor(attrs.color) ? attrs.color : null;
+}
+
+// AttrStep keeps the NodeSelection (a markup replace would drop it and
+// re-trigger the detail panel via onSelectionUpdate).
+function setReferenceColor(color: ReferenceColor | null) {
+  const ed = editor.value;
+  const selection = ed?.state.selection;
+  if (!ed || !(selection instanceof NodeSelection)) return;
+  ed.view.dispatch(ed.state.tr.setNodeAttribute(selection.from, "color", color));
+}
+
 function onAtomAction(nodeType: string, attrs: Record<string, unknown>) {
   if (nodeType === "quranVerse") {
     const surah = attrs.surah as number;
@@ -724,14 +748,13 @@ function insertQuranMushaf(data: {
       <TableBubbleMenu v-if="editor && editable" :editor="editor" />
       <AtomBubbleMenu
         v-if="editor && editable"
-        :hidden="!isMobile"
         :editor="editor"
         :node-types="['quranVerse', 'hadithNode']"
         @action="onAtomAction"
       >
         <template #action="{ attrs, onAction }">
           <Button
-            v-if="editor!.isActive('quranVerse')"
+            v-if="isMobile && editor!.isActive('quranVerse')"
             severity="secondary"
             text
             rounded
@@ -744,7 +767,7 @@ function insertQuranMushaf(data: {
             </template>
           </Button>
           <Button
-            v-if="editor!.isActive('hadithNode')"
+            v-if="isMobile && editor!.isActive('hadithNode')"
             severity="secondary"
             text
             rounded
@@ -756,6 +779,42 @@ function insertQuranMushaf(data: {
               <i class="pi pi-book text-xs" />
             </template>
           </Button>
+          <Button
+            severity="secondary"
+            text
+            rounded
+            size="small"
+            :label="t('referenceColor.label')"
+            :aria-expanded="colorPanelOpen"
+            @click="colorPanelOpen = !colorPanelOpen"
+          >
+            <template #icon>
+              <span
+                class="h-3 w-3 rounded-full"
+                :style="{
+                  background: referenceColorVar(
+                    resolveReferenceColor(
+                      editor!.isActive('hadithNode') ? 'hadith' : 'quran',
+                      attrs?.color
+                    )
+                  ),
+                }"
+              />
+            </template>
+          </Button>
+        </template>
+        <template #panel="{ attrs }">
+          <div
+            v-if="colorPanelOpen"
+            class="border-t border-border px-2.5 py-2"
+          >
+            <ReferenceColorPicker
+              :kind="editor!.isActive('hadithNode') ? 'hadith' : 'quran'"
+              :model-value="selectedReferenceColor(attrs)"
+              allow-default
+              @update:model-value="setReferenceColor"
+            />
+          </div>
         </template>
       </AtomBubbleMenu>
       <AtomBubbleMenu

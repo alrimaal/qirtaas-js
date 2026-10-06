@@ -153,6 +153,23 @@ export default {
     tapToRetry: "اضغط للمحاولة مرة أخرى",
     backLabel: "العودة",
   },
+  referenceColor: {
+    label: "اللون",
+    useDefault: "اللون الافتراضي",
+    names: {
+      plum: "برقوقي",
+      olive: "زيتوني",
+      red: "أحمر",
+      orange: "برتقالي",
+      gold: "ذهبي",
+      green: "أخضر",
+      teal: "فيروزي",
+      blue: "أزرق",
+      violet: "بنفسجي",
+      pink: "وردي",
+      ink: "حبري",
+    },
+  },
   errors: {
     loadDocument: "تعذّر تحميل المستند.",
     saveFailed: "تعذّر حفظ تغييراتك.",

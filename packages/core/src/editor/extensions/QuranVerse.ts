@@ -1,5 +1,9 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { VueNodeViewRenderer } from "@tiptap/vue-3";
+import {
+  isReferenceColor,
+  type ReferenceColor,
+} from "../../composables/useReferenceColors";
 import QuranVerseView from "../QuranVerseView.vue";
 
 export type QuranTextEncoding = "uthmani" | "qpc_hafs";
@@ -30,6 +34,8 @@ export interface QuranVerseAttributes {
   // not make the node a real block node. Defaults to "inline" so old docs are
   // unaffected.
   displayMode: "inline" | "card";
+  // Per-node text colour; null follows the reader's default for the kind.
+  color: ReferenceColor | null;
 }
 
 const num = (default_: number | null) => ({
@@ -113,6 +119,15 @@ export const QuranVerse = Node.create({
             : "inline",
         renderHTML: (attrs) =>
           attrs.displayMode === "card" ? { "data-display-mode": "card" } : {},
+      },
+      color: {
+        default: null,
+        parseHTML: (el) => {
+          const v = (el as HTMLElement).getAttribute("data-reference-color");
+          return isReferenceColor(v) ? v : null;
+        },
+        renderHTML: (attrs) =>
+          attrs.color ? { "data-reference-color": attrs.color } : {},
       },
     };
   },

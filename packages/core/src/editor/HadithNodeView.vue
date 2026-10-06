@@ -6,6 +6,10 @@ import type { Editor } from "@tiptap/core";
 import { useI18n } from "vue-i18n";
 import HadithTranslationStrip from "./HadithTranslationStrip.vue";
 import SanitizedHtml from "./SanitizedHtml.vue";
+import {
+  resolveReferenceColor,
+  referenceColorVar,
+} from "../composables/useReferenceColors";
 
 const props = defineProps<{
   node: {
@@ -16,6 +20,7 @@ const props = defineProps<{
       text: string;
       translationOpen: boolean;
       displayMode: "inline" | "card";
+      color: string | null;
     };
   };
   editor: Editor;
@@ -25,6 +30,10 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+
+const textStyle = computed(() => ({
+  color: referenceColorVar(resolveReferenceColor("hadith", props.node.attrs.color)),
+}));
 
 const isCard = computed(() => props.node.attrs.displayMode === "card");
 
@@ -98,7 +107,8 @@ const selectNode = () => {
         policy="compact"
         :html="props.node.attrs.text"
         dir="rtl"
-        class="block text-right text-lg leading-loose text-hadith-text"
+        :style="textStyle"
+        class="block text-right text-lg leading-loose"
       />
     </button>
     <span v-if="open" class="block px-4 pb-3" @mousedown.stop>
@@ -119,7 +129,7 @@ const selectNode = () => {
         <SanitizedHtml
           policy="compact"
           :html="props.node.attrs.text"
-          class="text-hadith-text"
+          :style="textStyle"
         /><span class="text-[1.4em] leading-[0] text-accent/60 align-middle"
           >»</span
         >

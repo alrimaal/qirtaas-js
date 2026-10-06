@@ -73,9 +73,8 @@ function deleteNode() {
       },
     }"
   >
-    <div
-      class="flex items-center gap-0.5 bg-bg border border-border rounded-lg shadow-md px-1 py-0.5"
-    >
+    <div class="bg-bg border border-border rounded-lg shadow-md">
+    <div class="flex items-center gap-0.5 px-1 py-0.5">
       <slot name="action" :attrs="getSelectedAttrs()" :on-action="onAction" />
       <Button
         severity="secondary"
@@ -100,6 +99,8 @@ function deleteNode() {
       >
         <i class="pi pi-trash text-xs" />
       </Button>
+    </div>
+    <slot name="panel" :attrs="getSelectedAttrs()" />
     </div>
   </BubbleMenu>
 </template>
