@@ -3,6 +3,7 @@ import { ref, watch, provide, onMounted, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { useToast } from "primevue/usetoast";
 import DocumentEditor from "../editor/DocumentEditor.vue";
+import DocumentRenderer from "../editor/DocumentRenderer.vue";
 import EditorToolbar from "../editor/EditorToolbar.vue";
 import FindReplaceBar from "../editor/FindReplaceBar.vue";
 import VerseDetailContainer from "../editor/VerseDetailContainer.vue";
@@ -60,6 +61,9 @@ const editorRef = ref<InstanceType<typeof DocumentEditor> | null>(null);
 const findReplaceVisible = ref(false);
 const findReplaceRef = ref<InstanceType<typeof FindReplaceBar> | null>(null);
 const content = ref<Json | null>(props.initialContent ?? null);
+// Read-only swaps the editor for the lightweight renderer; toggling remounts
+// from `content`. Driven by the `editable` option and setEditable().
+const isEditable = ref(props.editable);
 
 function openFindReplace() {
   if (findReplaceVisible.value) {
@@ -165,8 +169,16 @@ onMounted(async () => {
 
 watch(
   () => props.editable,
-  (editable) => editorRef.value?.editor?.setEditable(editable)
+  (editable) => (isEditable.value = editable)
 );
+
+// Toggling editable remounts the view; the host still gets onReady once.
+let readyFired = false;
+function onViewReady() {
+  if (readyFired) return;
+  readyFired = true;
+  props.onReady?.();
+}
 
 function onContentUpdate(json: Json) {
   content.value = json;
@@ -177,8 +189,9 @@ function onContentUpdate(json: Json) {
 defineExpose({
   getJSON: () => content.value,
   save: autosave.saveNow,
-  setEditable: (editable: boolean) =>
-    editorRef.value?.editor?.setEditable(editable),
+  setEditable: (editable: boolean) => {
+    isEditable.value = editable;
+  },
   openShortcuts: () => editorRef.value?.openShortcuts(),
   openCommandPalette: () => editorRef.value?.openCommandPalette(),
 });
@@ -200,7 +213,7 @@ defineExpose({
       <!-- Desktop toolbar (top). Editing only; drives the editor through the
            DocumentEditor's exposed imperative API. -->
       <div
-        v-if="editable && !loadFailed && editorRef?.editor"
+        v-if="isEditable && !loadFailed && editorRef?.editor"
         class="hidden md:block shrink-0 border-b border-border bg-bg px-3"
       >
         <EditorToolbar
@@ -225,19 +238,25 @@ defineExpose({
            so Moveable's control box anchors and clips to the editor. -->
       <div class="flex-1 min-h-0 min-w-0 overflow-y-auto relative" data-editor-scroll>
         <DocumentEditor
+          v-if="isEditable && !loadFailed"
           ref="editorRef"
           :model-value="content"
-          :editable="editable && !loadFailed"
           :autofocus="autofocus"
           :document-id="docId ?? undefined"
           @update:model-value="onContentUpdate"
-          @ready="onReady?.()"
+          @ready="onViewReady"
           @open-find-replace="openFindReplace"
+        />
+        <DocumentRenderer
+          v-else
+          :content="content"
+          :document-id="docId ?? undefined"
+          @ready="onViewReady"
         />
       </div>
       <!-- Mobile toolbar (bottom), mirroring the SPA's bottom bar. -->
       <div
-        v-if="editable && !loadFailed && editorRef?.editor"
+        v-if="isEditable && !loadFailed && editorRef?.editor"
         class="md:hidden shrink-0 border-t border-border bg-bg px-1"
       >
         <EditorToolbar

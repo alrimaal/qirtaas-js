@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, provide, onMounted } from "vue";
-import DocumentEditor from "../editor/DocumentEditor.vue";
+import DocumentRenderer from "../editor/DocumentRenderer.vue";
 import VerseDetailContainer from "../editor/VerseDetailContainer.vue";
 import { IsDarkKey } from "../editor/runtime/context";
 import Toast from "primevue/toast";
@@ -10,7 +10,7 @@ const props = withDefaults(
   defineProps<{
     /** Resolves the read-only document content (auth handled by the transport). */
     load: () => Promise<Json | null>;
-    /** Forwarded to the editor so image reads carry `document_id` — required for
+    /** Forwarded to the renderer so image reads carry `document_id` — required for
         the signature read path to authorize linked images. */
     documentId?: string;
     theme?: "light" | "dark";
@@ -58,10 +58,9 @@ onMounted(async () => {
     >
       <i class="pi pi-spinner pi-spin" style="font-size: 1.5rem; opacity: 0.6" />
     </div>
-    <DocumentEditor
+    <DocumentRenderer
       v-else-if="!loadFailed"
-      :model-value="content"
-      :editable="false"
+      :content="content"
       :document-id="documentId"
       @ready="onReady?.()"
     />
