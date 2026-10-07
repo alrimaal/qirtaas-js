@@ -79,12 +79,15 @@ const props = withDefaults(
     documentId?: string;
     /** Size to content with no page-level caret anchoring, for small embeds. */
     compact?: boolean;
+    /** When false, pasted or dropped image files aren't uploaded. */
+    images?: boolean;
   }>(),
   {
     editable: true,
     autofocus: false,
     documentId: undefined,
     compact: false,
+    images: true,
   }
 );
 
@@ -397,19 +400,23 @@ const editor = useEditor({
       documentId: props.documentId,
       translate: (key: string) => t(key),
     }),
-    FileHandler.configure({
-      allowedMimeTypes: ALLOWED_IMAGE_MIMES,
-      onDrop: (_editor, files, pos) => {
-        const picked = selectFirstImage(files);
-        if (picked) startImageUpload(picked, pos);
-      },
-      onPaste: (currentEditor, files) => {
-        const picked = selectFirstImage(files);
-        if (picked) {
-          startImageUpload(picked, currentEditor.state.selection.from);
-        }
-      },
-    }),
+    ...(props.images
+      ? [
+          FileHandler.configure({
+            allowedMimeTypes: ALLOWED_IMAGE_MIMES,
+            onDrop: (_editor, files, pos) => {
+              const picked = selectFirstImage(files);
+              if (picked) startImageUpload(picked, pos);
+            },
+            onPaste: (currentEditor, files) => {
+              const picked = selectFirstImage(files);
+              if (picked) {
+                startImageUpload(picked, currentEditor.state.selection.from);
+              }
+            },
+          }),
+        ]
+      : []),
     SearchReplace.configure({
       searchResultClass: "search-result",
     }),

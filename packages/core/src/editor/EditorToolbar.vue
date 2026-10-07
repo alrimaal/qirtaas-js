@@ -13,7 +13,14 @@ import { HONORIFICS, isHonorificType } from "./honorifics";
 import { HIGHLIGHT_COLORS, insertToggleList } from "./commands";
 import { trackHonorificInserted } from "./extensions/Honorific";
 
-const props = defineProps<{ editor: Editor | undefined }>();
+const props = withDefaults(
+  defineProps<{
+    editor: Editor | undefined;
+    /** When false, the image button is hidden. */
+    images?: boolean;
+  }>(),
+  { images: true }
+);
 const emit = defineEmits<{
   "open-quran": [];
   "open-hadith": [];
@@ -543,6 +550,7 @@ function removeLink() {
       </svg>
     </Button>
     <Button
+      v-if="images"
       v-tooltip.bottom="t('editor.insertImage')"
       icon="pi pi-image"
       severity="secondary"
