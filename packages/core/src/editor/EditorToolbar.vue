@@ -12,6 +12,11 @@ import { Search, ListCollapse, ListOrdered, Highlighter } from "lucide-vue-next"
 import { HONORIFICS, isHonorificType } from "./honorifics";
 import { HIGHLIGHT_COLORS, insertToggleList } from "./commands";
 import { trackHonorificInserted } from "./extensions/Honorific";
+import {
+  TEXT_COLORS,
+  textColorVar,
+  type TextColorName,
+} from "./extensions/TextColor";
 
 const props = withDefaults(
   defineProps<{
@@ -65,6 +70,7 @@ const alignments = computed(() => {
 const headingPopover = ref();
 const alignPopover = ref();
 const highlightPopover = ref();
+const textColorPopover = ref();
 const linkPopover = ref();
 const linkUrl = ref("");
 
@@ -120,6 +126,17 @@ function applyHighlight(color: string) {
 function removeHighlight() {
   props.editor!.chain().focus().unsetHighlight().run();
   highlightPopover.value.hide();
+}
+
+// Current text colour, for the button's underline swatch.
+const activeTextColor = computed<TextColorName | null>(
+  () => props.editor?.getAttributes("textColor").color ?? null
+);
+
+function applyTextColor(color: TextColorName | null) {
+  const chain = props.editor!.chain().focus();
+  (color ? chain.setTextColor(color) : chain.unsetTextColor()).run();
+  textColorPopover.value.hide();
 }
 
 function toggleLinkPopover(event: Event) {
@@ -389,6 +406,52 @@ function removeLink() {
         >
           <i class="pi pi-times text-[0.6rem] text-muted" />
         </button>
+      </div>
+    </Popover>
+
+    <!-- Text colour -->
+    <Button
+      v-tooltip.bottom="t('editor.tooltips.textColor')"
+      severity="secondary"
+      text
+      rounded
+      size="small"
+      class="shrink-0"
+      :class="{ '!bg-accent/10 !text-accent': activeTextColor }"
+      @click="textColorPopover.toggle($event)"
+    >
+      <span class="flex flex-col items-center leading-none">
+        <span class="text-sm font-semibold">A</span>
+        <span
+          class="mt-0.5 h-[3px] w-3.5 rounded-full"
+          :style="{
+            background: activeTextColor
+              ? textColorVar(activeTextColor)
+              : 'var(--color-ink)',
+          }"
+        />
+      </span>
+    </Button>
+    <Popover :append-to="getOverlayAppendTo()" ref="textColorPopover">
+      <div class="grid grid-cols-6 gap-2 p-1">
+        <button
+          class="w-6 h-6 rounded-full border-2 border-border cursor-pointer flex items-center justify-center bg-transparent hover:bg-bg-soft"
+          :title="t('editor.tooltips.defaultTextColor')"
+          @mousedown.prevent
+          @click="applyTextColor(null)"
+        >
+          <i class="pi pi-times text-[0.6rem] text-muted" />
+        </button>
+        <button
+          v-for="c in TEXT_COLORS"
+          :key="c"
+          class="w-6 h-6 rounded-full border-2 cursor-pointer transition-transform hover:scale-110"
+          :class="activeTextColor === c ? 'border-accent' : 'border-transparent'"
+          :style="{ backgroundColor: textColorVar(c) }"
+          :title="t(`editor.textColors.${c}`)"
+          @mousedown.prevent
+          @click="applyTextColor(c)"
+        />
       </div>
     </Popover>
 

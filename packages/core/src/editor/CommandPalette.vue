@@ -29,6 +29,7 @@ const GROUP_ORDER: CommandGroup[] = [
   "insert",
   "honorifics",
   "format",
+  "textColor",
   "highlight",
   "tools",
 ];
@@ -36,14 +37,14 @@ const GROUP_ORDER: CommandGroup[] = [
 const matches = computed(() => filterCommands(props.commands, query.value));
 
 const ordered = computed(() =>
-  GROUP_ORDER.flatMap((group) => matches.value.filter((c) => c.group === group)),
+  GROUP_ORDER.flatMap((group) => matches.value.filter((c) => c.group === group))
 );
 
 const groups = computed(() =>
   GROUP_ORDER.map((group) => ({
     group,
     items: matches.value.filter((c) => c.group === group),
-  })).filter((g) => g.items.length > 0),
+  })).filter((g) => g.items.length > 0)
 );
 
 function indexOf(command: ResolvedCommand): number {
@@ -148,8 +149,8 @@ function onKeydown(e: KeyboardEvent) {
                 ? 'bg-accent/[0.12] text-accent'
                 : 'bg-accent/10 text-accent'
               : activeIds.has(item.id)
-                ? 'bg-accent/[0.04] text-ink'
-                : 'bg-transparent text-ink',
+              ? 'bg-accent/[0.04] text-ink'
+              : 'bg-transparent text-ink',
             activeIds.has(item.id) && 'font-semibold',
           ]"
           @click="run(item)"
@@ -167,7 +168,11 @@ function onKeydown(e: KeyboardEvent) {
             class="honorific-glyph w-4 text-center text-base leading-none"
             >{{ item.glyph }}</span
           >
-          <i v-else :class="item.icon" class="w-4 text-center text-xs text-muted" />
+          <i
+            v-else
+            :class="item.icon"
+            class="w-4 text-center text-xs text-muted"
+          />
           <span class="min-w-0 flex-1 truncate">{{ item.label }}</span>
           <span
             v-if="activeIds.has(item.id) && indexOf(item) === selectedIndex"
@@ -196,7 +201,10 @@ function onKeydown(e: KeyboardEvent) {
         </button>
       </template>
 
-      <div v-if="ordered.length === 0" class="px-3 py-6 text-center text-xs text-muted">
+      <div
+        v-if="ordered.length === 0"
+        class="px-3 py-6 text-center text-xs text-muted"
+      >
         {{ t("editor.commandPalette.empty") }}
       </div>
     </div>

@@ -1,11 +1,13 @@
 import type { Editor } from "@tiptap/core";
 import { HONORIFICS } from "./honorifics";
 import { mod, modShift, type Combo } from "./keyboard";
+import { TEXT_COLORS, textColorVar } from "./extensions/TextColor";
 
 export type CommandGroup =
   | "insert"
   | "honorifics"
   | "format"
+  | "textColor"
   | "highlight"
   | "tools";
 
@@ -19,6 +21,12 @@ export const HIGHLIGHT_COLORS = [
 ] as const;
 
 export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number];
+
+/** Colour dot shown next to a palette command. */
+export interface Swatch {
+  light: string;
+  dark: string;
+}
 
 export function insertToggleList(editor: Editor) {
   const { $from } = editor.state.selection;
@@ -57,7 +65,7 @@ export interface CommandDef {
 
   combo?: Combo;
 
-  swatch?: HighlightColor;
+  swatch?: Swatch;
 
   slash?: boolean;
 
@@ -262,7 +270,8 @@ const HIGHLIGHT_COMMANDS: CommandDef[] = [
     swatch: c,
     searchTerms: ["highlight", "color", "colour", c.id],
     palette: true,
-    run: (e: Editor) => e.chain().focus().toggleHighlight({ color: c.light }).run(),
+    run: (e: Editor) =>
+      e.chain().focus().toggleHighlight({ color: c.light }).run(),
     isActive: (e: Editor) => e.isActive("highlight", { color: c.light }),
   })),
   {
@@ -272,6 +281,34 @@ const HIGHLIGHT_COMMANDS: CommandDef[] = [
     icon: "pi pi-ban",
     palette: true,
     run: (e) => e.chain().focus().unsetHighlight().run(),
+  },
+];
+
+const TEXT_COLOR_COMMANDS: CommandDef[] = [
+  ...TEXT_COLORS.map((c) => ({
+    id: `textColor-${c}`,
+    group: "textColor" as const,
+    labelKey: `editor.textColors.${c}`,
+    icon: "pi pi-palette",
+    // The CSS variable already switches with the theme.
+    swatch: { light: textColorVar(c), dark: textColorVar(c) },
+    searchTerms: ["text", "font", "color", "colour", c],
+    palette: true,
+    run: (e: Editor) => {
+      const chain = e.chain().focus();
+      if (e.isActive("textColor", { color: c })) chain.unsetTextColor().run();
+      else chain.setTextColor(c).run();
+    },
+    isActive: (e: Editor) => e.isActive("textColor", { color: c }),
+  })),
+  {
+    id: "textColorRemove",
+    group: "textColor",
+    labelKey: "editor.tooltips.defaultTextColor",
+    icon: "pi pi-ban",
+    searchTerms: ["text", "font", "color", "colour", "default", "remove"],
+    palette: true,
+    run: (e) => e.chain().focus().unsetTextColor().run(),
   },
 ];
 
@@ -297,6 +334,7 @@ export const COMMAND_DEFS: CommandDef[] = [
   ...INSERT_COMMANDS,
   ...HONORIFIC_COMMANDS,
   ...FORMAT_COMMANDS,
+  ...TEXT_COLOR_COMMANDS,
   ...HIGHLIGHT_COMMANDS,
   ...TOOL_COMMANDS,
 ];
@@ -310,7 +348,7 @@ export interface ResolvedCommand {
   glyph?: string;
   syntax?: string;
   combo?: Combo;
-  swatch?: HighlightColor;
+  swatch?: Swatch;
   run?: (editor: Editor) => void;
   toggleable: boolean;
 }
@@ -330,13 +368,14 @@ export function buildCommands({
 }: BuildOptions): ResolvedCommand[] {
   const isAr = locale === "ar";
   return COMMAND_DEFS.filter(
-    (cmd) => (surface === "slash" ? cmd.slash : cmd.palette) && commandFilter(cmd.id),
+    (cmd) =>
+      (surface === "slash" ? cmd.slash : cmd.palette) && commandFilter(cmd.id)
   ).map((cmd) => {
     const label = cmd.labelKey
       ? t(cmd.labelKey)
       : isAr
-        ? cmd.labelText!.ar
-        : cmd.labelText!.en;
+      ? cmd.labelText!.ar
+      : cmd.labelText!.en;
     return {
       id: cmd.id,
       group: cmd.group,
@@ -360,9 +399,11 @@ export function buildCommands({
 
 export function filterCommands(
   commands: ResolvedCommand[],
-  query: string,
+  query: string
 ): ResolvedCommand[] {
   const q = query.trim().toLowerCase();
   if (!q) return commands;
-  return commands.filter((cmd) => cmd.searchTerms.some((term) => term.includes(q)));
+  return commands.filter((cmd) =>
+    cmd.searchTerms.some((term) => term.includes(q))
+  );
 }

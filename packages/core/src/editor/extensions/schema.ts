@@ -23,6 +23,7 @@ import { HadithNode } from "./HadithNode";
 import { DocumentLink } from "./DocumentLink";
 import { Honorific } from "./Honorific";
 import { ImageNode } from "./ImageNode";
+import { TextColor } from "./TextColor";
 import type { emojiSuggestion } from "../emojiSuggestion";
 
 /** Every node, mark and node view a document can contain. Shared by the
@@ -50,6 +51,7 @@ export function documentExtensions(opts: {
       multicolor: true,
     }),
     Underline,
+    TextColor,
     Link.configure({
       openOnClick: false,
       HTMLAttributes: {
