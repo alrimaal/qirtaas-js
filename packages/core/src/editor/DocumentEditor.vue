@@ -10,12 +10,13 @@ import { useAtomDetail } from "./useAtomDetail";
 import "./document.css";
 import TableBubbleMenu from "./TableBubbleMenu.vue";
 import AtomBubbleMenu from "./AtomBubbleMenu.vue";
+import ReferenceStylePicker from "./ReferenceStylePicker.vue";
 import ReferenceColorPicker from "./ReferenceColorPicker.vue";
 import {
   isReferenceColor,
   resolveReferenceColor,
+  resolveReferenceFill,
   referenceColorVar,
-  type ReferenceColor,
 } from "@qirtaas/core/composables/useReferenceColors";
 import Button from "primevue/button";
 import { SlashCommand } from "./extensions/SlashCommand";
@@ -41,13 +42,11 @@ import { MAX_IMAGE_BYTES } from "@qirtaas/core/services/images";
 import { useI18n } from "vue-i18n";
 import { trackEvent } from "./runtime/analytics";
 import { useVerseDetail } from "@qirtaas/core/composables/useVerseDetail";
-import { useIsMobile } from "@qirtaas/core/composables/useIsMobile";
 import { useToast } from "primevue/usetoast";
 
 const verseDetail = useVerseDetail();
 const openAtomDetail = useAtomDetail();
 const toast = useToast();
-const { isMobile } = useIsMobile();
 
 const props = withDefaults(
   defineProps<{
@@ -389,16 +388,6 @@ const editor = useEditor({
   onUpdate: ({ editor: ed }) => {
     emit("update:modelValue", ed.getJSON() as Record<string, unknown>);
   },
-  onSelectionUpdate: ({ editor: ed }) => {
-    // On mobile, the AtomBubbleMenu handles this.
-    if (isMobile.value) return;
-    const { selection } = ed.state;
-    if (!(selection instanceof NodeSelection)) return;
-    const nodeType = selection.node.type.name;
-    // quranMushaf uses an image-style bubble menu instead.
-    if (nodeType !== "quranVerse" && nodeType !== "hadithNode") return;
-    openAtomDetail(nodeType, selection.node.attrs);
-  },
 });
 
 // The scroll props are baked in at view creation, so recompute them when the
@@ -429,21 +418,51 @@ defineExpose({
   insertImageFromInput,
 });
 
-// ---- Per-node verse/hadith colour (atom bubble menu) ----
+// ---- Per-node verse/hadith style (atom bubble menu) ----
 
-const colorPanelOpen = ref(false);
+const stylePanelOpen = ref(false);
 
-function selectedReferenceColor(attrs: Record<string, unknown> | null) {
-  return attrs && isReferenceColor(attrs.color) ? attrs.color : null;
+function selectedReferenceKind() {
+  return editor.value?.isActive("hadithNode") ? "hadith" : "quran";
 }
 
-// AttrStep keeps the NodeSelection (a markup replace would drop it and
-// re-trigger the detail panel via onSelectionUpdate).
-function setReferenceColor(color: ReferenceColor | null) {
+function selectedReferenceColor(attrs: Record<string, unknown> | null) {
+  return resolveReferenceColor(selectedReferenceKind(), attrs?.color);
+}
+
+// AttrSteps keep the NodeSelection (a markup replace would drop it and close
+// the bubble menu).
+function setReferenceAttrs(attrs: { color?: string | null; fill?: string | null }) {
   const ed = editor.value;
   const selection = ed?.state.selection;
   if (!ed || !(selection instanceof NodeSelection)) return;
-  ed.view.dispatch(ed.state.tr.setNodeAttribute(selection.from, "color", color));
+  const tr = ed.state.tr;
+  for (const [name, value] of Object.entries(attrs)) {
+    tr.setNodeAttribute(selection.from, name, value);
+  }
+  ed.view.dispatch(tr);
+}
+
+function setReferenceColor(color: string | null, displayMode: unknown) {
+  setReferenceAttrs({ color });
+  trackEvent("reference_color_changed", {
+    kind: selectedReferenceKind(),
+    color: color ?? "default",
+    display_mode: displayMode,
+  });
+}
+
+function setReferenceFill(fill: string | null) {
+  setReferenceAttrs({ fill });
+  trackEvent("reference_fill_changed", {
+    kind: selectedReferenceKind(),
+    fill: fill ?? "default",
+  });
+}
+
+function resetReferenceStyle() {
+  setReferenceAttrs({ color: null, fill: null });
+  trackEvent("reference_style_reset", { kind: selectedReferenceKind() });
 }
 
 const onAtomAction = openAtomDetail;
@@ -671,7 +690,7 @@ function insertQuranMushaf(data: {
       >
         <template #action="{ attrs, onAction }">
           <Button
-            v-if="isMobile && editor!.isActive('quranVerse')"
+            v-if="editor!.isActive('quranVerse')"
             severity="secondary"
             text
             rounded
@@ -684,7 +703,7 @@ function insertQuranMushaf(data: {
             </template>
           </Button>
           <Button
-            v-if="isMobile && editor!.isActive('hadithNode')"
+            v-if="editor!.isActive('hadithNode')"
             severity="secondary"
             text
             rounded
@@ -696,40 +715,67 @@ function insertQuranMushaf(data: {
               <i class="pi pi-book text-xs" />
             </template>
           </Button>
+          <!-- Cards get fill + colour; inline nodes just colour. -->
           <Button
+            v-if="attrs?.displayMode === 'card'"
+            severity="secondary"
+            text
+            rounded
+            size="small"
+            :label="t('referenceStyle.label')"
+            :aria-expanded="stylePanelOpen"
+            @click="stylePanelOpen = !stylePanelOpen"
+          >
+            <template #icon>
+              <span
+                :class="`ref-fill-${resolveReferenceFill(selectedReferenceKind(), attrs?.fill)}`"
+                :style="{ '--ref': referenceColorVar(selectedReferenceColor(attrs)) }"
+                class="grid h-4 w-5 place-items-center rounded border border-(--ref-cb) bg-(--ref-bg) text-[0.6rem] font-bold text-(--ref-tc)"
+                >A</span
+              >
+            </template>
+          </Button>
+          <Button
+            v-else
             severity="secondary"
             text
             rounded
             size="small"
             :label="t('referenceColor.label')"
-            :aria-expanded="colorPanelOpen"
-            @click="colorPanelOpen = !colorPanelOpen"
+            :aria-expanded="stylePanelOpen"
+            @click="stylePanelOpen = !stylePanelOpen"
           >
             <template #icon>
               <span
                 class="h-3 w-3 rounded-full"
-                :style="{
-                  background: referenceColorVar(
-                    resolveReferenceColor(
-                      editor!.isActive('hadithNode') ? 'hadith' : 'quran',
-                      attrs?.color
-                    )
-                  ),
-                }"
+                :style="{ background: referenceColorVar(selectedReferenceColor(attrs)) }"
               />
             </template>
           </Button>
         </template>
         <template #panel="{ attrs }">
           <div
-            v-if="colorPanelOpen"
+            v-if="stylePanelOpen && attrs?.displayMode === 'card'"
+            class="border-t border-border"
+          >
+            <ReferenceStylePicker
+              :kind="selectedReferenceKind()"
+              :color="attrs?.color"
+              :fill="attrs?.fill"
+              @update:color="(c) => setReferenceColor(c, 'card')"
+              @update:fill="setReferenceFill"
+              @reset="resetReferenceStyle"
+            />
+          </div>
+          <div
+            v-else-if="stylePanelOpen"
             class="border-t border-border px-2.5 py-2"
           >
             <ReferenceColorPicker
-              :kind="editor!.isActive('hadithNode') ? 'hadith' : 'quran'"
-              :model-value="selectedReferenceColor(attrs)"
+              :kind="selectedReferenceKind()"
+              :model-value="isReferenceColor(attrs?.color) ? attrs.color : null"
               allow-default
-              @update:model-value="setReferenceColor"
+              @update:model-value="(c) => setReferenceColor(c, 'inline')"
             />
           </div>
         </template>

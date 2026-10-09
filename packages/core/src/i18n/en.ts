@@ -169,6 +169,21 @@ export default {
     tapToResave: "Tap to re-save",
     tapToRetry: "Tap to re-try",
   },
+  referenceStyle: {
+    label: "Style",
+    fill: "Fill",
+    fills: {
+      plain: "Plain",
+      paper: "Paper",
+      tint: "Tint",
+      solid: "Solid",
+    },
+    usingDefault: {
+      quran: "Using your Quran default",
+      hadith: "Using your hadith default",
+    },
+    reset: "Reset",
+  },
   referenceColor: {
     label: "Colour",
     useDefault: "Your default",

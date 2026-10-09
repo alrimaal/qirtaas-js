@@ -33,6 +33,8 @@ const props = defineProps<{
   ayah: number;
   /** Drop the strip's own border and background (inside a panel). */
   bare?: boolean;
+  /** Inherit colour and drop the italic (reference cards). */
+  plain?: boolean;
 }>();
 
 const { t } = useI18n();
@@ -126,7 +128,8 @@ watch(
       v-else
       policy="inline"
       :html="translation"
-      class="block text-ink/90 leading-relaxed italic"
+      class="block leading-relaxed"
+      :class="plain ? '' : 'text-ink/90 italic'"
     />
   </span>
 </template>

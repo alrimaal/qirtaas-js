@@ -2,7 +2,9 @@ import { Node, mergeAttributes } from "@tiptap/core";
 import { VueNodeViewRenderer } from "@tiptap/vue-3";
 import {
   isReferenceColor,
+  isReferenceFill,
   type ReferenceColor,
+  type ReferenceFill,
 } from "../../composables/useReferenceColors";
 import HadithNodeView from "../HadithNodeView.vue";
 
@@ -22,6 +24,8 @@ export interface HadithNodeAttributes {
   displayMode: "inline" | "card";
   // Per-node text colour; null follows the reader's default for the kind.
   color: ReferenceColor | null;
+  // Card fill style; null follows the default.
+  fill: ReferenceFill | null;
 }
 
 export const HadithNode = Node.create({
@@ -60,6 +64,15 @@ export const HadithNode = Node.create({
         },
         renderHTML: (attrs) =>
           attrs.color ? { "data-reference-color": attrs.color } : {},
+      },
+      fill: {
+        default: null,
+        parseHTML: (el) => {
+          const v = (el as HTMLElement).getAttribute("data-reference-fill");
+          return isReferenceFill(v) ? v : null;
+        },
+        renderHTML: (attrs) =>
+          attrs.fill ? { "data-reference-fill": attrs.fill } : {},
       },
     };
   },

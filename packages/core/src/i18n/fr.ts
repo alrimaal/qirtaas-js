@@ -172,6 +172,21 @@ export default {
     tapToResave: "Appuyez pour enregistrer à nouveau",
     tapToRetry: "Appuyez pour réessayer",
   },
+  referenceStyle: {
+    label: "Style",
+    fill: "Remplissage",
+    fills: {
+      plain: "Simple",
+      paper: "Papier",
+      tint: "Teinte",
+      solid: "Plein",
+    },
+    usingDefault: {
+      quran: "Style par défaut du Coran",
+      hadith: "Style par défaut du hadith",
+    },
+    reset: "Réinitialiser",
+  },
   referenceColor: {
     label: "Couleur",
     useDefault: "Votre couleur par défaut",

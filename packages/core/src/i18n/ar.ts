@@ -169,6 +169,21 @@ export default {
     tapToRetry: "اضغط للمحاولة مرة أخرى",
     backLabel: "العودة",
   },
+  referenceStyle: {
+    label: "النمط",
+    fill: "التعبئة",
+    fills: {
+      plain: "بسيط",
+      paper: "ورقي",
+      tint: "مُلوَّن",
+      solid: "مُصمَت",
+    },
+    usingDefault: {
+      quran: "يستخدم نمطك الافتراضي للقرآن",
+      hadith: "يستخدم نمطك الافتراضي للحديث",
+    },
+    reset: "إعادة تعيين",
+  },
   referenceColor: {
     label: "اللون",
     useDefault: "اللون الافتراضي",

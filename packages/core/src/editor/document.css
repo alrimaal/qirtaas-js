@@ -316,3 +316,67 @@
     margin: 0.5rem 0;
   }
 }
+
+/* Verse/hadith card fills. Set --ref inline (the node's colour); each fill
+   derives the card bg, footer band, border, accent, text and muted tones. */
+.ref-fill-paper,
+.ref-fill-plain,
+.ref-fill-tint,
+.ref-fill-solid {
+  --ref-w1: 9%;
+  --ref-w2: 15%;
+  --ref-w3: 26%;
+  --ref-cream: #fcf9f4;
+  --ref-tc: var(--ref);
+}
+:is(.dark-mode, .qirtaas-dark) :is(.ref-fill-tint, .ref-fill-solid) {
+  --ref-w1: 13%;
+  --ref-w2: 19%;
+  --ref-w3: 32%;
+  --ref-cream: #f7efe4;
+}
+.ref-fill-paper {
+  --ref-bg: var(--color-bg-soft);
+  --ref-hbg: var(--color-bg);
+  --ref-cb: var(--color-border);
+  --ref-ht: var(--color-primary);
+  --ref-mt: var(--color-muted);
+}
+.ref-fill-plain {
+  --ref-bg: transparent;
+  --ref-hbg: transparent;
+  --ref-cb: var(--color-border);
+  --ref-ht: var(--color-primary);
+  --ref-mt: var(--color-muted);
+}
+.ref-fill-tint {
+  --ref-bg: color-mix(in oklab, var(--ref) var(--ref-w1), var(--color-bg));
+  --ref-hbg: color-mix(in oklab, var(--ref) var(--ref-w2), var(--color-bg));
+  --ref-cb: color-mix(in oklab, var(--ref) var(--ref-w3), var(--color-bg));
+  --ref-ht: color-mix(in oklab, var(--ref) 72%, var(--color-ink));
+  --ref-mt: color-mix(in oklab, var(--ref) 22%, var(--color-muted));
+}
+.ref-fill-solid {
+  --ref-bg: color-mix(in oklab, var(--ref) 86%, #000);
+  --ref-hbg: color-mix(in oklab, var(--ref) 74%, #000);
+  --ref-cb: transparent;
+  --ref-ht: var(--ref-cream);
+  --ref-tc: var(--ref-cream);
+  --ref-mt: color-mix(in oklab, var(--ref-cream) 80%, var(--ref));
+}
+:is(.dark-mode, .qirtaas-dark) .ref-fill-solid {
+  --ref-bg: color-mix(in oklab, var(--ref) 30%, #140d10);
+  --ref-hbg: color-mix(in oklab, var(--ref) 40%, #140d10);
+  --ref-cb: color-mix(in oklab, var(--ref) 46%, #140d10);
+  --ref-ht: color-mix(in oklab, var(--ref) 55%, #fff);
+}
+.ref-fill-plain .ref-card-footer {
+  border-top-style: dashed;
+}
+.tiptap .ref-card.ProseMirror-selectednode {
+  background-color: var(--ref-bg);
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 2px var(--color-bg),
+    0 0 0 4px color-mix(in oklab, var(--color-primary) 50%, transparent);
+}

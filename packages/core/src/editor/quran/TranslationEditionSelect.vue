@@ -10,7 +10,7 @@ import { localeToTafsirLanguage } from "@qirtaas/core/composables/useVerseDetail
 
 const props = withDefaults(
   defineProps<{
-    variant: "pill" | "field" | "menu";
+    variant: "pill" | "card" | "field" | "menu";
     /** `locale`: the reader's language leads, then English. */
     priority?: "default" | "locale";
     appendTo?: HTMLElement | string;
@@ -40,7 +40,9 @@ const current = computed(() =>
 );
 
 const ready = computed(
-  () => groups.value.length > 0 && (props.variant !== "pill" || !!current.value)
+  () =>
+    groups.value.length > 0 &&
+    ((props.variant !== "pill" && props.variant !== "card") || !!current.value)
 );
 
 const PT = {
@@ -50,6 +52,13 @@ const PT = {
         "!text-[0.65rem] !font-semibold !text-accent !py-0.5 !ps-2 !pe-0 truncate",
     },
     dropdown: { class: "!w-5 !text-accent" },
+    overlay: { class: "text-sm" },
+  },
+  card: {
+    label: {
+      class: "!text-[0.72rem] !text-(--ref-mt) !py-0.5 !ps-2 !pe-0 truncate",
+    },
+    dropdown: { class: "!w-5 !text-(--ref-mt)" },
     overlay: { class: "text-sm" },
   },
   field: {
@@ -62,6 +71,7 @@ const PT = {
 
 const CLASS = {
   pill: "max-w-[11rem] !rounded-full !bg-bg-soft !border-border hover:!border-accent/60",
+  card: "max-w-[11rem] !rounded-full !bg-transparent !border-(--ref-mt)/30 hover:!border-(--ref-mt)/60",
   field: "min-w-0 max-w-[60%] !bg-bg !border-border hover:!border-accent/50",
   menu: "",
 };

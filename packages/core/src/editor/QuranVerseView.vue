@@ -7,8 +7,10 @@ import { useI18n } from "vue-i18n";
 import { formatReference, shortReference } from "./quran/formatReference";
 import TranslationEditionSelect from "./quran/TranslationEditionSelect.vue";
 import VerseTranslationStrip from "./VerseTranslationStrip.vue";
+import ReferenceCard, { referenceCardWrapper } from "./ReferenceCard.vue";
 import {
   resolveReferenceColor,
+  resolveReferenceFill,
   referenceColorVar,
 } from "../composables/useReferenceColors";
 
@@ -28,6 +30,7 @@ const props = defineProps<{
       translationOpen: boolean;
       displayMode: "inline" | "card";
       color: string | null;
+      fill: string | null;
     };
   };
   editor: Editor;
@@ -42,9 +45,11 @@ const reference = computed(() => formatReference(props.node.attrs));
 const refNumber = computed(() => shortReference(props.node.attrs));
 const isCard = computed(() => props.node.attrs.displayMode === "card");
 
-const textStyle = computed(() => ({
-  color: referenceColorVar(resolveReferenceColor("quran", props.node.attrs.color)),
-}));
+const color = computed(() =>
+  resolveReferenceColor("quran", props.node.attrs.color)
+);
+const fill = computed(() => resolveReferenceFill("quran", props.node.attrs.fill));
+const textStyle = computed(() => ({ color: referenceColorVar(color.value) }));
 
 const fontClass = computed(() =>
   props.node.attrs.encoding === "qpc_hafs" ? "font-quran" : "font-quran-uthmani"
@@ -88,60 +93,90 @@ const selectNode = () => {
     v-if="isCard"
     as="span"
     contenteditable="false"
-    class="block my-2 border border-border rounded-lg bg-bg-soft overflow-hidden"
+    v-bind="referenceCardWrapper(fill, color)"
+    @click="fill !== 'paper' && selectNode()"
   >
-    <span
-      class="flex items-center gap-2 px-3 py-2 bg-bg border-b border-border"
-    >
-      <span dir="rtl" class="text-sm font-semibold text-primary">{{
-        props.node.attrs.surahNameArabic
-      }}</span>
-      <span class="text-sm font-semibold text-primary">{{
-        props.node.attrs.surahNameEnglish
-      }}</span>
-      <span class="text-xs text-muted">{{ refNumber }}</span>
-      <span class="flex-1" />
-      <button
-        type="button"
-        class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full border border-border bg-bg-soft text-[0.65rem] font-semibold text-accent hover:border-accent/60 cursor-pointer select-none"
-        :class="{ '!border-accent/60': open }"
-        :aria-label="t('verseDetail.translation')"
-        :aria-expanded="open"
-        @mousedown.stop
-        @click.stop="toggle"
-      >
-        Aa
-        <i
-          class="pi pi-chevron-down text-[0.5rem] transition-transform"
-          :class="{ 'rotate-180': open }"
-        />
-      </button>
-      <!-- Searchable edition picker. appendTo the scoped overlay root so the
-           panel escapes the card's clipping in embeds. data-screen-only keeps
-           it out of exported PDFs (see RenderDocumentView's print block). -->
-      <TranslationEditionSelect
-        variant="pill"
-        data-screen-only
-        @mousedown.stop
-        @click.stop
-      />
-    </span>
-    <button
-      class="block w-full text-start px-4 py-3 cursor-pointer"
-      @click="selectNode"
-    >
+    <!-- Paper: the original card. -->
+    <template v-if="fill === 'paper'">
       <span
-        dir="rtl"
-        :class="fontClass"
-        :style="textStyle"
-        class="block text-right text-lg leading-loose"
+        class="flex items-center gap-2 px-3 py-2 bg-bg border-b border-border"
       >
-        {{ props.node.attrs.text }}
+        <span dir="rtl" class="text-sm font-semibold text-primary">{{
+          props.node.attrs.surahNameArabic
+        }}</span>
+        <span class="text-sm font-semibold text-primary">{{
+          props.node.attrs.surahNameEnglish
+        }}</span>
+        <span class="text-xs text-muted">{{ refNumber }}</span>
+        <span class="flex-1" />
+        <button
+          type="button"
+          class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full border border-border bg-bg-soft text-[0.65rem] font-semibold text-accent hover:border-accent/60 cursor-pointer select-none"
+          :class="{ '!border-accent/60': open }"
+          :aria-label="t('verseDetail.translation')"
+          :aria-expanded="open"
+          @mousedown.stop
+          @click.stop="toggle"
+        >
+          Aa
+          <i
+            class="pi pi-chevron-down text-[0.5rem] transition-transform"
+            :class="{ 'rotate-180': open }"
+          />
+        </button>
+        <!-- Searchable edition picker. appendTo the scoped overlay root so the
+             panel escapes the card's clipping in embeds. data-screen-only keeps
+             it out of exported PDFs (see RenderDocumentView's print block). -->
+        <TranslationEditionSelect
+          variant="pill"
+          data-screen-only
+          @mousedown.stop
+          @click.stop
+        />
       </span>
-    </button>
-    <span v-if="open" class="block px-4 pb-3" @mousedown.stop>
-      <VerseTranslationStrip :surah="seedSurah" :ayah="seedAyah" />
-    </span>
+      <button
+        class="block w-full text-start px-4 py-3 cursor-pointer"
+        @click="selectNode"
+      >
+        <span
+          dir="rtl"
+          :class="fontClass"
+          :style="textStyle"
+          class="block text-right text-lg leading-loose"
+        >
+          {{ props.node.attrs.text }}
+        </span>
+      </button>
+      <span v-if="open" class="block px-4 pb-3" @mousedown.stop>
+        <VerseTranslationStrip :surah="seedSurah" :ayah="seedAyah" />
+      </span>
+    </template>
+    <!-- Other fills: colophon layout. -->
+    <ReferenceCard
+      v-else
+      :open="open"
+      :name-arabic="props.node.attrs.surahNameArabic"
+      :reference="`${props.node.attrs.surahNameEnglish} · ${refNumber}`"
+      @toggle="toggle"
+    >
+      <template #text>
+        <span :class="fontClass">{{ props.node.attrs.text }}</span>
+      </template>
+      <template #translation>
+        <VerseTranslationStrip :surah="seedSurah" :ayah="seedAyah" bare plain />
+      </template>
+      <!-- appendTo the scoped overlay root so the panel escapes the card's
+           clipping in embeds. data-screen-only keeps it out of exported PDFs
+           (see RenderDocumentView's print block). -->
+      <template #edition>
+        <TranslationEditionSelect
+          variant="card"
+          data-screen-only
+          @mousedown.stop
+          @click.stop
+        />
+      </template>
+    </ReferenceCard>
   </NodeViewWrapper>
 
   <!-- ── INLINE MODE ── -->
@@ -149,17 +184,18 @@ const selectNode = () => {
     <button
       @click="selectNode"
       class="inline !no-underline !text-inherit cursor-pointer hover:!text-accent"
+      :style="{ '--ref': referenceColorVar(color) }"
     >
       <span dir="rtl" :class="fontClass">
-        <span class="text-[1.8em] leading-[0] text-accent/60 align-middle"
+        <span class="text-[1.8em] leading-[0] text-(--ref)/60 align-middle"
           >﴿
         </span>
-        <span :style="textStyle">{{ props.node.attrs.text }}</span
-        ><span class="text-[1.8em] leading-[0] text-accent/60 align-middle">
+        <span class="text-(--ref)">{{ props.node.attrs.text }}</span
+        ><span class="text-[1.8em] leading-[0] text-(--ref)/60 align-middle">
           ﴾</span
         ></span
       >
-      <span class="text-[0.7rem] text-muted ms-1">[{{ reference }}]</span>
+      <span class="text-[0.7rem] text-(--ref)/70 ms-1">[{{ reference }}]</span>
     </button>
   </NodeViewWrapper>
 </template>

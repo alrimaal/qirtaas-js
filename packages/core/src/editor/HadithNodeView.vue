@@ -6,8 +6,10 @@ import type { Editor } from "@tiptap/core";
 import { useI18n } from "vue-i18n";
 import HadithTranslationStrip from "./HadithTranslationStrip.vue";
 import SanitizedHtml from "./SanitizedHtml.vue";
+import ReferenceCard, { referenceCardWrapper } from "./ReferenceCard.vue";
 import {
   resolveReferenceColor,
+  resolveReferenceFill,
   referenceColorVar,
 } from "../composables/useReferenceColors";
 
@@ -21,6 +23,7 @@ const props = defineProps<{
       translationOpen: boolean;
       displayMode: "inline" | "card";
       color: string | null;
+      fill: string | null;
     };
   };
   editor: Editor;
@@ -31,9 +34,11 @@ const props = defineProps<{
 
 const { t } = useI18n();
 
-const textStyle = computed(() => ({
-  color: referenceColorVar(resolveReferenceColor("hadith", props.node.attrs.color)),
-}));
+const color = computed(() =>
+  resolveReferenceColor("hadith", props.node.attrs.color)
+);
+const fill = computed(() => resolveReferenceFill("hadith", props.node.attrs.fill));
+const textStyle = computed(() => ({ color: referenceColorVar(color.value) }));
 
 const isCard = computed(() => props.node.attrs.displayMode === "card");
 
@@ -71,49 +76,73 @@ const selectNode = () => {
     v-if="isCard"
     as="span"
     contenteditable="false"
-    class="block my-2 border border-border rounded-lg bg-bg-soft overflow-hidden"
+    v-bind="referenceCardWrapper(fill, color)"
+    @click="fill !== 'paper' && selectNode()"
   >
-    <span class="flex items-center gap-2 px-3 py-2 bg-bg border-b border-border">
-      <span dir="rtl" class="text-sm font-semibold text-primary">{{
-        props.node.attrs.collectionNameArabic
-      }}</span>
-      <span class="text-xs text-muted"
-        >{{ props.node.attrs.collectionNameEnglish }} #{{
-          props.node.attrs.number
-        }}</span
-      >
-      <span class="flex-1" />
+    <!-- Paper: the original card. -->
+    <template v-if="fill === 'paper'">
+      <span class="flex items-center gap-2 px-3 py-2 bg-bg border-b border-border">
+        <span dir="rtl" class="text-sm font-semibold text-primary">{{
+          props.node.attrs.collectionNameArabic
+        }}</span>
+        <span class="text-xs text-muted"
+          >{{ props.node.attrs.collectionNameEnglish }} #{{
+            props.node.attrs.number
+          }}</span
+        >
+        <span class="flex-1" />
+        <button
+          type="button"
+          class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full border border-border bg-bg-soft text-[0.65rem] font-semibold text-accent hover:border-accent/60 cursor-pointer select-none"
+          :class="{ '!border-accent/60': open }"
+          :aria-label="t('hadithDetail.translation')"
+          :aria-expanded="open"
+          @mousedown.stop
+          @click.stop="toggle"
+        >
+          Aa
+          <i
+            class="pi pi-chevron-down text-[0.5rem] transition-transform"
+            :class="{ 'rotate-180': open }"
+          />
+        </button>
+      </span>
       <button
-        type="button"
-        class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full border border-border bg-bg-soft text-[0.65rem] font-semibold text-accent hover:border-accent/60 cursor-pointer select-none"
-        :class="{ '!border-accent/60': open }"
-        :aria-label="t('hadithDetail.translation')"
-        :aria-expanded="open"
-        @mousedown.stop
-        @click.stop="toggle"
+        class="block w-full text-start px-4 py-3 cursor-pointer"
+        @click="selectNode"
       >
-        Aa
-        <i
-          class="pi pi-chevron-down text-[0.5rem] transition-transform"
-          :class="{ 'rotate-180': open }"
+        <SanitizedHtml
+          policy="compact"
+          :html="props.node.attrs.text"
+          dir="rtl"
+          :style="textStyle"
+          class="block text-right text-lg leading-loose"
         />
       </button>
-    </span>
-    <button
-      class="block w-full text-start px-4 py-3 cursor-pointer"
-      @click="selectNode"
+      <span v-if="open" class="block px-4 pb-3" @mousedown.stop>
+        <HadithTranslationStrip :slug="slug" :number="props.node.attrs.number" />
+      </span>
+    </template>
+    <!-- Other fills: colophon layout. -->
+    <ReferenceCard
+      v-else
+      :open="open"
+      :name-arabic="props.node.attrs.collectionNameArabic"
+      :reference="`${props.node.attrs.collectionNameEnglish} · #${props.node.attrs.number}`"
+      @toggle="toggle"
     >
-      <SanitizedHtml
-        policy="compact"
-        :html="props.node.attrs.text"
-        dir="rtl"
-        :style="textStyle"
-        class="block text-right text-lg leading-loose"
-      />
-    </button>
-    <span v-if="open" class="block px-4 pb-3" @mousedown.stop>
-      <HadithTranslationStrip :slug="slug" :number="props.node.attrs.number" />
-    </span>
+      <template #text>
+        <SanitizedHtml policy="compact" :html="props.node.attrs.text" />
+      </template>
+      <template #translation>
+        <HadithTranslationStrip
+          :slug="slug"
+          :number="props.node.attrs.number"
+          bare
+          plain
+        />
+      </template>
+    </ReferenceCard>
   </NodeViewWrapper>
 
   <!-- ── INLINE MODE ── -->
@@ -121,20 +150,21 @@ const selectNode = () => {
     <button
       @click="selectNode"
       class="inline !no-underline !text-inherit cursor-pointer hover:!text-accent"
+      :style="{ '--ref': referenceColorVar(color) }"
     >
       <span dir="rtl">
-        <span class="text-[1.4em] leading-[0] text-accent/60 align-middle"
+        <span class="text-[1.4em] leading-[0] text-(--ref)/60 align-middle"
           >«</span
         >
         <SanitizedHtml
           policy="compact"
           :html="props.node.attrs.text"
-          :style="textStyle"
-        /><span class="text-[1.4em] leading-[0] text-accent/60 align-middle"
+          class="text-(--ref)"
+        /><span class="text-[1.4em] leading-[0] text-(--ref)/60 align-middle"
           >»</span
         >
       </span>
-      <span class="text-[0.7rem] text-muted ms-1"
+      <span class="text-[0.7rem] text-(--ref)/70 ms-1"
         >[{{ props.node.attrs.collectionNameArabic }}
         {{ props.node.attrs.number }}]</span
       >
