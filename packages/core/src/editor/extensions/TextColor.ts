@@ -1,4 +1,7 @@
 import { Mark } from "@tiptap/core";
+import type { Node as PMNode } from "@tiptap/pm/model";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { referenceColorVar } from "../../composables/useReferenceColors";
 
 /** Text colours: gray (for "fill me in" placeholders) plus the verse palette,
@@ -26,6 +29,28 @@ export function isTextColor(v: unknown): v is TextColorName {
 /** Theme-aware CSS colour for a text colour name. */
 export function textColorVar(color: TextColorName): string {
   return color === "gray" ? "var(--color-muted)" : referenceColorVar(color);
+}
+
+/** A list marker belongs to its `li`, not the text, so it ignores the mark.
+ *  Tag each item that opens with coloured text for `li::marker` to pick up. */
+function markerDecorations(doc: PMNode): DecorationSet {
+  const decorations: Decoration[] = [];
+  doc.descendants((node, pos) => {
+    if (node.type.name !== "listItem") return;
+    const first = node.firstChild?.isTextblock
+      ? node.firstChild.firstChild
+      : null;
+    const color = first?.marks.find((m) => m.type.name === "textColor")?.attrs
+      .color;
+    if (!isTextColor(color)) return;
+    decorations.push(
+      Decoration.node(pos, pos + node.nodeSize, {
+        "data-marker-color": color,
+        style: `--marker-color: ${textColorVar(color)}`,
+      })
+    );
+  });
+  return DecorationSet.create(doc, decorations);
 }
 
 declare module "@tiptap/core" {
@@ -80,5 +105,22 @@ export const TextColor = Mark.create({
         ({ commands }) =>
           commands.unsetMark(this.name),
     };
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("textColorMarkers"),
+        state: {
+          init: (_, { doc }) => markerDecorations(doc),
+          apply: (tr, old) => (tr.docChanged ? markerDecorations(tr.doc) : old),
+        },
+        props: {
+          decorations(state) {
+            return this.getState(state);
+          },
+        },
+      }),
+    ];
   },
 });

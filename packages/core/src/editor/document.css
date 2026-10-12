@@ -167,6 +167,11 @@
   margin: 0.5rem 0;
 }
 
+/* Set by TextColor on items that open with coloured text */
+.tiptap li[data-marker-color]::marker {
+  color: var(--marker-color);
+}
+
 .tiptap blockquote {
   border-inline-start: 3px solid var(--color-accent);
   padding-inline-start: 1rem;
