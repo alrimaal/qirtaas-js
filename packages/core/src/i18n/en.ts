@@ -291,7 +291,7 @@ export default {
     searchPlaceholder: "Search by ref (bukhari:1) or text...",
     noResults: "No hadiths found.",
     searchError: "Search failed. Please try again.",
-    selectionHint: "Select part of the hadith or press Insert for all.",
+    selectionHint: "Select part or all of the hadith and press Insert.",
     insert: "Insert",
     insertInline: "Insert inline",
     insertAsCard: "Insert as card",

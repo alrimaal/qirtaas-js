@@ -7,7 +7,14 @@ export interface HadithResult {
   collection_name_english: string;
   number: number | null;
   text: string;
+  /**
+   * The hadith body alone, without the isnad. Empty string when the source
+   * carries no markup or its markup was malformed — roughly a third of the
+   * corpus — so always fall back to `text`.
+   */
+  matn: string;
   translation_en: string;
+  /** The isnad alone. Empty under the same conditions as `matn`. */
   narrator_chain: string;
   grade: string;
   arabic_bab_name: string;

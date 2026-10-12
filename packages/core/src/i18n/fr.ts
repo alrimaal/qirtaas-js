@@ -280,7 +280,7 @@ export default {
     noResults: "Aucun hadith trouvé.",
     searchError: "Échec de la recherche. Veuillez réessayer.",
     selectionHint:
-      "Sélectionnez une partie du hadith ou appuyez sur Insérer pour tout insérer",
+      "Sélectionnez tout ou partie du hadith, puis appuyez sur Insérer.",
     insert: "Insérer",
     insertInline: "Insérer dans le texte",
     insertAsCard: "Insérer en tant que carte",

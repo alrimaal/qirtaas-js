@@ -55,6 +55,35 @@ const hadithText = computed(() =>
   selectedHadith.value ? cleanText(selectedHadith.value.text) : ""
 );
 
+// Word range covering the matn, so the picker opens with the hadith body
+// selected and the isnad is one drag away rather than hidden. Null when the
+// backend parsed no matn — about a third of the corpus — and the picker then
+// falls back to selecting everything.
+const matnRange = computed<[number, number] | null>(() => {
+  const matn = selectedHadith.value?.matn;
+  if (!matn) return null;
+
+  const text = hadithText.value;
+  const body = cleanText(matn);
+  const at = text.indexOf(body);
+  if (at < 0) return null;
+
+  // Char offset -> word index, splitting exactly as WordRangePicker does so the
+  // numbering lines up. A [matn] tag can close mid-token, so when `before` ends
+  // inside a word the matn starts in that word, not after it. `to` needs no
+  // such fix: slicing through the matn's last character already counts the word
+  // containing it.
+  const before = text.slice(0, at);
+  const n = before.split(/\s+/).filter(Boolean).length;
+  const from = /\S$/.test(before) ? n - 1 : n;
+  const to =
+    text
+      .slice(0, at + body.length)
+      .split(/\s+/)
+      .filter(Boolean).length - 1;
+  return [from, to];
+});
+
 // Reset selection when a hadith is picked; the picker re-emits its range.
 watch(selectedHadith, (hadith) => {
   if (hadith) {
@@ -167,7 +196,8 @@ function close() {
 </script>
 
 <template>
-  <Dialog :append-to="getOverlayAppendTo()"
+  <Dialog
+    :append-to="getOverlayAppendTo()"
     :visible="props.visible"
     @update:visible="close"
     :header="t('hadith.dialogTitle')"
@@ -262,10 +292,11 @@ function close() {
         }}) — #{{ selectedHadith.number }}
       </p>
 
-      <!-- Word-level range selection -->
+      <!-- Word-level range selection, opened on the matn -->
       <WordRangePicker
         class="mb-3"
         :text="hadithText"
+        :initial-range="matnRange"
         @change="selection = $event"
       />
 
