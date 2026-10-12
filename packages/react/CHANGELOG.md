@@ -1,5 +1,17 @@
 # @qirtaas/react
 
+## 0.9.0
+
+### Minor Changes
+
+- 313265b: Redesigns the UI. Adds custom theming options. Improves Hadith search
+- 58d70b9: Restyles the editor with the warm Paper (light) and Night (dark) palettes.
+
+### Patch Changes
+
+- Updated dependencies [58d70b9]
+  - @qirtaas/core@0.9.0
+
 ## 0.8.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.9.0
+
+### Minor Changes
+
+- 58d70b9: Restyles the editor with the warm Paper (light) and Night (dark) palettes.
+
 ## 0.8.1
 
 ### Patch Changes
