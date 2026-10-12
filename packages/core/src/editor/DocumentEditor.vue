@@ -20,6 +20,7 @@ import {
 } from "@qirtaas/core/composables/useReferenceColors";
 import Button from "primevue/button";
 import { SlashCommand } from "./extensions/SlashCommand";
+import { ToggleShortcuts } from "./extensions/ToggleShortcuts";
 import { QuranReference } from "./extensions/QuranReference";
 import {
   isHonorificType,
@@ -327,6 +328,7 @@ const editor = useEditor({
       translate: (key: string) => t(key),
       emojiSuggestion,
     }),
+    ToggleShortcuts,
     Placeholder.configure({
       placeholder: ({ editor: ed, node, pos }) => {
         if (pos === 0 && node.type.name === "heading")

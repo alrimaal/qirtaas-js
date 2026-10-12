@@ -32,7 +32,8 @@ const blockRows: BlockRow[] = [
   { label: t("editor.shortcuts.blocks.heading3"), syntax: "###" },
   { label: t("editor.shortcuts.blocks.bulletList"), syntax: "* or -" },
   { label: t("editor.shortcuts.blocks.numberedList"), syntax: "1." },
-  { label: t("editor.shortcuts.blocks.blockquote"), syntax: ">" },
+  { label: t("editor.insertToggleList"), syntax: ">" },
+  { label: t("editor.shortcuts.blocks.blockquote"), syntax: '"' },
   { label: t("editor.shortcuts.blocks.nestItem"), combo: { mods: [], key: "Tab" } },
   {
     label: t("editor.shortcuts.blocks.unnestItem"),

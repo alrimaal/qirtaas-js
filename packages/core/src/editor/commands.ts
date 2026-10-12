@@ -44,6 +44,18 @@ export function insertToggleList(editor: Editor) {
   } else {
     editor.chain().focus().setDetails().run();
   }
+  openToggle(editor);
+}
+
+/** Opens the toggle around the cursor. Its own transaction, after the toggle
+ *  exists: one created already open renders closed. */
+export function openToggle(editor: Editor) {
+  if (editor.isDestroyed || !editor.isActive("details")) return;
+  editor
+    .chain()
+    .updateAttributes("details", { open: true })
+    .setMeta("addToHistory", false)
+    .run();
 }
 
 function setAlign(editor: Editor, align: "left" | "center" | "right") {
@@ -219,6 +231,7 @@ const FORMAT_COMMANDS: CommandDef[] = [
     group: "format",
     labelKey: "editor.insertToggleList",
     icon: "pi pi-chevron-right",
+    syntax: ">",
     palette: true,
     run: insertToggleList,
   },
@@ -227,7 +240,7 @@ const FORMAT_COMMANDS: CommandDef[] = [
     group: "format",
     labelKey: "editor.tooltips.blockquote",
     icon: "pi pi-align-right",
-    syntax: ">",
+    syntax: '"',
     palette: true,
     run: (e) => e.chain().focus().toggleBlockquote().run(),
     isActive: (e) => e.isActive("blockquote"),
