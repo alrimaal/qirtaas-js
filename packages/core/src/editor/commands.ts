@@ -230,6 +230,16 @@ const FORMAT_COMMANDS: CommandDef[] = [
     isActive: (e) => e.isActive("orderedList"),
   },
   {
+    id: "taskList",
+    group: "format",
+    labelKey: "editor.tooltips.taskList",
+    icon: "pi pi-check-square",
+    syntax: "[ ]",
+    palette: true,
+    run: (e) => e.chain().focus().toggleTaskList().run(),
+    isActive: (e) => e.isActive("taskList"),
+  },
+  {
     id: "toggleList",
     group: "format",
     labelKey: "editor.insertToggleList",

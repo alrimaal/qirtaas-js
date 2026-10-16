@@ -31,6 +31,7 @@ export default {
       align: "محاذاة",
       bulletList: "قائمة نقطية",
       orderedList: "قائمة رقمية",
+      taskList: "قائمة مهام",
       blockquote: "اقتباس",
     },
     image: {

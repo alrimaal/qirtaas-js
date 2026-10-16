@@ -8,7 +8,13 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Popover from "primevue/popover";
 import SplitButton from "primevue/splitbutton";
-import { Search, ListCollapse, ListOrdered, Highlighter } from "lucide-vue-next";
+import {
+  Search,
+  ListCollapse,
+  ListOrdered,
+  ListChecks,
+  Highlighter,
+} from "lucide-vue-next";
 import { HONORIFICS, isHonorificType } from "./honorifics";
 import { HIGHLIGHT_COLORS, insertToggleList, setAlign } from "./commands";
 import { trackHonorificInserted } from "./extensions/Honorific";
@@ -188,7 +194,9 @@ function removeLink() {
       class="shrink-0 !bg-primary !text-on-accent !border-primary hover:!opacity-90"
       @click="emit('open-hadith')"
     >
-      <span class="font-[Noto_Naskh_Arabic,serif] text-base leading-none">ح</span>
+      <span class="font-[Noto_Naskh_Arabic,serif] text-base leading-none"
+        >ح</span
+      >
       <span class="text-xs font-medium">{{ t("editor.insertHadith") }}</span>
     </Button>
     <!-- Honorifics: ﷺ inserts directly, the dropdown offers the rest -->
@@ -452,7 +460,9 @@ function removeLink() {
           v-for="c in TEXT_COLORS"
           :key="c"
           class="w-6 h-6 rounded-full border-2 cursor-pointer transition-transform hover:scale-110"
-          :class="activeTextColor === c ? 'border-accent' : 'border-transparent'"
+          :class="
+            activeTextColor === c ? 'border-accent' : 'border-transparent'
+          "
           :style="{ backgroundColor: textColorVar(c) }"
           :title="t(`editor.textColors.${c}`)"
           @mousedown.prevent
@@ -561,6 +571,7 @@ function removeLink() {
     >
       <ListOrdered :size="16" />
     </Button>
+
     <Button
       severity="secondary"
       text
@@ -595,6 +606,18 @@ function removeLink() {
       @click="onInsertToggleList()"
     >
       <ListCollapse :size="16" />
+    </Button>
+    <Button
+      severity="secondary"
+      text
+      rounded
+      size="small"
+      class="shrink-0"
+      :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('taskList') }"
+      v-tooltip.bottom="t('editor.tooltips.taskList')"
+      @click="props.editor!.chain().focus().toggleTaskList().run()"
+    >
+      <ListChecks :size="16" />
     </Button>
     <Button
       v-tooltip.bottom="t('editor.insertTable')"

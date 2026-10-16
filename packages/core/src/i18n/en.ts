@@ -32,6 +32,7 @@ export default {
       align: "Alignment",
       bulletList: "Bullet list",
       orderedList: "Numbered list",
+      taskList: "Checklist",
       blockquote: "Quote",
     },
     image: {

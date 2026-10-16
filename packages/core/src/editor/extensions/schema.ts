@@ -5,6 +5,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
+import { TaskList, TaskItem } from "@tiptap/extension-list";
 import {
   Table,
   TableRow,
@@ -37,7 +38,7 @@ export function documentExtensions(opts: {
   return [
     StarterKit.configure({}),
     TextDirection.configure({
-      types: ["heading", "paragraph", "listItem"],
+      types: ["heading", "paragraph", "listItem", "taskItem"],
     }),
     Emoji.configure({
       emojis: gitHubEmojis,
@@ -50,6 +51,8 @@ export function documentExtensions(opts: {
     Highlight.configure({
       multicolor: true,
     }),
+    TaskList,
+    TaskItem.configure({ nested: true }),
     Underline,
     TextColor,
     Link.configure({
