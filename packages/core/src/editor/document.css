@@ -167,6 +167,39 @@
   margin: 0.5rem 0;
 }
 
+/* Google Docs cycle: 1. → a. → i. */
+.tiptap ol ol {
+  list-style-type: lower-alpha;
+}
+
+.tiptap ol ol ol {
+  list-style-type: lower-roman;
+}
+
+.tiptap ol ol ol ol {
+  list-style-type: decimal;
+}
+
+.tiptap ol ol ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.tiptap ol ol ol ol ol ol {
+  list-style-type: lower-roman;
+}
+
+.tiptap ol ol ol ol ol ol ol {
+  list-style-type: decimal;
+}
+
+.tiptap ol ol ol ol ol ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.tiptap ol ol ol ol ol ol ol ol ol {
+  list-style-type: lower-roman;
+}
+
 .tiptap ul[data-type="taskList"] {
   list-style: none;
   padding-inline-start: 0.25rem;
