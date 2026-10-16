@@ -10,7 +10,7 @@ import Popover from "primevue/popover";
 import SplitButton from "primevue/splitbutton";
 import { Search, ListCollapse, ListOrdered, Highlighter } from "lucide-vue-next";
 import { HONORIFICS, isHonorificType } from "./honorifics";
-import { HIGHLIGHT_COLORS, insertToggleList } from "./commands";
+import { HIGHLIGHT_COLORS, insertToggleList, setAlign } from "./commands";
 import { trackHonorificInserted } from "./extensions/Honorific";
 import {
   TEXT_COLORS,
@@ -60,9 +60,9 @@ const honorificItems = computed(() =>
 
 const alignments = computed(() => {
   const items = [
-    { value: "left", icon: "pi pi-align-left" },
-    { value: "center", icon: "pi pi-align-center" },
-    { value: "right", icon: "pi pi-align-right" },
+    { value: "left" as const, icon: "pi pi-align-left" },
+    { value: "center" as const, icon: "pi pi-align-center" },
+    { value: "right" as const, icon: "pi pi-align-right" },
   ];
   return locale.value === "ar" ? [...items].reverse() : items;
 });
@@ -92,6 +92,12 @@ const activeAlignIcon = computed(() => {
   if (e.isActive({ textAlign: "right" })) return "pi pi-align-right";
   return "pi pi-align-left";
 });
+
+const hasAlign = computed(() =>
+  (["left", "center", "right"] as const).some((a) =>
+    props.editor?.isActive({ textAlign: a })
+  )
+);
 
 function toggleHeadingPopover(event: Event) {
   headingPopover.value.toggle(event);
@@ -504,6 +510,7 @@ function removeLink() {
       rounded
       size="small"
       class="shrink-0"
+      :class="{ '!bg-accent/10 !text-accent': hasAlign }"
       @click="toggleAlignPopover"
     >
       <i :class="activeAlignIcon" class="text-sm" />
@@ -521,9 +528,7 @@ function removeLink() {
           size="small"
           :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive({ textAlign: align.value }) }"
           @click="
-            props.editor!.isActive({ textAlign: align.value })
-              ? props.editor!.chain().focus().unsetTextAlign().run()
-              : props.editor!.chain().focus().setTextAlign(align.value).run();
+            setAlign(props.editor!, align.value);
             alignPopover.hide();
           "
         />

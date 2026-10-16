@@ -37,7 +37,7 @@ export function documentExtensions(opts: {
   return [
     StarterKit.configure({}),
     TextDirection.configure({
-      types: ["heading", "paragraph", "listItem", "bulletItem"],
+      types: ["heading", "paragraph", "listItem"],
     }),
     Emoji.configure({
       emojis: gitHubEmojis,

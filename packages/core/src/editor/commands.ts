@@ -58,7 +58,10 @@ export function openToggle(editor: Editor) {
     .run();
 }
 
-function setAlign(editor: Editor, align: "left" | "center" | "right") {
+export function setAlign(
+  editor: Editor,
+  align: "left" | "center" | "right",
+) {
   const chain = editor.chain().focus();
   if (editor.isActive({ textAlign: align })) chain.unsetTextAlign().run();
   else chain.setTextAlign(align).run();
