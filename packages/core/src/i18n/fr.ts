@@ -65,6 +65,12 @@ export default {
       deleted: "Cette page a été supprimée",
       createFailed: "Échec de la création de la page",
     },
+    outline: {
+      title: "Plan",
+      show: "Afficher le plan",
+      hide: "Masquer le plan",
+      empty: "Les titres que vous ajoutez à la page apparaissent ici. Tapez # puis un espace pour en commencer un.",
+    },
     findReplace: {
       title: "Rechercher et remplacer",
       findPlaceholder: "Mot-clé",

@@ -64,6 +64,12 @@ export default {
       deleted: "هذه الصفحة محذوفة",
       createFailed: "تعذر إنشاء الصفحة.",
     },
+    outline: {
+      title: "المخطط",
+      show: "إظهار المخطط",
+      hide: "إخفاء المخطط",
+      empty: "تظهر هنا العناوين التي تضيفها إلى الصفحة. اكتب # ثم مسافة لبدء عنوان.",
+    },
     findReplace: {
       title: "بحث وتغيير",
       findPlaceholder: "كلمة البحث",

@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, shallowRef, computed, onMounted, onBeforeUnmount } from "vue";
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { SearchReplace } from "./extensions/SearchReplace";
 import { emojiSuggestion } from "./emojiSuggestion";
 import Placeholder from "@tiptap/extension-placeholder";
+import {
+  TableOfContents,
+  type TableOfContentData,
+} from "@tiptap/extension-table-of-contents";
 import { documentExtensions } from "./extensions/schema";
 import { useAtomDetail } from "./useAtomDetail";
 import "./document.css";
@@ -58,12 +62,15 @@ const props = withDefaults(
     compact?: boolean;
     /** When false, pasted or dropped image files aren't uploaded. */
     images?: boolean;
+    /** Track headings for the document outline. */
+    outline?: boolean;
   }>(),
   {
     autofocus: false,
     documentId: undefined,
     compact: false,
     images: true,
+    outline: false,
   }
 );
 
@@ -86,6 +93,7 @@ const shortcutsVisible = ref(false);
 const paletteVisible = ref(false);
 const activeCommandIds = ref<Set<string>>(new Set());
 const failedToLoad = ref(false);
+const outlineItems = shallowRef<TableOfContentData>([]);
 
 function openShortcuts() {
   shortcutsVisible.value = true;
@@ -355,6 +363,18 @@ const editor = useEditor({
           }),
         ]
       : []),
+    ...(props.outline
+      ? [
+          TableOfContents.configure({
+            scrollParent: () =>
+              document.querySelector<HTMLElement>("[data-editor-scroll]") ??
+              window,
+            onUpdate: (items) => {
+              outlineItems.value = items;
+            },
+          }),
+        ]
+      : []),
     SearchReplace.configure({
       searchResultClass: "search-result",
     }),
@@ -388,6 +408,7 @@ const editor = useEditor({
     emit("ready");
   },
   onUpdate: ({ editor: ed }) => {
+    if (!ed.isInitialized) return; // heading IDs added on load aren't an edit
     emit("update:modelValue", ed.getJSON() as Record<string, unknown>);
   },
 });
@@ -418,6 +439,7 @@ defineExpose({
   openCommandPalette,
   insertTable,
   insertImageFromInput,
+  outlineItems,
 });
 
 // ---- Per-node verse/hadith style (atom bubble menu) ----

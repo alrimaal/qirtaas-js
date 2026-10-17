@@ -65,6 +65,12 @@ export default {
       deleted: "This page was deleted",
       createFailed: "Failed to create page.",
     },
+    outline: {
+      title: "Outline",
+      show: "Show outline",
+      hide: "Hide outline",
+      empty: "Headings you add to the page appear here. Type # and a space to start one.",
+    },
     findReplace: {
       title: "Find & Replace",
       findPlaceholder: "Search key",
