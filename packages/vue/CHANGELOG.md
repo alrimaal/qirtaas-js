@@ -1,5 +1,15 @@
 # @qirtaas/vue
 
+## 0.9.1
+
+### Patch Changes
+
+- 73a862b: Support outline in readonly editor
+- 2ff5234: Supports checklists and document outline.
+- Updated dependencies [73a862b]
+- Updated dependencies [2ff5234]
+  - @qirtaas/core@0.9.1
+
 ## 0.9.0
 
 ### Minor Changes
