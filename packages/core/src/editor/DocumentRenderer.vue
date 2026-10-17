@@ -2,9 +2,13 @@
 // Read-only document view: the document's nodes and node views only. No
 // editing extensions, dialogs, bubble menus or window listeners, so it's cheap
 // to mount many times (thumbnails, previews, shared links, the SDK renderer).
-import { ref, watch } from "vue";
+import { ref, shallowRef, watch } from "vue";
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import { NodeSelection } from "@tiptap/pm/state";
+import {
+  TableOfContents,
+  type TableOfContentData,
+} from "@tiptap/extension-table-of-contents";
 import { useI18n } from "vue-i18n";
 import { documentExtensions } from "./extensions/schema";
 import { useAtomDetail } from "./useAtomDetail";
@@ -16,8 +20,10 @@ const props = withDefaults(
     documentId?: string;
     /** Size to content, for small previews. */
     compact?: boolean;
+    /** Track headings for the document outline. */
+    outline?: boolean;
   }>(),
-  { documentId: undefined, compact: false }
+  { documentId: undefined, compact: false, outline: false }
 );
 
 const emit = defineEmits<{ ready: [] }>();
@@ -25,6 +31,7 @@ const emit = defineEmits<{ ready: [] }>();
 const { t } = useI18n();
 const openAtomDetail = useAtomDetail();
 const failedToLoad = ref(false);
+const outlineItems = shallowRef<TableOfContentData>([]);
 
 const editor = useEditor({
   // An empty document arrives as {}, which fails the content check.
@@ -35,10 +42,24 @@ const editor = useEditor({
     console.error(error);
     failedToLoad.value = true;
   },
-  extensions: documentExtensions({
-    documentId: props.documentId,
-    translate: (key: string) => t(key),
-  }),
+  extensions: [
+    ...documentExtensions({
+      documentId: props.documentId,
+      translate: (key: string) => t(key),
+    }),
+    ...(props.outline
+      ? [
+          TableOfContents.configure({
+            scrollParent: () =>
+              document.querySelector<HTMLElement>("[data-editor-scroll]") ??
+              window,
+            onUpdate: (items) => {
+              outlineItems.value = items;
+            },
+          }),
+        ]
+      : []),
+  ],
   editorProps: {
     attributes: {
       class: props.compact
@@ -65,7 +86,7 @@ watch(
   }
 );
 
-defineExpose({ editor });
+defineExpose({ editor, outlineItems });
 </script>
 
 <template>
