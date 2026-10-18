@@ -17,7 +17,7 @@ import {
   DetailsSummary,
   DetailsContent,
 } from "@tiptap/extension-details";
-import TextDirection from "tiptap-text-direction";
+import { TextDirection } from "./TextDirection";
 import { QuranVerse } from "./QuranVerse";
 import { QuranMushaf } from "./QuranMushaf";
 import { HadithNode } from "./HadithNode";
