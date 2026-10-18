@@ -1,5 +1,13 @@
 # @qirtaas/react
 
+## 0.9.2
+
+### Patch Changes
+
+- 62a1e76: Fix leading emoji arabic text direction and listitem arabic text direction.
+- Updated dependencies [62a1e76]
+  - @qirtaas/core@0.9.2
+
 ## 0.9.1
 
 ### Patch Changes

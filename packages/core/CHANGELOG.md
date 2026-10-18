@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.9.2
+
+### Patch Changes
+
+- 62a1e76: Fix leading emoji arabic text direction and listitem arabic text direction.
+
 ## 0.9.1
 
 ### Patch Changes
