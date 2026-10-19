@@ -408,7 +408,6 @@ const editor = useEditor({
     emit("ready");
   },
   onUpdate: ({ editor: ed }) => {
-    if (!ed.isInitialized) return; // heading IDs added on load aren't an edit
     emit("update:modelValue", ed.getJSON() as Record<string, unknown>);
   },
 });
