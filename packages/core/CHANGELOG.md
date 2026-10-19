@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.9.3
+
+### Patch Changes
+
+- 3ab02bc: (HOTFIX): Fixes synchronisation issue.
+
 ## 0.9.2
 
 ### Patch Changes

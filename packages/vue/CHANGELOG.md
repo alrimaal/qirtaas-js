@@ -1,5 +1,13 @@
 # @qirtaas/vue
 
+## 0.9.3
+
+### Patch Changes
+
+- 3ab02bc: (HOTFIX): Fixes synchronisation issue.
+- Updated dependencies [3ab02bc]
+  - @qirtaas/core@0.9.3
+
 ## 0.9.2
 
 ### Patch Changes
