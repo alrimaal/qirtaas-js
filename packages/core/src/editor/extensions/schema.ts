@@ -36,9 +36,12 @@ export function documentExtensions(opts: {
   emojiSuggestion?: typeof emojiSuggestion;
 }): Extensions {
   return [
-    StarterKit.configure({}),
+    StarterKit.configure({
+      // Fallback for blockquotes saved before they got a detected `dir`.
+      blockquote: { HTMLAttributes: { dir: "auto" } },
+    }),
     TextDirection.configure({
-      types: ["heading", "paragraph", "listItem", "taskItem"],
+      types: ["heading", "paragraph", "listItem", "taskItem", "blockquote"],
     }),
     Emoji.configure({
       emojis: gitHubEmojis,
