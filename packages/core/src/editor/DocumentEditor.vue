@@ -119,6 +119,15 @@ const paletteCommands = computed<ResolvedCommand[]>(() =>
   })
 );
 
+const slashCommands = computed<ResolvedCommand[]>(() =>
+  buildCommands({
+    locale: locale.value,
+    t,
+    surface: "slash",
+    commandFilter,
+  })
+);
+
 const commandFilter = (id: string) => id !== "page" || documentLinkHost.enabled;
 
 function runCommand(
@@ -384,9 +393,7 @@ const editor = useEditor({
       onInsert: insertQuranVerse,
     }),
     SlashCommand.configure({
-      locale: locale.value,
-      translate: (key: string) => t(key),
-      commandFilter,
+      commands: () => slashCommands.value,
       onCommand: (commandId: string, ed: import("@tiptap/core").Editor) => {
         trackEvent("slash_command", { command: commandId });
         runCommand(commandId, ed, "slash");

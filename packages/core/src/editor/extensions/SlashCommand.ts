@@ -7,7 +7,7 @@ const SlashCommandPluginKey = new PluginKey("slashCommand");
 import { VueRenderer } from "@tiptap/vue-3";
 import { getOverlayTarget } from "../../mount/overlay";
 import SlashMenu from "../SlashMenu.vue";
-import { buildCommands, filterCommands, type ResolvedCommand } from "../commands";
+import { filterCommands, type ResolvedCommand } from "../commands";
 
 export type SlashCommandItem = ResolvedCommand;
 
@@ -16,11 +16,8 @@ export const SlashCommand = Extension.create({
 
   addOptions() {
     return {
-      locale: "en" as string,
-      translate: ((key: string) => key) as (key: string) => string,
-      // Lets hosts drop commands whose backing capability is unavailable
-      // (e.g. /page when no document-link host is provided).
-      commandFilter: ((_id: string) => true) as (id: string) => boolean,
+      // A getter so labels follow locale changes after the editor is created.
+      commands: (() => []) as () => ResolvedCommand[],
       onCommand: (
         _commandId: string,
         _editor?: import("@tiptap/core").Editor,
@@ -31,12 +28,7 @@ export const SlashCommand = Extension.create({
   addProseMirrorPlugins() {
     const editor = this.editor;
     const onCommand = this.options.onCommand;
-    const commands = buildCommands({
-      locale: this.options.locale,
-      t: this.options.translate,
-      surface: "slash",
-      commandFilter: this.options.commandFilter,
-    });
+    const commands = this.options.commands;
 
     return [
       Suggestion({
@@ -45,7 +37,7 @@ export const SlashCommand = Extension.create({
         char: "/",
         startOfLine: false,
         items: ({ query }: { query: string }): SlashCommandItem[] =>
-          filterCommands(commands, query),
+          filterCommands(commands(), query),
         render: () => {
           let tippyInstance: TippyInstance | null = null;
           let renderer: VueRenderer | null = null;

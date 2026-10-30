@@ -11,7 +11,7 @@ export default {
     failedToLoad: "تعذر تحميل المستند",
     tryAgainLater: "يرجى المحاولة مرة أخرى لاحقًا",
     insert: "إدراج",
-    insertQuran: "آية قرآنية",
+    insertQuran: "قرآن",
     insertHadith: "حديث",
     insertToggleList: "قائمة مسدولة",
     insertTable: "جدول",
@@ -68,7 +68,8 @@ export default {
       title: "المخطط",
       show: "إظهار المخطط",
       hide: "إخفاء المخطط",
-      empty: "تظهر هنا العناوين التي تضيفها إلى الصفحة. اكتب # ثم مسافة لبدء عنوان.",
+      empty:
+        "تظهر هنا العناوين التي تضيفها إلى الصفحة. اكتب # ثم مسافة لبدء عنوان.",
     },
     findReplace: {
       title: "بحث وتغيير",
@@ -136,7 +137,7 @@ export default {
       },
       inline: {
         commands: "قائمة الأوامر",
-        verse: "آية قرآنية",
+        verse: "قرآن",
         hadith: "حديث",
         pageLink: "ربط صفحة",
         honorific: "الصلوات",
