@@ -4,6 +4,7 @@ import { VueNodeViewRenderer } from "@tiptap/vue-3";
 import HonorificView from "../HonorificView.vue";
 import { trackEvent } from "../runtime/analytics";
 import {
+  HONORIFIC_BY_TYPE,
   HONORIFIC_SHORTCODE_MAP,
   HONORIFIC_TYPES,
   isHonorificType,
@@ -101,6 +102,10 @@ export const Honorific = Node.create({
       "span",
       mergeAttributes(HTMLAttributes, { "data-type": "honorific" }),
     ];
+  },
+
+  renderText({ node }) {
+    return HONORIFIC_BY_TYPE[node.attrs.type as HonorificType]?.glyph ?? "";
   },
 
   addNodeView() {

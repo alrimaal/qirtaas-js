@@ -36,6 +36,13 @@ onBeforeUnmount(() => {
     window.removeEventListener(e, clearPicked);
 });
 
+// Keeps leaves with a text form (emoji, honorifics); drops Quran/hadith cards.
+function label({ node }: TableOfContentDataItem) {
+  return node.textBetween(0, node.content.size, "", (leaf) =>
+    leaf.type.spec.toText?.({ node: leaf }) ?? ""
+  );
+}
+
 function jump(item: TableOfContentDataItem) {
   pickedId.value = item.id;
   item.dom.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -74,7 +81,7 @@ function jump(item: TableOfContentDataItem) {
         v-for="item in items"
         :key="item.id"
         dir="auto"
-        class="relative block w-full pe-2 text-start leading-[1.35] rounded-e-md cursor-pointer transition-colors hover:bg-hover hover:text-ink before:absolute before:inset-y-1 before:start-0 before:w-0.5 before:rounded-sm"
+        class="relative block w-full pe-2 font-[Kitab,var(--font-sans)] text-start leading-[1.35] rounded-e-md cursor-pointer transition-colors hover:bg-hover hover:text-ink before:absolute before:inset-y-1 before:start-0 before:w-0.5 before:rounded-sm"
         :class="[
           item.id === activeId
             ? 'text-primary font-medium before:bg-primary'
@@ -89,7 +96,7 @@ function jump(item: TableOfContentDataItem) {
         ]"
         @click="jump(item)"
       >
-        {{ item.textContent }}
+        {{ label(item) }}
       </button>
     </div>
   </nav>
