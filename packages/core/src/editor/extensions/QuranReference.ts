@@ -13,6 +13,7 @@ import {
 import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationEdition";
 import { getOverlayTarget } from "../../mount/overlay";
 import QuranRefMenu from "../QuranRefMenu.vue";
+import { isRtlLocale, localizeDigits, verseLabel } from "../quran/formatReference";
 
 const QuranReferencePluginKey = new PluginKey("quranReference");
 
@@ -63,7 +64,8 @@ export const QuranReference = Extension.create({
 
   addOptions() {
     return {
-      locale: "en" as string,
+      // Getter so a locale switch applies without recreating the editor.
+      locale: (() => "en") as () => string,
       translate: ((key: string) => key) as (key: string) => string,
       onInsert: ((_data: QuranReferenceInsert) => {}) as (
         data: QuranReferenceInsert
@@ -76,7 +78,7 @@ export const QuranReference = Extension.create({
     const { locale, translate, onInsert } = this.options;
     const { selectedTranslationId } = useTranslationEdition();
     const surahName = (info: SurahInfo) =>
-      locale.startsWith("ar") ? info.name_arabic : info.name_english;
+      isRtlLocale(locale()) ? info.name_arabic : info.name_english;
 
     /**
      * The popup's two static lines, for every state. Everything here is known
@@ -92,16 +94,25 @@ export const QuranReference = Extension.create({
           };
         case "surah":
           return {
-            reference: `${surahName(match.info)} · 1–${match.info.verse_count}`,
+            reference: `${surahName(match.info)} · ${localizeDigits(
+              `1–${match.info.verse_count}`,
+              locale()
+            )}`,
             hint: translate(
               match.hasColon ? "quran.refTypeVerse" : "quran.refEnterForVerse"
             ),
           };
         case "verse":
           return {
-            reference: `${surahName(match.info)} · ${match.surah}:${
-              match.ayah
-            }`,
+            reference: verseLabel(
+              {
+                surah: match.surah,
+                ayah: match.ayah,
+                surahNameArabic: match.info.name_arabic,
+                surahNameEnglish: match.info.name_english,
+              },
+              locale()
+            ),
             hint: "",
           };
       }

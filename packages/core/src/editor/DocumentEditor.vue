@@ -388,7 +388,7 @@ const editor = useEditor({
       searchResultClass: "search-result",
     }),
     QuranReference.configure({
-      locale: locale.value,
+      locale: () => locale.value,
       translate: (key: string) => t(key),
       onInsert: insertQuranVerse,
     }),

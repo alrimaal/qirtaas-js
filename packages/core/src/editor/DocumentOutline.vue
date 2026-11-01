@@ -62,7 +62,7 @@ function jump(item: TableOfContentDataItem) {
         class="grid place-items-center w-6 h-6 rounded-lg text-muted hover:bg-hover hover:text-ink cursor-pointer"
         @click="emit('close')"
       >
-        <i class="pi pi-angle-double-left text-[13px] [html[dir=rtl]_&]:rotate-180" />
+        <i class="pi pi-angle-double-left text-[13px] rtl:-scale-x-100" />
       </button>
     </div>
     <p

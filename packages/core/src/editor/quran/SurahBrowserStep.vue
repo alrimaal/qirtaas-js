@@ -300,7 +300,7 @@ function onRefineWords() {
         rounded
         size="small"
         :aria-label="t('quran.back')"
-        class="[html[dir=rtl]_&]:rotate-180"
+        class="rtl:-scale-x-100"
         @click="emit('back')"
       />
       <span class="text-sm font-semibold text-primary"

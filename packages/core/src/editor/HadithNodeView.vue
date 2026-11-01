@@ -12,6 +12,7 @@ import {
   resolveReferenceFill,
   referenceColorVar,
 } from "../composables/useReferenceColors";
+import { useReferenceLabel } from "../composables/useReferenceLabel";
 
 const props = defineProps<{
   node: {
@@ -33,6 +34,8 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+const { dir: labelDir, hadithLabel } = useReferenceLabel();
+const inlineReference = computed(() => hadithLabel(props.node.attrs));
 
 const color = computed(() =>
   resolveReferenceColor("hadith", props.node.attrs.color)
@@ -116,7 +119,7 @@ const selectNode = () => {
           :html="props.node.attrs.text"
           dir="rtl"
           :style="textStyle"
-          class="block text-right text-lg leading-loose"
+          class="block text-start text-lg leading-loose"
         />
       </button>
       <span v-if="open" class="block px-4 pb-3" @mousedown.stop>
@@ -164,9 +167,8 @@ const selectNode = () => {
           >»</span
         >
       </span>
-      <span class="text-[0.7rem] text-(--ref)/70 ms-1"
-        >[{{ props.node.attrs.collectionNameArabic }}
-        {{ props.node.attrs.number }}]</span
+      <bdi :dir="labelDir" class="text-[0.7rem] text-(--ref)/70 ms-1"
+        >[{{ inlineReference }}]</bdi
       >
     </button>
   </NodeViewWrapper>

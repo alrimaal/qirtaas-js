@@ -243,7 +243,7 @@ const FORMAT_COMMANDS: CommandDef[] = [
     id: "toggleList",
     group: "format",
     labelKey: "editor.insertToggleList",
-    icon: "pi pi-chevron-right",
+    icon: "pi pi-chevron-right rtl:-scale-x-100",
     syntax: ">",
     palette: true,
     run: insertToggleList,

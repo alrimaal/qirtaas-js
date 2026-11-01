@@ -174,7 +174,7 @@ function scrollIntoView() {
         @click="emit('browseCollections')"
       >
         {{ t("quran.importCollectionLink") }}
-        <span class="opacity-70 text-[11px] [html[dir=rtl]_&]:rotate-180"
+        <span class="opacity-70 text-[11px] rtl:-scale-x-100"
           >→</span
         >
       </button>
@@ -230,7 +230,7 @@ function scrollIntoView() {
             class="inline-flex items-center gap-1 px-2.5 py-1 text-[11.5px] font-semibold text-primary bg-bg border border-primary/25 rounded-full whitespace-nowrap"
           >
             {{ t("quran.browse") }}
-            <span class="[html[dir=rtl]_&]:rotate-180">→</span>
+            <span class="rtl:-scale-x-100">→</span>
           </span>
         </button>
       </template>
@@ -282,7 +282,9 @@ function scrollIntoView() {
               <span class="text-[11px] font-medium text-primary opacity-75">{{
                 v.surah.name_english
               }}</span>
-              <span class="text-[10px] text-primary opacity-60">→</span>
+              <span class="text-[10px] text-primary opacity-60 rtl:-scale-x-100"
+                >→</span
+              >
             </button>
             <span class="text-[11px] text-muted font-medium"
               >{{ v.surah.number }}:{{ v.number }}</span

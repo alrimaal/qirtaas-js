@@ -13,6 +13,7 @@ import {
   resolveReferenceFill,
   referenceColorVar,
 } from "../composables/useReferenceColors";
+import { useReferenceLabel } from "../composables/useReferenceLabel";
 
 const props = defineProps<{
   node: {
@@ -39,26 +40,11 @@ const props = defineProps<{
   updateAttributes: (attrs: Record<string, unknown>) => void;
 }>();
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const { dir: labelDir, verseLabel } = useReferenceLabel();
 
 const refNumber = computed(() => shortReference(props.node.attrs));
-
-// Arabic: "آل عمران ٦-٨" (ayahs only). Otherwise: "Ali 'Imran 3:6-8".
-const isArabic = computed(() => locale.value === "ar");
-const inlineReference = computed(() => {
-  const { surahNameArabic, surahNameEnglish } = props.node.attrs;
-  if (!isArabic.value) {
-    return `${surahNameEnglish} ${refNumber.value}`;
-  }
-  const digits = new Intl.NumberFormat("ar-EG", { useGrouping: false });
-  const from = props.node.attrs.fromAyah ?? props.node.attrs.ayah;
-  const to = props.node.attrs.toAyah ?? from;
-  const ayahs =
-    from === to
-      ? digits.format(from)
-      : `${digits.format(from)}-${digits.format(to)}`;
-  return `${surahNameArabic} ${ayahs}`;
-});
+const inlineReference = computed(() => verseLabel(props.node.attrs));
 const isCard = computed(() => props.node.attrs.displayMode === "card");
 
 const color = computed(() =>
@@ -158,7 +144,7 @@ const selectNode = () => {
           dir="rtl"
           :class="fontClass"
           :style="textStyle"
-          class="block text-right text-lg leading-loose"
+          class="block text-start text-lg leading-loose"
         >
           {{ props.node.attrs.text }}
         </span>
@@ -212,7 +198,7 @@ const selectNode = () => {
         ></span
       >
       <bdi
-        :dir="isArabic ? 'rtl' : 'ltr'"
+        :dir="labelDir"
         class="text-[0.7rem] text-(--ref)/70 ms-1"
         >[{{ inlineReference }}]</bdi
       >

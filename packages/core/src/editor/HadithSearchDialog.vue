@@ -282,6 +282,7 @@ function close() {
           text
           rounded
           size="small"
+          class="rtl:-scale-x-100"
           @click="back"
         />
       </div>

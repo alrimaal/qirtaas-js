@@ -3,8 +3,10 @@ import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AyahResult } from "@qirtaas/core/services/quran";
 import { useQuranCollectionsHost } from "../runtime/context";
+import { useReferenceLabel } from "../../composables/useReferenceLabel";
 
 const { t } = useI18n();
+const { dir: labelDir, verseLabel } = useReferenceLabel();
 const host = useQuranCollectionsHost();
 
 const props = withDefaults(defineProps<{ active?: boolean }>(), {
@@ -123,7 +125,7 @@ function importSelected() {
         class="inline-flex items-center gap-1 text-[13px] font-medium text-muted hover:text-primary cursor-pointer font-[inherit]"
         @click="onBack"
       >
-        <span class="[html[dir=rtl]_&]:rotate-180">←</span>
+        <span class="rtl:-scale-x-100">←</span>
         {{ t("quran.back") }}
       </button>
       <span class="text-sm font-bold text-primary truncate">
@@ -191,7 +193,7 @@ function importSelected() {
             >{{ c.count }}</span
           >
           <span
-            class="text-[13px] text-muted opacity-50 group-hover:opacity-100 group-hover:text-primary [html[dir=rtl]_&]:rotate-180"
+            class="text-[13px] text-muted opacity-50 group-hover:opacity-100 group-hover:text-primary rtl:-scale-x-100"
             >→</span
           >
         </button>
@@ -270,9 +272,16 @@ function importSelected() {
               class="flex flex-col flex-1 min-w-0 gap-1 transition-opacity"
               :class="selectedKeys.has(verseKey(v)) ? 'opacity-100' : 'opacity-50'"
             >
-              <span class="text-[11px] text-muted font-medium">
-                {{ v.surah.name_arabic }} · {{ v.surah.number }}:{{ v.number }}
-              </span>
+              <bdi :dir="labelDir" class="text-[11px] text-muted font-medium">
+                {{
+                  verseLabel({
+                    surah: v.surah.number,
+                    ayah: v.number,
+                    surahNameArabic: v.surah.name_arabic,
+                    surahNameEnglish: v.surah.name_english,
+                  })
+                }}
+              </bdi>
               <span
                 class="text-[15px] text-ink leading-[1.8] line-clamp-2 font-quran"
                 dir="rtl"

@@ -77,7 +77,7 @@ function onInsert(displayMode: "inline" | "card") {
         rounded
         size="small"
         :aria-label="t('quran.back')"
-        class="[html[dir=rtl]_&]:rotate-180"
+        class="rtl:-scale-x-100"
         @click="emit('back')"
       />
       <span class="text-xs text-muted">
@@ -129,7 +129,7 @@ function onInsert(displayMode: "inline" | "card") {
           t("quran.selectMoreVersesSub")
         }}</span>
       </span>
-      <span class="text-muted [html[dir=rtl]_&]:rotate-180">→</span>
+      <span class="text-muted rtl:-scale-x-100">→</span>
     </button>
 
     <div class="flex justify-end gap-2">

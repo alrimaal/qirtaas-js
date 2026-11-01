@@ -19,7 +19,7 @@ defineEmits<{ select: [] }>();
     class="block w-max max-w-sm text-start bg-bg border border-border rounded-lg shadow-md p-3 cursor-pointer"
     @click="$emit('select')"
   >
-    <span class="block text-xs text-muted">{{ reference }}</span>
+    <bdi dir="auto" class="block text-xs text-muted">{{ reference }}</bdi>
     <span v-if="error" class="block mt-1 text-sm text-muted">{{ error }}</span>
     <template v-else>
       <span

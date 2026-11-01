@@ -148,7 +148,7 @@ function onKeydown(e: KeyboardEvent) {
         size="small"
         :disabled="!hasPrev"
         :aria-label="t('verseDetail.prev')"
-        class="[html[dir=rtl]_&]:rotate-180"
+        class="rtl:-scale-x-100"
         @click="goPrev"
       />
       <Button
@@ -160,7 +160,7 @@ function onKeydown(e: KeyboardEvent) {
         size="small"
         :disabled="!hasNext"
         :aria-label="t('verseDetail.next')"
-        class="[html[dir=rtl]_&]:rotate-180"
+        class="rtl:-scale-x-100"
         @click="goNext"
       />
       <Button

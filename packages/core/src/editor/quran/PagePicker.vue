@@ -64,7 +64,7 @@ function next() {
       size="small"
       :disabled="activeIdx === 0"
       :aria-label="t('quran.previousPage')"
-      class="[html[dir=rtl]_&]:rotate-180"
+      class="rtl:-scale-x-100"
       @click="prev"
     />
     <button
@@ -85,7 +85,7 @@ function next() {
       size="small"
       :disabled="activeIdx >= pages.length - 1"
       :aria-label="t('quran.nextPage')"
-      class="[html[dir=rtl]_&]:rotate-180"
+      class="rtl:-scale-x-100"
       @click="next"
     />
 

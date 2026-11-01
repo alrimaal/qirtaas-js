@@ -3,10 +3,12 @@ import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import Button from "primevue/button";
 import { useHadithDetail } from "@qirtaas/core/composables/useHadithDetail";
+import { useReferenceLabel } from "@qirtaas/core/composables/useReferenceLabel";
 import ReportDataDialog from "./ReportDataDialog.vue";
 import SanitizedHtml from "./SanitizedHtml.vue";
 
 const { t, locale } = useI18n();
+const { dir: labelDir, digits } = useReferenceLabel();
 const {
   isOpen,
   loading,
@@ -52,7 +54,9 @@ const hadithReference = computed(
 const headerRef = computed(() => {
   if (data.value) {
     const name = collectionName.value;
-    return data.value.number != null ? `${name} · #${data.value.number}` : name;
+    return data.value.number != null
+      ? `${name} · #${digits(data.value.number)}`
+      : name;
   }
   if (activeSlug.value && activeNumber.value != null) {
     return `${activeSlug.value}:${activeNumber.value}`;
@@ -76,7 +80,10 @@ function onKeydown(e: KeyboardEvent) {
       class="shrink-0 flex items-center gap-2 px-4 py-2 border-b border-border bg-bg"
     >
       <i class="pi pi-book text-accent text-sm shrink-0" />
-      <div class="flex-1 min-w-0 text-sm font-semibold text-primary truncate">
+      <div
+        :dir="data ? labelDir : 'ltr'"
+        class="flex-1 min-w-0 text-sm font-semibold text-primary truncate"
+      >
         {{ headerRef }}
       </div>
       <Button
