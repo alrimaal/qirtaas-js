@@ -153,6 +153,7 @@ export default {
         heading1: "عنوان 1",
         heading2: "عنوان 2",
         heading3: "عنوان 3",
+        heading4: "عنوان 4",
         bulletList: "قائمة نقطية",
         numberedList: "قائمة مرقمة",
         blockquote: "اقتباس",

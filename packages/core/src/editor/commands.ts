@@ -210,6 +210,16 @@ const FORMAT_COMMANDS: CommandDef[] = [
     isActive: (e) => e.isActive("heading", { level: 3 }),
   },
   {
+    id: "heading4",
+    group: "format",
+    labelKey: "editor.shortcuts.blocks.heading4",
+    icon: "pi pi-hashtag",
+    syntax: "####",
+    palette: true,
+    run: (e) => e.chain().focus().toggleHeading({ level: 4 }).run(),
+    isActive: (e) => e.isActive("heading", { level: 4 }),
+  },
+  {
     id: "bulletList",
     group: "format",
     labelKey: "editor.tooltips.bulletList",

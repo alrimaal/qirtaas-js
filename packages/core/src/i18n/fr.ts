@@ -155,6 +155,7 @@ export default {
         heading1: "Titre 1",
         heading2: "Titre 2",
         heading3: "Titre 3",
+        heading4: "Titre 4",
         bulletList: "Liste à puces",
         numberedList: "Liste numérotée",
         blockquote: "Citation",

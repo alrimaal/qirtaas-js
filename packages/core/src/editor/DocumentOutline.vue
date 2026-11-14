@@ -11,17 +11,40 @@ const props = defineProps<{
 const emit = defineEmits<{ close: []; navigate: [] }>();
 const { t } = useI18n();
 
+const MAX_LEVEL = 4;
+
+// Hides H5+; their active state passes to the nearest visible heading above.
+const visible = computed(() => {
+  const items: TableOfContentDataItem[] = [];
+  let activeId: string | undefined;
+  for (const item of props.items) {
+    if (item.originalLevel <= MAX_LEVEL) items.push(item);
+    if (item.isActive) activeId = items[items.length - 1]?.id;
+  }
+  return { items, activeId };
+});
+
 // The title heading always counts, so a lone item means no real headings yet.
-const empty = computed(() => props.items.length < 2);
+const empty = computed(() => visible.value.items.length < 2);
 
 // A picked heading stays highlighted until the user scrolls themselves, since
 // headings already in view or near the end may not scroll at all.
 const pickedId = ref<string | null>(null);
 const activeId = computed(
   () =>
-    pickedId.value ??
-    (props.items.find((i) => i.isActive) ?? props.items[0])?.id
+    pickedId.value ?? visible.value.activeId ?? visible.value.items[0]?.id
 );
+
+// [panel, sheet] padding per heading level.
+const INDENT = [
+  ["ps-3.5", "ps-4"],
+  ["ps-6", "ps-7"],
+  ["ps-8.5", "ps-10"],
+  ["ps-11", "ps-13"],
+] as const;
+function indent(level: number) {
+  return INDENT[level - 1]![props.sheet ? 1 : 0];
+}
 
 const USER_SCROLL_EVENTS = ["wheel", "touchmove", "keydown"] as const;
 function clearPicked() {
@@ -78,21 +101,24 @@ function jump(item: TableOfContentDataItem) {
       :class="!sheet && 'max-h-[calc(100vh-220px)] overflow-auto [scrollbar-width:none]'"
     >
       <button
-        v-for="item in items"
+        v-for="item in visible.items"
         :key="item.id"
         dir="auto"
         class="relative block w-full pe-2 font-[Kitab,var(--font-sans)] text-start leading-[1.35] rounded-e-md cursor-pointer transition-colors hover:bg-hover hover:text-ink before:absolute before:inset-y-1 before:start-0 before:w-0.5 before:rounded-sm"
         :class="[
           item.id === activeId
             ? 'text-primary font-medium before:bg-primary'
-            : item.level === 1
+            : item.originalLevel === 1
               ? 'text-ink'
               : 'text-muted',
-          item.level === 1 && 'font-medium mb-1',
+          item.originalLevel === 1 && 'font-semibold mb-1',
           sheet ? 'py-3 min-h-11' : 'py-1.5',
-          item.level >= 3
-            ? sheet ? 'ps-8 text-sm' : 'ps-7 text-[12.5px]'
-            : sheet ? 'ps-4 text-[15px]' : 'ps-3.5 text-[13px]',
+          indent(item.originalLevel),
+          item.originalLevel === 1
+            ? sheet ? 'text-base' : 'text-[14px]'
+            : item.originalLevel === 2
+              ? sheet ? 'text-[15px]' : 'text-[13px]'
+              : sheet ? 'text-sm' : 'text-[12.5px]',
         ]"
         @click="jump(item)"
       >

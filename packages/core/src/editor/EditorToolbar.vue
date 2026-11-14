@@ -85,7 +85,7 @@ const highlightColors = HIGHLIGHT_COLORS;
 const activeHeadingLabel = computed(() => {
   const e = props.editor;
   if (!e) return "H";
-  for (const level of [1, 2, 3] as const) {
+  for (const level of [1, 2, 3, 4] as const) {
     if (e.isActive("heading", { level })) return `H${level}`;
   }
   return "H";
@@ -492,7 +492,7 @@ function removeLink() {
     <Popover :append-to="getOverlayAppendTo()" ref="headingPopover">
       <div class="flex flex-col min-w-32 p-1">
         <button
-          v-for="level in [1, 2, 3] as const"
+          v-for="level in [1, 2, 3, 4] as const"
           :key="level"
           class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-start bg-transparent text-ink hover:bg-accent/10 hover:text-accent cursor-pointer border-none font-[inherit]"
           :class="{ '!bg-accent/10 !text-accent': props.editor!.isActive('heading', { level }) }"

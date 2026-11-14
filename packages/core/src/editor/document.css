@@ -9,6 +9,7 @@
 
 .tiptap {
   font-family: inherit;
+  font-size: 1.0625rem;
   line-height: 1.8;
   color: var(--color-ink);
 }
@@ -102,27 +103,37 @@
   }
 }
 
-.tiptap h1,
-.tiptap h2,
-.tiptap h3 {
+.tiptap :is(h1, h2, h3, h4, h5, h6) {
   color: var(--color-ink);
   font-family: inherit;
   font-weight: 700;
   line-height: 1.3;
 }
 .tiptap h1 {
-  font-size: 2rem;
+  font-size: 1.875em;
   margin: 2rem 0 0.5rem;
 }
 .tiptap h2 {
-  font-size: 1.5rem;
+  font-size: 1.5em;
   margin: 1.75rem 0 0.5rem;
 }
 .tiptap h3 {
-  font-size: 1.25rem;
+  font-size: 1.3em;
   margin: 1.25rem 0 0.25rem;
 }
-.tiptap > :is(h1, h2, h3):first-child {
+.tiptap h4 {
+  font-size: 1.125em;
+  margin: 1rem 0 0.25rem;
+}
+/* H5/H6 aren't offered in menus but `#####` still creates them. */
+.tiptap :is(h5, h6) {
+  font-size: 1em;
+  margin: 1rem 0 0.25rem;
+}
+.tiptap h6 {
+  color: var(--color-muted);
+}
+.tiptap > :is(h1, h2, h3, h4, h5, h6):first-child {
   margin-top: 0.5rem;
 }
 
@@ -378,7 +389,6 @@
     flex-direction: column;
     width: 100%;
     min-width: 0;
-
   }
 }
 
@@ -441,7 +451,6 @@
 .tiptap .ref-card.ProseMirror-selectednode {
   background-color: var(--ref-bg);
   border-radius: 10px;
-  box-shadow:
-    0 0 0 2px var(--color-bg),
+  box-shadow: 0 0 0 2px var(--color-bg),
     0 0 0 4px color-mix(in oklab, var(--color-primary) 50%, transparent);
 }
