@@ -66,6 +66,8 @@ declare module "@tiptap/core" {
  *  follows the theme; pasted colours outside the palette are dropped. */
 export const TextColor = Mark.create({
   name: "textColor",
+  // Outer of underline/strike so their lines take the text colour.
+  priority: 101,
 
   addAttributes() {
     return {

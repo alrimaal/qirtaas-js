@@ -311,6 +311,7 @@
 }
 
 .tiptap mark {
+  color: inherit;
   border-radius: 0.15em;
   padding: 0.05em 0.15em;
 }
