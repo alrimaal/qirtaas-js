@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.10.0
+
+### Minor Changes
+
+- 3871d35: Fix outline rendering H5+ and make strikethrough/underline follow text colour
+
 ## 0.9.3
 
 ### Patch Changes
