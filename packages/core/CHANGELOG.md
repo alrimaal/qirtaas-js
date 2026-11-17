@@ -1,5 +1,11 @@
 # @qirtaas/core
 
+## 0.10.1
+
+### Patch Changes
+
+- ea6ac98: Uses Noto Naskh Arabic font in all environments
+
 ## 0.10.0
 
 ### Minor Changes

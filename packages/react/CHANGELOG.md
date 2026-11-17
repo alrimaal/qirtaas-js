@@ -1,5 +1,13 @@
 # @qirtaas/react
 
+## 0.10.1
+
+### Patch Changes
+
+- ea6ac98: Uses Noto Naskh Arabic font in all environments
+- Updated dependencies [ea6ac98]
+  - @qirtaas/core@0.10.1
+
 ## 0.10.0
 
 ### Minor Changes
