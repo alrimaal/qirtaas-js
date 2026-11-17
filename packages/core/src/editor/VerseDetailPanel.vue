@@ -11,8 +11,10 @@ import { languageLabel } from "./quran/languageLabels";
 import TranslationEditionSelect from "./quran/TranslationEditionSelect.vue";
 import ReportDataDialog from "./ReportDataDialog.vue";
 import SanitizedHtml from "./SanitizedHtml.vue";
+import CopyTranslationButton from "./CopyTranslationButton.vue";
 
 const { t, locale } = useI18n();
+const translationRef = ref<{ $el: HTMLElement } | null>(null);
 const {
   isOpen,
   loading,
@@ -248,6 +250,19 @@ function onKeydown(e: KeyboardEvent) {
               >
                 {{ t("verseDetail.translation") }}
               </h3>
+              <CopyTranslationButton
+                v-if="data.translation_en"
+                :source="() => translationRef?.$el"
+                event="verse_translation_copied"
+                :params="{
+                  surah: activeSurah,
+                  ayah: activeAyah,
+                  edition: data.translation?.resource_id,
+                  source: 'panel',
+                }"
+                class="self-center -my-1"
+              />
+              <span class="flex-1" />
               <!-- Searchable edition picker, grouped by language: 144 editions
                    is far too many to scroll blind. -->
               <TranslationEditionSelect
@@ -264,6 +279,7 @@ function onKeydown(e: KeyboardEvent) {
             </div>
             <SanitizedHtml
               v-if="data.translation_en"
+              ref="translationRef"
               :html="data.translation_en"
               class="text-sm text-ink leading-relaxed"
             />

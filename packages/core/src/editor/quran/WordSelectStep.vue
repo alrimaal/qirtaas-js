@@ -105,6 +105,7 @@ function onInsert(displayMode: "inline" | "card") {
         :surah="verse.surah.number"
         :ayah="verse.number"
         bare
+        source="search"
       />
     </TranslationStripPanel>
 

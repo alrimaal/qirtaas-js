@@ -48,6 +48,8 @@ export default {
     },
     atom: {
       copy: "Copier",
+      copyTranslation: "Copier la traduction",
+      translationCopied: "Traduction copiée",
       delete: "Supprimer",
     },
     verse: {

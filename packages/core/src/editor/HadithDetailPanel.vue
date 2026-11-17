@@ -6,8 +6,10 @@ import { useHadithDetail } from "@qirtaas/core/composables/useHadithDetail";
 import { useReferenceLabel } from "@qirtaas/core/composables/useReferenceLabel";
 import ReportDataDialog from "./ReportDataDialog.vue";
 import SanitizedHtml from "./SanitizedHtml.vue";
+import CopyTranslationButton from "./CopyTranslationButton.vue";
 
 const { t, locale } = useI18n();
+const translationRef = ref<{ $el: HTMLElement } | null>(null);
 const { dir: labelDir, digits } = useReferenceLabel();
 const {
   isOpen,
@@ -209,12 +211,25 @@ function onKeydown(e: KeyboardEvent) {
             v-if="data.translation_en && locale !== 'ar'"
             class="space-y-1"
           >
-            <h3
-              class="text-[0.7rem] font-semibold uppercase tracking-wider text-muted"
-            >
-              {{ t("hadithDetail.translation") }}
-            </h3>
+            <div class="flex items-center gap-2">
+              <h3
+                class="text-[0.7rem] font-semibold uppercase tracking-wider text-muted"
+              >
+                {{ t("hadithDetail.translation") }}
+              </h3>
+              <CopyTranslationButton
+                :source="() => translationRef?.$el"
+                event="hadith_translation_copied"
+                :params="{
+                  slug: activeSlug,
+                  number: activeNumber,
+                  source: 'panel',
+                }"
+                class="-my-1"
+              />
+            </div>
             <SanitizedHtml
+              ref="translationRef"
               :html="data.translation_en"
               class="text-sm text-ink leading-relaxed"
             />

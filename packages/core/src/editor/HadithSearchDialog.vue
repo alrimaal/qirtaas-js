@@ -311,6 +311,7 @@ function close() {
           :number="selectedHadith.number"
           :text="selectedHadith.translation_en"
           bare
+          source="search"
         />
       </TranslationStripPanel>
 

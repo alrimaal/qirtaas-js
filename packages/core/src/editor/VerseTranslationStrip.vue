@@ -26,6 +26,7 @@ import { useTranslationEdition } from "@qirtaas/core/composables/useTranslationE
 import { useQuranEditions } from "@qirtaas/core/composables/useQuranEditions";
 import { languageDir } from "./quran/languageLabels";
 import SanitizedHtml from "./SanitizedHtml.vue";
+import CopyTranslationButton from "./CopyTranslationButton.vue";
 
 // Shows the translation of a SINGLE verse — no navigation, no switching.
 const props = defineProps<{
@@ -35,9 +36,13 @@ const props = defineProps<{
   bare?: boolean;
   /** Inherit colour and drop the italic (reference cards). */
   plain?: boolean;
+  /** Analytics: where the strip is shown. */
+  source?: "card" | "search";
 }>();
 
 const { t } = useI18n();
+
+const textRef = ref<{ $el: HTMLElement } | null>(null);
 const { selectedTranslationId } = useTranslationEdition();
 const { editions } = useQuranEditions();
 
@@ -106,7 +111,7 @@ watch(
     contenteditable="false"
     data-async-content
     :data-state="state"
-    class="block text-sm"
+    class="relative block text-sm"
     :class="
       bare
         ? ''
@@ -124,12 +129,21 @@ watch(
         {{ t("verseDetail.retry") }}
       </button>
     </span>
-    <SanitizedHtml
-      v-else
-      policy="inline"
-      :html="translation"
-      class="block leading-relaxed"
-      :class="plain ? '' : 'text-ink/90 italic'"
-    />
+    <template v-else>
+      <SanitizedHtml
+        ref="textRef"
+        policy="inline"
+        :html="translation"
+        class="block leading-relaxed"
+        :class="[plain ? 'px-7 print:px-0' : 'pe-7 print:pe-0 text-ink/90 italic']"
+      />
+      <CopyTranslationButton
+        :source="() => textRef?.$el"
+        event="verse_translation_copied"
+        :params="{ surah, ayah, edition: selectedTranslationId, source: source ?? 'card' }"
+        class="absolute opacity-60 hover:opacity-100 focus-visible:opacity-100"
+        :class="bare ? 'top-0 end-0' : 'top-1.5 end-1.5'"
+      />
+    </template>
   </span>
 </template>

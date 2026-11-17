@@ -8,6 +8,7 @@ import { ref, watch, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { getHadithByRef } from "@qirtaas/core/services/hadith";
 import SanitizedHtml from "./SanitizedHtml.vue";
+import CopyTranslationButton from "./CopyTranslationButton.vue";
 
 // Shows the English translation of a SINGLE hadith — no navigation.
 const props = defineProps<{
@@ -18,9 +19,13 @@ const props = defineProps<{
   bare?: boolean;
   /** Inherit colour and drop the italic (reference cards). */
   plain?: boolean;
+  /** Analytics: where the strip is shown. */
+  source?: "card" | "search";
 }>();
 
 const { t } = useI18n();
+
+const textRef = ref<{ $el: HTMLElement } | null>(null);
 
 const translation = ref<string | null>(null);
 const loading = ref(false);
@@ -71,7 +76,7 @@ watch(() => [props.slug, props.number, props.text], load, { immediate: true });
     contenteditable="false"
     data-async-content
     :data-state="state"
-    class="block text-sm"
+    class="relative block text-sm"
     :class="
       bare
         ? ''
@@ -92,13 +97,22 @@ watch(() => [props.slug, props.number, props.text], load, { immediate: true });
         {{ t("hadithDetail.retry") }}
       </button>
     </span>
-    <SanitizedHtml
-      v-else-if="translation"
-      policy="inline"
-      :html="translation"
-      class="block leading-relaxed"
-      :class="plain ? '' : 'text-ink/90 italic'"
-    />
+    <template v-else-if="translation">
+      <SanitizedHtml
+        ref="textRef"
+        policy="inline"
+        :html="translation"
+        class="block leading-relaxed"
+        :class="[plain ? 'px-7 print:px-0' : 'pe-7 print:pe-0 text-ink/90 italic']"
+      />
+      <CopyTranslationButton
+        :source="() => textRef?.$el"
+        event="hadith_translation_copied"
+        :params="{ slug, number, source: source ?? 'card' }"
+        class="absolute opacity-60 hover:opacity-100 focus-visible:opacity-100"
+        :class="bare ? 'top-0 end-0' : 'top-1.5 end-1.5'"
+      />
+    </template>
     <span v-else class="block text-muted italic">
       {{ t("hadithDetail.noTranslation") }}
     </span>

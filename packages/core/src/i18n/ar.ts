@@ -47,6 +47,8 @@ export default {
     },
     atom: {
       copy: "نسخ",
+      copyTranslation: "نسخ الترجمة",
+      translationCopied: "تم نسخ الترجمة",
       delete: "حذف",
     },
     verse: {
