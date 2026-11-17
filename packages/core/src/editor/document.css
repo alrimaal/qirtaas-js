@@ -1,3 +1,16 @@
+/* Bundled Arabic text face (Noto Naskh, OFL) so Arabic renders the same on
+   every OS and in the PDF render pod, instead of each system's fallback.
+   Arabic-only range; Latin stays Geist. */
+@font-face {
+  font-family: "Qirtaas Arabic";
+  src: url("../assets/fonts/noto-naskh-arabic.woff2") format("woff2-variations");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1,
+    U+08E3-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
 .tiptap .is-empty::before {
   content: attr(data-placeholder);
   display: block;
@@ -18,7 +31,8 @@
    bugs, which also kills Arabic shaping (lam-alif renders as isolated ل + ا).
    Re-enable on Arabic font runs. */
 .tiptap .font-quran,
-.tiptap .font-quran-uthmani {
+.tiptap .font-quran-uthmani,
+.tiptap [dir="rtl"] {
   font-variant-ligatures: normal;
   -webkit-font-variant-ligatures: normal;
   font-feature-settings: "liga", "calt", "rlig";
