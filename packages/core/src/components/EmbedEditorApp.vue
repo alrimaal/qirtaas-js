@@ -6,6 +6,7 @@ import DocumentEditor from "../editor/DocumentEditor.vue";
 import DocumentRenderer from "../editor/DocumentRenderer.vue";
 import EditorToolbar from "../editor/EditorToolbar.vue";
 import FindReplaceBar from "../editor/FindReplaceBar.vue";
+import ReloadRequiredBar from "../editor/ReloadRequiredBar.vue";
 import VerseDetailContainer from "../editor/VerseDetailContainer.vue";
 import { IsDarkKey } from "../editor/runtime/context";
 import Toast from "primevue/toast";
@@ -78,6 +79,8 @@ function closeFindReplace() {
 }
 const loading = ref(false);
 const loadFailed = ref(false);
+// The doc moved to collab under us: REST saves 409, so editing is blocked.
+const reloadRequired = ref(false);
 // Editor renders only once we have content (or know there's none to load), so
 // a documentId load doesn't flash an empty editor first.
 const contentReady = ref(!props.documentId);
@@ -94,6 +97,7 @@ function mapError(err: unknown): ErrorCode {
     if (err.status === 413 || code === "document_too_large") {
       return "doc_too_large";
     }
+    if (code === "document_collab") return "reload_required";
     if (err.status === 401 || err.status === 403) return "unauthorized";
   }
   return "network";
@@ -133,6 +137,11 @@ const autosave = useDocumentAutosave({
   onError: (err) => {
     const code = mapError(err);
     props.onError?.(code, err);
+    if (code === "reload_required") {
+      autosave.setSuspended(true);
+      reloadRequired.value = true;
+      return;
+    }
     toast.add({
       severity: "error",
       summary:
@@ -213,7 +222,7 @@ defineExpose({
       <!-- Desktop toolbar (top). Editing only; drives the editor through the
            DocumentEditor's exposed imperative API. -->
       <div
-        v-if="isEditable && !loadFailed && editorRef?.editor"
+        v-if="isEditable && !loadFailed && !reloadRequired && editorRef?.editor"
         class="hidden md:block shrink-0 border-b border-border bg-bg px-3"
       >
         <EditorToolbar
@@ -236,9 +245,10 @@ defineExpose({
            scrolls. `data-editor-scroll` is the seam the resizable-image NodeView
            looks up for its scroll container; it must stay positioned (relative)
            so Moveable's control box anchors and clips to the editor. -->
+      <ReloadRequiredBar v-if="reloadRequired" class="shrink-0 m-3 mb-0" />
       <div class="flex-1 min-h-0 min-w-0 overflow-y-auto relative" data-editor-scroll>
         <DocumentEditor
-          v-if="isEditable && !loadFailed"
+          v-if="isEditable && !loadFailed && !reloadRequired"
           ref="editorRef"
           :model-value="content"
           :autofocus="autofocus"
@@ -256,7 +266,7 @@ defineExpose({
       </div>
       <!-- Mobile toolbar (bottom), mirroring the SPA's bottom bar. -->
       <div
-        v-if="isEditable && !loadFailed && editorRef?.editor"
+        v-if="isEditable && !loadFailed && !reloadRequired && editorRef?.editor"
         class="md:hidden shrink-0 border-t border-border bg-bg px-1"
       >
         <EditorToolbar

@@ -216,6 +216,8 @@ export default {
     loadDocument: "تعذّر تحميل المستند.",
     saveFailed: "تعذّر حفظ تغييراتك.",
     documentTooLarge: "هذا المستند تجاوز الحجم المسموح",
+    reloadRequired: "تم تحديث هذا المستند. أعد تحميل الصفحة لمتابعة التحرير.",
+    reload: "إعادة التحميل",
   },
   quran: {
     dialogTitle: "إدراج آية قرآنية",

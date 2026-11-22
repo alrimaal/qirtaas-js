@@ -215,6 +215,8 @@ export default {
     loadDocument: "Couldn't load the document.",
     saveFailed: "Couldn't save your changes.",
     documentTooLarge: "This document is too large to save.",
+    reloadRequired: "This document was upgraded. Reload the page to keep editing.",
+    reload: "Reload",
   },
   quran: {
     dialogTitle: "Insert Quran Verses",

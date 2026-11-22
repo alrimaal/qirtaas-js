@@ -13,6 +13,7 @@ export type ErrorCode =
   | "load_failed"
   | "unauthorized"
   | "network"
+  | "reload_required"
   | (string & {});
 
 export interface AutosaveOptions {

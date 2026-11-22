@@ -218,6 +218,8 @@ export default {
     loadDocument: "Impossible de charger le document.",
     saveFailed: "Impossible d’enregistrer vos modifications.",
     documentTooLarge: "Ce document est trop volumineux pour être enregistré.",
+    reloadRequired: "Ce document a été mis à niveau. Rechargez la page pour continuer à le modifier.",
+    reload: "Recharger",
   },
   quran: {
     dialogTitle: "Insérer des versets du Coran",
