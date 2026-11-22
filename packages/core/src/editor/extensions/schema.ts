@@ -34,9 +34,12 @@ export function documentExtensions(opts: {
   translate: (key: string) => string;
   /** Editor only: the `:` emoji picker. */
   emojiSuggestion?: typeof emojiSuggestion;
+  /** Yjs `Collaboration` brings its own undo/redo. */
+  collab?: boolean;
 }): Extensions {
   return [
     StarterKit.configure({
+      ...(opts.collab ? { undoRedo: false as const } : {}),
       // Fallback for blockquotes saved before they got a detected `dir`.
       blockquote: { HTMLAttributes: { dir: "auto" } },
     }),

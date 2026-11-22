@@ -5,6 +5,10 @@ import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { SearchReplace } from "./extensions/SearchReplace";
 import { emojiSuggestion } from "./emojiSuggestion";
 import Placeholder from "@tiptap/extension-placeholder";
+import Collaboration from "@tiptap/extension-collaboration";
+import { COLLAB_FIELD } from "../collab/content";
+import type { HocuspocusProvider } from "@hocuspocus/provider";
+import type * as Y from "yjs";
 import {
   TableOfContents,
   type TableOfContentData,
@@ -64,6 +68,8 @@ const props = withDefaults(
     images?: boolean;
     /** Track headings for the document outline. */
     outline?: boolean;
+    /** Edit a Yjs doc instead of `modelValue`. Read at mount only. */
+    collab?: { ydoc: Y.Doc; provider: HocuspocusProvider };
   }>(),
   {
     autofocus: false,
@@ -71,6 +77,7 @@ const props = withDefaults(
     compact: false,
     images: true,
     outline: false,
+    collab: undefined,
   }
 );
 
@@ -327,11 +334,22 @@ function contentClass(): string {
   return "outline-none min-h-[70vh] px-1 py-4 pb-[33vh]";
 }
 
+const collab = props.collab;
+
+function initialContent() {
+  // Collab content comes from the Y.Doc; passing it too would duplicate it.
+  if (collab) return undefined;
+  // Empty document gets empty object which breaks validity checks
+  return props.modelValue?.type ? props.modelValue : undefined;
+}
+
 const editor = useEditor({
-  content: props.modelValue?.type ? props.modelValue : undefined, // Empty document gets empty object which breaks validity checks
+  content: initialContent(),
   enableContentCheck: true,
-  onContentError({ error }) {
+  onContentError({ error, disableCollaboration }) {
     console.error(error);
+    // Don't "fix" an invalid remote node and sync the loss back.
+    if (collab) disableCollaboration();
     toast.add({
       severity: "error",
       summary: t("editor.failedToLoad"),
@@ -344,7 +362,21 @@ const editor = useEditor({
       documentId: props.documentId,
       translate: (key: string) => t(key),
       emojiSuggestion,
+      collab: !!collab,
     }),
+    ...(collab
+      ? [
+          Collaboration.configure({
+            document: collab.ydoc,
+            field: COLLAB_FIELD,
+            provider: collab.provider,
+            // Content lands after create, so autofocus "end" would miss it.
+            onFirstRender: () => {
+              if (props.autofocus) editor.value?.commands.focus("end");
+            },
+          }),
+        ]
+      : []),
     ToggleShortcuts,
     Placeholder.configure({
       placeholder: ({ editor: ed, node, pos }) => {
