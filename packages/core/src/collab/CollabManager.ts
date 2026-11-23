@@ -19,6 +19,8 @@ export interface CollabHandle {
   provider: HocuspocusProvider;
   /** Edits also go to IndexedDB. */
   isLocal(): boolean;
+  /** Resolves once the server has stored the doc as it is now. */
+  whenStored(): Promise<void>;
   /** Resolves once the doc is closed (if this was the last holder). */
   release(): Promise<void>;
 }
@@ -40,6 +42,7 @@ const RETRY_MAX_MS = 30000;
 const SYNC_RETRY_MIN_MS = 5000;
 const SYNC_RETRY_MAX_MS = 5 * 60 * 1000;
 const STORE_TIMEOUT_MS = 30000;
+const STORED_POLL_MS = 1000;
 
 const localDbName = (userId: string, docName: string) =>
   `qirtaas:${userId}:${docName}`;
@@ -116,6 +119,7 @@ export class CollabManager {
       ydoc: e.ydoc,
       provider: e.provider,
       isLocal: () => e.persistence !== null,
+      whenStored: () => this.whenStored(name, e),
       release: () => {
         if (!released) {
           released = true;
@@ -124,6 +128,18 @@ export class CollabManager {
         return e.closed ?? Promise.resolve();
       },
     };
+  }
+
+  private async whenStored(name: string, entry: Entry) {
+    const state = Y.encodeStateAsUpdate(entry.ydoc);
+    for (let i = 0; i < STORE_TIMEOUT_MS / STORED_POLL_MS; i++) {
+      const snapshot = await this.api.snapshot(name);
+      if (!snapshot || Y.snapshotContainsUpdate(Y.decodeSnapshot(snapshot), state)) {
+        return;
+      }
+      await new Promise((r) => setTimeout(r, STORED_POLL_MS));
+    }
+    throw new Error("not stored");
   }
 
   /** Starts the sync worker: runs now and on reconnect. */
