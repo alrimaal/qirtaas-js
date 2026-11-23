@@ -7,11 +7,7 @@ import {
   type ShallowRef,
 } from "vue";
 import { WebSocketStatus } from "@hocuspocus/provider";
-import type {
-  CollabHandle,
-  CollabManager,
-  CollabToken,
-} from "../collab/CollabManager";
+import type { CollabHandle, CollabManager } from "../collab/CollabManager";
 import type { SaveState } from "../mount/types";
 
 export interface CollabStored {
@@ -39,7 +35,6 @@ export function useCollabDocument(
   name: Ref<string | null>,
   opts: {
     manager: CollabManager;
-    token: CollabToken;
     onStored?: (stored: CollabStored) => void;
     onTooLarge?: () => void;
   }
@@ -154,7 +149,7 @@ export function useCollabDocument(
       release();
       boundName = next;
       if (next) {
-        const h = opts.manager.acquire(next, { token: opts.token });
+        const h = opts.manager.acquire(next);
         handle.value = h;
         bind(h);
       }
@@ -164,8 +159,9 @@ export function useCollabDocument(
     { immediate: true, flush: "post" }
   );
 
+  // With local persistence, unsent edits survive the tab and the sync worker sends them.
   function beforeUnload(e: BeforeUnloadEvent) {
-    if (unsyncedChanges.value > 0) e.preventDefault();
+    if (unsyncedChanges.value > 0 && !handle.value?.isLocal()) e.preventDefault();
   }
   window.addEventListener("beforeunload", beforeUnload);
 
