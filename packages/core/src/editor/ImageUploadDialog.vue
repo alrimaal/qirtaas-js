@@ -10,7 +10,7 @@ import {
   confirmUpload,
 } from "@qirtaas/core/services/images";
 
-const props = defineProps<{ file: File | null }>();
+const props = defineProps<{ file: File | null; documentId?: string }>();
 
 const emit = defineEmits<{
   uploaded: [imageId: string];
@@ -40,7 +40,7 @@ watch(
 async function run(file: File) {
   errored.value = false;
   try {
-    const ticket = await requestUploadUrl(file.name, file.type);
+    const ticket = await requestUploadUrl(file.name, file.type, props.documentId);
     if (aborted) return;
     await uploadToPresignedUrl(ticket.upload_url, file);
     if (aborted) return;

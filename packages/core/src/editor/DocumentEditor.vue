@@ -908,6 +908,7 @@ function insertQuranMushaf(data: {
       />
       <ImageUploadDialog
         :file="pendingImageFile"
+        :document-id="props.documentId"
         @uploaded="onImageUploaded"
         @cancel="onImageUploadCancelled"
       />

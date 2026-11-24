@@ -8,13 +8,15 @@ export interface UploadTicket {
   upload_url: string;
 }
 
+/** With `documentId`, the image is linked to that doc on upload. */
 export async function requestUploadUrl(
   filename: string,
   contentType: string,
+  documentId?: string,
 ): Promise<UploadTicket> {
   return await getTransport().data.post<UploadTicket>(
     "/documents/images/upload/",
-    { filename, content_type: contentType },
+    { filename, content_type: contentType, document_id: documentId },
   );
 }
 
