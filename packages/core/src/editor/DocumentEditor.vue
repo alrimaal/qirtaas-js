@@ -70,6 +70,8 @@ const props = withDefaults(
     outline?: boolean;
     /** Edit a Yjs doc instead of `modelValue`. Read at mount only. */
     collab?: { ydoc: Y.Doc; provider: HocuspocusProvider };
+    /** New doc: written into it if empty, at mount only. */
+    seedContent?: Record<string, unknown>;
   }>(),
   {
     autofocus: false,
@@ -78,6 +80,7 @@ const props = withDefaults(
     images: true,
     outline: false,
     collab: undefined,
+    seedContent: undefined,
   }
 );
 
@@ -443,7 +446,8 @@ const editor = useEditor({
     },
   },
   autofocus: props.autofocus ? "end" : false,
-  onCreate: () => {
+  onCreate: ({ editor: ed }) => {
+    if (props.seedContent && ed.isEmpty) ed.commands.setContent(props.seedContent);
     emit("ready");
   },
   onUpdate: ({ editor: ed }) => {
