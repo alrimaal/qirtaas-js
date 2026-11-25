@@ -142,6 +142,11 @@ export class CollabManager {
     throw new Error("not stored");
   }
 
+  /** Opens the shared socket ahead of the first doc. */
+  connect() {
+    this.getSocket();
+  }
+
   /** Starts the sync worker: runs now and on reconnect. */
   startSync() {
     if (this.syncStarted) return;
