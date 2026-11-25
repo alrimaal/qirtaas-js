@@ -181,6 +181,13 @@ export default {
       "Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?",
     tapToResave: "Appuyez pour enregistrer à nouveau",
     tapToRetry: "Appuyez pour réessayer",
+    offline: {
+      title: "Vous êtes hors ligne",
+      local:
+        "Vos modifications sont enregistrées sur cet appareil et seront synchronisées à votre retour en ligne.",
+      unsaved:
+        "Vos modifications seront synchronisées à votre retour en ligne.",
+    },
   },
   referenceStyle: {
     label: "Style",

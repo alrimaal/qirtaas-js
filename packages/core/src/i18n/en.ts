@@ -178,6 +178,13 @@ export default {
     unsavedWarning: "You have unsaved changes. Are you sure you want to leave?",
     tapToResave: "Tap to re-save",
     tapToRetry: "Tap to re-try",
+    offline: {
+      title: "You're offline",
+      local:
+        "Your changes are saved on this device and will sync when you're back online.",
+      unsaved:
+        "Your changes will sync when you're back online.",
+    },
   },
   referenceStyle: {
     label: "Style",

@@ -9,6 +9,7 @@ import Collaboration from "@tiptap/extension-collaboration";
 import { COLLAB_FIELD } from "../collab/content";
 import type { HocuspocusProvider } from "@hocuspocus/provider";
 import type * as Y from "yjs";
+import { UndoManager } from "yjs";
 import {
   TableOfContents,
   type TableOfContentData,
@@ -373,6 +374,10 @@ const editor = useEditor({
             document: collab.ydoc,
             field: COLLAB_FIELD,
             provider: collab.provider,
+            // Track undo/redo by class: the instance drops out of its own
+            // trackedOrigins when BubbleMenus reconfigure plugins at mount,
+            // leaving redo always empty.
+            yUndoOptions: { trackedOrigins: [UndoManager] },
             // Content lands after create, so autofocus "end" would miss it.
             onFirstRender: () => {
               if (props.autofocus) editor.value?.commands.focus("end");

@@ -24,11 +24,15 @@ export interface CollabDocument {
   /** Updates not yet acked by the server. */
   unsyncedChanges: Ref<number>;
   state: Ref<SaveState>;
+  /** Browser offline after loading. */
+  offline: Ref<boolean>;
   /** Resolves once `name`'s content is loaded, or `name` changes. */
   whenSynced(): Promise<void>;
 }
 
 const SAVED_IDLE_MS = 2000;
+// Edits are acked per keystroke; only report once typing pauses or a send lags.
+const SETTLE_MS = 1000;
 
 /** Binds a component to `manager` for the doc `name` (null = none). */
 export function useCollabDocument(
@@ -45,29 +49,49 @@ export function useCollabDocument(
   const unsyncedChanges = ref(0);
   const state = ref<SaveState>("idle");
   const tooLarge = ref(false);
-  let idleTimer: ReturnType<typeof setTimeout> | null = null;
+  const offline = ref(false);
+  let stateTimer: ReturnType<typeof setTimeout> | null = null;
+  // Edits made since the last "saved".
+  let pending = false;
   let unbind: (() => void) | null = null;
   let everSynced = false;
   let boundName: string | null = null;
   let syncWaiters: { name: string; resolve: () => void }[] = [];
 
-  function clearIdle() {
-    if (idleTimer) clearTimeout(idleTimer);
-    idleTimer = null;
+  function setState(next: SaveState) {
+    if (stateTimer) clearTimeout(stateTimer);
+    stateTimer = null;
+    state.value = next;
   }
 
   function updateState() {
-    clearIdle();
     // Initial load isn't a save.
-    if (!everSynced) state.value = "idle";
-    else if (tooLarge.value) state.value = "error";
-    else if (unsyncedChanges.value > 0) {
-      state.value =
-        status.value === WebSocketStatus.Connected ? "saving" : "error";
-    } else if (state.value === "saving" || state.value === "error") {
-      state.value = "saved";
-      idleTimer = setTimeout(() => (state.value = "idle"), SAVED_IDLE_MS);
+    if (!everSynced) return setState("idle");
+    if (tooLarge.value) {
+      pending = true;
+      return setState("error");
     }
+    if (unsyncedChanges.value > 0) {
+      pending = true;
+      if (status.value !== WebSocketStatus.Connected) {
+        // Local edits are safe offline; `offline` covers the UI.
+        return setState(handle.value?.isLocal() ? "idle" : "error");
+      }
+      setState(state.value === "saving" ? "saving" : "idle");
+      stateTimer = setTimeout(() => setState("saving"), SETTLE_MS);
+    } else if (pending) {
+      setState(state.value);
+      stateTimer = setTimeout(() => {
+        pending = false;
+        setState("saved");
+        stateTimer = setTimeout(() => setState("idle"), SAVED_IDLE_MS);
+      }, SETTLE_MS);
+    }
+  }
+
+  // The browser's view, not the socket's: that only notices after ~30s.
+  function updateOffline() {
+    offline.value = everSynced && !navigator.onLine;
   }
 
   function settleSync() {
@@ -89,6 +113,7 @@ export function useCollabDocument(
       synced.value = true;
       everSynced = true;
       updateState();
+      updateOffline();
       settleSync();
     };
     const onStatus = ({ status: s }: { status: WebSocketStatus }) => {
@@ -139,8 +164,9 @@ export function useCollabDocument(
     unsyncedChanges.value = 0;
     tooLarge.value = false;
     everSynced = false;
-    clearIdle();
-    state.value = "idle";
+    pending = false;
+    setState("idle");
+    updateOffline();
   }
 
   watch(
@@ -164,9 +190,13 @@ export function useCollabDocument(
     if (unsyncedChanges.value > 0 && !handle.value?.isLocal()) e.preventDefault();
   }
   window.addEventListener("beforeunload", beforeUnload);
+  window.addEventListener("online", updateOffline);
+  window.addEventListener("offline", updateOffline);
 
   onBeforeUnmount(() => {
     window.removeEventListener("beforeunload", beforeUnload);
+    window.removeEventListener("online", updateOffline);
+    window.removeEventListener("offline", updateOffline);
     release();
     boundName = null;
     settleSync();
@@ -178,6 +208,7 @@ export function useCollabDocument(
     status,
     unsyncedChanges,
     state,
+    offline,
     whenSynced() {
       const n = name.value;
       if (!n || (n === boundName && synced.value)) return Promise.resolve();
