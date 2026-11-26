@@ -52,8 +52,7 @@ interface Entry {
 
 const RETRY_MIN_MS = 1000;
 const RETRY_MAX_MS = 30000;
-const SYNC_RETRY_MIN_MS = 5000;
-const SYNC_RETRY_MAX_MS = 5 * 60 * 1000;
+const SYNC_INTERVAL_MS = 10000;
 const STORE_TIMEOUT_MS = 30000;
 const STORED_POLL_MS = 1000;
 
@@ -113,9 +112,8 @@ export class CollabManager {
   private socket: HocuspocusProviderWebsocket | null = null;
   private entries = new Map<string, Entry>();
   private userId: Promise<string> | null = null;
-  private syncStarted = false;
+  private syncTimer: ReturnType<typeof setInterval> | null = null;
   private syncing = false;
-  private syncRetryDelay = SYNC_RETRY_MIN_MS;
 
   constructor(
     private readonly url: string,
@@ -151,7 +149,10 @@ export class CollabManager {
     const state = Y.encodeStateAsUpdate(entry.ydoc);
     for (let i = 0; i < STORE_TIMEOUT_MS / STORED_POLL_MS; i++) {
       const snapshot = await this.api.snapshot(name);
-      if (!snapshot || Y.snapshotContainsUpdate(Y.decodeSnapshot(snapshot), state)) {
+      if (
+        !snapshot ||
+        Y.snapshotContainsUpdate(Y.decodeSnapshot(snapshot), state)
+      ) {
         return;
       }
       await new Promise((r) => setTimeout(r, STORED_POLL_MS));
@@ -164,11 +165,11 @@ export class CollabManager {
     this.getSocket();
   }
 
-  /** Starts the sync worker: runs now and on reconnect. */
+  /** Starts the sync worker: a pass every SYNC_INTERVAL_MS. */
   startSync() {
-    if (this.syncStarted) return;
-    this.syncStarted = true;
-    this.nudge();
+    this.syncTimer ??= setInterval(() => {
+      if (!this.syncing) void this.sync();
+    }, SYNC_INTERVAL_MS);
   }
 
   private loadUserId() {
@@ -182,10 +183,7 @@ export class CollabManager {
   private getSocket(): HocuspocusProviderWebsocket {
     if (!this.socket) {
       this.socket = new HocuspocusProviderWebsocket({ url: this.url });
-      this.socket.on("connect", () => {
-        this.events.socketConnected?.();
-        this.nudge();
-      });
+      this.socket.on("connect", () => this.events.socketConnected?.());
       this.socket.on("close", () => this.events.socketClosed?.());
       // Skip the reconnect backoff; no-op if already connected.
       window.addEventListener("online", () => void this.socket?.connect());
@@ -264,11 +262,6 @@ export class CollabManager {
     });
   }
 
-  /** Runs the sync worker unless it's already running. */
-  private nudge() {
-    if (this.syncStarted && !this.syncing) void this.sync();
-  }
-
   private async sync() {
     this.syncing = true;
     let error: unknown = null;
@@ -279,16 +272,8 @@ export class CollabManager {
       error = e;
     }
     this.syncing = false;
-    if (!error) {
-      this.syncRetryDelay = SYNC_RETRY_MIN_MS;
-      this.events.syncSucceeded?.();
-      return;
-    }
-    // Offline: the reconnect on "online" nudges us again.
-    if (!navigator.onLine) return;
-    this.events.syncFailed?.(error);
-    setTimeout(() => this.nudge(), this.syncRetryDelay);
-    this.syncRetryDelay = Math.min(this.syncRetryDelay * 2, SYNC_RETRY_MAX_MS);
+    if (!error) this.events.syncSucceeded?.();
+    else if (navigator.onLine) this.events.syncFailed?.(error);
   }
 
   private async localDbNames() {
@@ -298,14 +283,22 @@ export class CollabManager {
       .filter((n): n is string => !!n?.startsWith(prefix));
   }
 
-  async hasLocalDocuments(): Promise<boolean> {
-    return (await this.localDbNames()).length > 0;
+  /** Local copies, minus ones open here whose edits the server has acknowledged. */
+  async hasUnsyncedDocuments(): Promise<boolean> {
+    const userId = await this.loadUserId();
+    const clean = new Set(
+      [...this.entries]
+        .filter(([, e]) => e.provider.isSynced && !e.provider.hasUnsyncedChanges)
+        .map(([name]) => localDbName(userId, name))
+    );
+    return (await this.localDbNames()).some((dbName) => !clean.has(dbName));
   }
 
   /** On logout: stops syncing, closes the socket and deletes local copies once closed. */
   async reset() {
     const dbNames = await this.localDbNames();
-    this.syncStarted = false;
+    if (this.syncTimer) clearInterval(this.syncTimer);
+    this.syncTimer = null;
     this.userId = null;
     this.socket?.destroy();
     this.socket = null;
