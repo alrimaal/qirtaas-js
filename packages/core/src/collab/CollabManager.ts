@@ -291,12 +291,35 @@ export class CollabManager {
     this.syncRetryDelay = Math.min(this.syncRetryDelay * 2, SYNC_RETRY_MAX_MS);
   }
 
+  private async localDbNames() {
+    const prefix = localDbName(await this.loadUserId(), "");
+    return (await indexedDB.databases())
+      .map((db) => db.name)
+      .filter((n): n is string => !!n?.startsWith(prefix));
+  }
+
+  async hasLocalDocuments(): Promise<boolean> {
+    return (await this.localDbNames()).length > 0;
+  }
+
+  /** On logout: stops syncing, closes the socket and deletes local copies once closed. */
+  async reset() {
+    const dbNames = await this.localDbNames();
+    this.syncStarted = false;
+    this.userId = null;
+    this.socket?.destroy();
+    this.socket = null;
+    for (const dbName of dbNames) {
+      void lock(idbLock(dbName), "exclusive").then((unlock) =>
+        clearDocument(dbName).finally(() => unlock?.())
+      );
+    }
+  }
+
   /** Syncs every closed doc with a local copy. Returns the last error if any copy was kept. */
   private async syncPass(): Promise<unknown> {
     const prefix = localDbName(await this.loadUserId(), "");
-    const dbNames = (await indexedDB.databases())
-      .map((db) => db.name)
-      .filter((n): n is string => !!n?.startsWith(prefix));
+    const dbNames = await this.localDbNames();
     let error: unknown = null;
     for (const dbName of dbNames) {
       const name = dbName.slice(prefix.length);
