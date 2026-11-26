@@ -14,6 +14,19 @@ export interface CollabApi {
   snapshot(name: string): Promise<Uint8Array | null>;
 }
 
+/** Hooks for monitoring; thresholds and reporting are the host's call. */
+export interface CollabEvents {
+  /** The doc opened online-only. */
+  localPersistenceFailed?(name: string, error: unknown): void;
+  /** A sync worker pass stored every local copy. */
+  syncSucceeded?(): void;
+  /** A sync worker pass kept a local copy while online. */
+  syncFailed?(error: unknown): void;
+  socketConnected?(): void;
+  /** A connect attempt failed or the connection dropped. */
+  socketClosed?(): void;
+}
+
 export interface CollabHandle {
   ydoc: Y.Doc;
   provider: HocuspocusProvider;
@@ -104,7 +117,11 @@ export class CollabManager {
   private syncing = false;
   private syncRetryDelay = SYNC_RETRY_MIN_MS;
 
-  constructor(private readonly url: string, private readonly api: CollabApi) {}
+  constructor(
+    private readonly url: string,
+    private readonly api: CollabApi,
+    private readonly events: CollabEvents = {}
+  ) {}
 
   acquire(name: string): CollabHandle {
     let entry = this.entries.get(name);
@@ -165,7 +182,11 @@ export class CollabManager {
   private getSocket(): HocuspocusProviderWebsocket {
     if (!this.socket) {
       this.socket = new HocuspocusProviderWebsocket({ url: this.url });
-      this.socket.on("connect", () => this.nudge());
+      this.socket.on("connect", () => {
+        this.events.socketConnected?.();
+        this.nudge();
+      });
+      this.socket.on("close", () => this.events.socketClosed?.());
       // Skip the reconnect backoff; no-op if already connected.
       window.addEventListener("online", () => void this.socket?.connect());
     }
@@ -225,6 +246,7 @@ export class CollabManager {
       await entry.persistence.whenSynced;
     } catch (e) {
       console.error(`[collab] local persistence unavailable for ${name}`, e);
+      this.events.localPersistenceFailed?.(name, e);
       await entry.persistence?.destroy().catch(() => {});
       entry.persistence = null;
     }
@@ -249,41 +271,43 @@ export class CollabManager {
 
   private async sync() {
     this.syncing = true;
-    let ok = false;
+    let error: unknown = null;
     try {
-      ok = await this.syncPass();
+      error = await this.syncPass();
     } catch (e) {
       console.error("[collab] sync worker failed", e);
+      error = e;
     }
     this.syncing = false;
-    if (ok) {
+    if (!error) {
       this.syncRetryDelay = SYNC_RETRY_MIN_MS;
-    } else {
-      setTimeout(() => this.nudge(), this.syncRetryDelay);
-      this.syncRetryDelay = Math.min(
-        this.syncRetryDelay * 2,
-        SYNC_RETRY_MAX_MS
-      );
+      this.events.syncSucceeded?.();
+      return;
     }
+    // Offline: the reconnect on "online" nudges us again.
+    if (!navigator.onLine) return;
+    this.events.syncFailed?.(error);
+    setTimeout(() => this.nudge(), this.syncRetryDelay);
+    this.syncRetryDelay = Math.min(this.syncRetryDelay * 2, SYNC_RETRY_MAX_MS);
   }
 
-  /** Syncs every closed doc with a local copy. False if any copy was kept. */
-  private async syncPass(): Promise<boolean> {
+  /** Syncs every closed doc with a local copy. Returns the last error if any copy was kept. */
+  private async syncPass(): Promise<unknown> {
     const prefix = localDbName(await this.loadUserId(), "");
     const dbNames = (await indexedDB.databases())
       .map((db) => db.name)
       .filter((n): n is string => !!n?.startsWith(prefix));
-    let ok = true;
+    let error: unknown = null;
     for (const dbName of dbNames) {
       const name = dbName.slice(prefix.length);
       try {
         await this.syncDoc(name, dbName);
       } catch (e) {
         console.warn(`[collab] keeping local copy of ${name}`, e);
-        ok = false;
+        error = e;
       }
     }
-    return ok;
+    return error;
   }
 
   /** Deletes the local copy once the server has stored it. Throws if kept. */
